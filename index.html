@@ -91,7 +91,7 @@ button{font-family:var(--f-ui)}
 .panel{background:var(--paper);color:var(--ink);border-radius:1px;box-shadow:0 3px 0 var(--shadow);padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .label,.stat dt{font:800 10.5px var(--f-ui);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap}
 .label{display:flex;align-items:center;gap:6px}
-.label::before{content:"";flex:none;width:9px;height:9px;box-sizing:border-box;border:1.5px solid var(--ink-2);border-radius:50%;
+.label::before,.sheet section.st > h3::before{content:"";flex:none;width:9px;height:9px;box-sizing:border-box;border:1.5px solid var(--ink-2);border-radius:50%;
   background:linear-gradient(var(--ink-2),var(--ink-2)) center/1px 100% no-repeat, linear-gradient(var(--ink-2),var(--ink-2)) center/100% 1px no-repeat}
 .label span{margin-left:auto;font:700 11px var(--f-num);letter-spacing:0}
 canvas{display:block}
@@ -319,6 +319,7 @@ table.rec td.n{font:700 13px var(--f-num);font-variant-numeric:tabular-nums}
 table.rec td.r{font:700 12px var(--f-num);color:var(--ink-2);width:2.5ch}
 table.rec tr.top td.n{text-shadow:1.5px 1.5px 0 var(--pink)}
 table.rec td.dim{color:var(--ink-2);font-size:12.5px}
+@media (max-width:420px){ table.rec.run th:nth-child(n+5),table.rec.run td:nth-child(n+5){display:none} table.rec.run th:nth-child(4),table.rec.run td:nth-child(4){padding-right:2px} }   /* phones: # · Result · ★ · Score fit the pane; Best clear and Date wait for a wider screen */
 .empty{padding:22px 0 10px;color:var(--ink-2);font-size:14px;line-height:1.45}
 
 /* ---- run mode: goal row (goal strip + boss tag) ---- */
@@ -483,8 +484,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   box-shadow:0 0 0 1px var(--paper-edge);-webkit-mask:conic-gradient(from -45deg at bottom, #0000, #000 1deg 90deg, #0000 91deg) 50% / 10px 100%;mask:conic-gradient(from -45deg at bottom, #0000, #000 1deg 90deg, #0000 91deg) 50% / 10px 100%}
 .receipt div{display:flex;align-items:baseline}
 .receipt div i{flex:1;border-bottom:1px dotted var(--ink-2);margin:0 4px 3px}
+.receipt div > span{flex:none;white-space:nowrap}   /* a label and its value never break inside: the leader takes the slack */
+.overlay .sub.receipt{max-width:min(14rem,100%)}   /* beats .sub's 30ch cap (198px), which squeezed the Overs line into four fragments */
 .receipt div.tot{font-weight:800;border-top:1px dashed var(--ink-2);margin-top:3px;padding-top:2px}
 .receipt div.overs{color:var(--ink-2);border-bottom:1px dashed var(--paper-edge);margin-bottom:3px;padding-bottom:2px}   /* Overs: points, outside the till total */
+.receipt div.jam{color:var(--red-t)}   /* a jam forfeits the unused pieces: no Overs, no leftover pay */
 
 /* ---- charms: die-cut tickets ---- */
 .charms-panel{display:none}
@@ -570,6 +574,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .card.foil .k{background:linear-gradient(90deg, var(--pink) 0 33.3%, var(--sun) 0 66.6%, var(--aqua) 0);color:var(--ink);overflow:hidden;padding-left:26px}   /* clears the seal */
 .card.foil .k .dots i{background:var(--ink)}
 .card.foil > b,.foil > b,.charm-strip span.foil{text-shadow:1.5px 1.5px 0 var(--pink), -1.5px -1px 0 var(--aqua)}
+.charm-strip span.foil{text-shadow:1px 1px 0 color-mix(in srgb, var(--pink) 75%, transparent)}   /* 12px phone tickets: one thin plate (two plates doubled the word at DPR 3); the 4px edge stays the foil cue */
 .card.foil::before{content:"FOIL";position:absolute;top:-8px;left:-8px;z-index:2;width:30px;height:30px;box-sizing:border-box;border-radius:50%;border:2px solid var(--ink);
   background:var(--sun);color:var(--ink);font:800 8.5px/26px var(--f-ui);letter-spacing:.08em;text-align:center;transform:rotate(-12deg)}
 .card.foil .k::after{content:"";position:absolute;top:0;bottom:0;left:0;width:30%;background:color-mix(in srgb, var(--paper) 60%, transparent);opacity:0;pointer-events:none;transform:skewX(-20deg) translateX(-140%)}
@@ -618,6 +623,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .shop-actions{position:sticky;bottom:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0 16px;margin-top:-4px;background:var(--paper);border-top:1px dashed var(--ink-2)}
 .shop-actions .r{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .shop .btn{font-size:14px}
+@media (max-width:700px){   /* two rows: [Abandon][Reroll $3], then a full-width Next round */
+  .shop-actions{padding:8px 0 10px}
+  .shop-actions .r{display:contents}
+  .shop-actions .btn{flex:1 1 100%}
+}
 
 @media (pointer:coarse){
   .pad{display:grid}
@@ -692,6 +702,255 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .next-mini{display:none}
 .stat .short{display:none}
 @media (max-width:700px){ .stat .short{display:inline} .stat .long{display:none} .next-mini{display:flex} }
+/* ==================== STARS (stars-tracker-design.md 1.6) ==================== */
+/* goal bar, non-boss Run rounds: 0 -> STAR_X[2] x target. Pink/green fill to the target, sunflower past it, notches + glyphs at 1x, 1.5x, 2.25x.
+   --s1 / --s2 (the 1-star and 2-star points, % of the bar) are set on #goal from STAR_X at boot */
+.goal .gfill2,.goal .gstars{display:none}
+.is-run:not(.is-boss) .goal .gfill{width:var(--s1,50%)}
+.is-run:not(.is-boss) .goal .gfill2{display:block;position:absolute;left:var(--s1,50%);top:0;bottom:0;right:0;background:var(--sun);
+  transform-origin:left center;transform:scaleX(0);transition:transform .25s ease-out}
+.is-run:not(.is-boss) .goal .gnotch{display:block;position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink)}
+.is-run:not(.is-boss) .goal .gstars{display:block;position:absolute;inset:0;z-index:3;pointer-events:none}
+.gstars i{position:absolute;top:50%;left:var(--s1,50%);width:12px;height:12px;margin:-6px 0 0 -6px}
+.gstars i:nth-child(2){left:var(--s2,75%)} .gstars i:nth-child(3){left:auto;right:1px;margin-left:0}
+.gstars svg{width:100%;height:100%;display:block;fill:var(--paper);stroke:var(--ink);stroke-width:1.3;stroke-linejoin:miter}
+.gstars i.on svg{fill:var(--sun)}
+.gstars i.new{animation:stamp .16s var(--e-stamp) both}
+.is-run:not(.is-boss) .goal .ghp{display:none}
+.is-run:not(.is-boss) .goal .gname{display:block}   /* "5,120 / 6,300" sits at the left, clear of the star glyphs */
+@container (max-width:250px){ .is-run:not(.is-boss) .goal .gname{display:none} }   /* phones: the stats slip shows the numbers */
+/* the star stamps on the tally (onStar) */
+.t-stars{display:flex;flex-direction:column;align-items:center;gap:3px}
+.ts-g{display:flex;gap:5px}
+.ts-g i{display:block;width:22px;height:22px}
+.ts-g svg{width:100%;height:100%;display:block;overflow:visible;fill:var(--paper);stroke:var(--ink);stroke-width:1.4;stroke-linejoin:miter}
+.ts-g .pl{fill:none;stroke:var(--pink)}
+.ts-g i:not(.on) .pl{display:none}
+.ts-g i.on svg{fill:var(--sun)}
+.ts-g i.on .pl{fill:none}
+.ts-g i.new{animation:stamp .16s var(--e-stamp) .8s both}
+.ts-g i.wait{visibility:hidden}
+.t-stars small{padding:0 5px;font:800 10.5px/1.8 var(--f-num);letter-spacing:.06em;color:var(--ink);text-wrap:balance;
+  background:linear-gradient(transparent 15%, var(--sun) 15% 85%, transparent 85%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+@media (max-width:700px){ .ts-g i{width:18px;height:18px} .t-stars small{font-size:9.5px;letter-spacing:0} }   /* one line in a 200px well */
+/* the receipt's star row (cleared screen); a boss round shows BOSS DOWN instead */
+.overlay .ostars{display:flex;gap:8px;justify-content:center;align-items:center;margin:-2px 0}
+.ostars i{display:block;width:26px;height:26px}
+.ostars svg{width:100%;height:100%;display:block;fill:var(--paper);stroke:var(--ink);stroke-width:1.2;stroke-linejoin:miter}
+.ostars i.on svg{fill:var(--sun)}
+.ostars i.new{animation:stamp .16s var(--e-stamp) both}
+.ostars .ostamp{font-size:17px;padding:2px 8px 1px}
+@media (max-height:700px){ .overlay .ostars{display:none !important} }   /* the receipt line still names the stars */
+.bank-btn.new{animation:stamp .16s var(--e-stamp) both}
+/* ==================== STATS TAB (stars-tracker-design.md 2.6) ==================== */
+.priv{margin:10px 0 0;font:600 12.5px/1.4 var(--f-ui);color:var(--ink)}
+.priv::before{content:"";display:inline-block;width:8px;height:8px;margin-right:6px;background:var(--green);border:1px solid var(--ink)}
+.sheet section.st{gap:6px;padding:10px 0 12px}
+.st-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.st-tile{background:var(--paper-2);padding:6px 8px;min-width:0}
+.st-tile b{display:block;font:800 18px var(--f-num);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-tile span{font:800 9.5px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.bars{display:grid;grid-template-columns:minmax(4.5rem,8rem) minmax(0,1fr) auto;gap:4px 8px;align-items:center;font:500 12px var(--f-ui)}
+.bars > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bars .bt{position:relative;height:10px;background:var(--paper-2)}
+.bars .bt i{position:absolute;inset:0 auto 0 0;width:calc(var(--w) * 100%);background:var(--c, var(--ink))}
+.bars .bt i::after{content:"";position:absolute;inset:0;opacity:.18;background:radial-gradient(var(--ink) 22%, transparent 24%) 0 0/4px 4px}
+.bars .bv{font:700 11px var(--f-num);font-variant-numeric:tabular-nums;text-align:right;min-width:3ch;white-space:nowrap}
+.bars .bv small{font:500 10.5px var(--f-ui);color:var(--ink-2);margin-left:4px}
+.stackbar{display:flex;height:14px;border:1.5px solid var(--ink)} .stackbar i{flex:var(--w) 0 0;background:var(--c);min-width:0}
+.st-chart svg{display:block;width:100%;height:96px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--paper-edge)}
+.st-axis{display:flex;justify-content:space-between;font:500 10.5px var(--f-num);color:var(--ink-2)}
+.st-cap{margin:0;font:500 11px/1.45 var(--f-num);color:var(--ink-2)}
+.st-cap b{color:var(--ink);font-weight:700}
+.st-hist{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;align-items:end;height:64px}
+.st-hist i{display:block;background:var(--ink);min-height:1px;position:relative}
+.st-hist i.q{background:var(--teal)}   /* quick pieces feed the fuse: tier-1 ink, not points blue */
+.st-hl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:3px;font:500 9.5px var(--f-num);color:var(--ink-2);text-align:center}
+.st-hl span{white-space:nowrap;overflow:hidden}
+.st-hl span.q{color:var(--ink);font-weight:700;border-left:2px solid var(--ink)}
+.st-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font:500 12px/1.35 var(--f-ui)}
+.st-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;align-items:baseline;padding:2px 0 3px;border-bottom:1px dotted var(--paper-edge)}
+.st-list li > span{min-width:0}
+.st-list li b{font:700 13px var(--f-num);font-variant-numeric:tabular-nums;text-align:right}
+.st-list li small{grid-column:1/-1;text-align:left;font-size:11px;color:var(--ink-2)}
+/* facts as till-receipt lines (the round-cleared receipt's idiom): label, dotted leader, value */
+.sheet section.st > h3{display:flex;align-items:center;gap:6px}
+.st-rc{font:500 11.5px/1.6 var(--f-num);color:var(--ink)}
+.st-rc div{display:flex;align-items:baseline}
+.st-rc div > span{min-width:0}
+.st-rc i{flex:1;min-width:12px;border-bottom:1px dotted var(--ink-2);margin:0 4px 3px}
+.st-rc b{flex:none;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-rc b.m{padding:0 3px;background:linear-gradient(transparent 15%, var(--sun) 15% 85%, transparent 85%)}   /* money: the sunflower highlighter */
+.st-tile:first-child b{text-shadow:1.5px 1.5px 0 var(--pink)}
+.st-btns{display:flex;flex-wrap:wrap;gap:8px}
+.st-btns .small{align-self:auto}
+#st-text{width:100%;box-sizing:border-box;font:500 11px var(--f-num);background:var(--paper-2);border:1.5px solid var(--ink);border-radius:0;color:var(--ink);resize:vertical}
+@media (max-width:420px){
+  .st-tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .bars{grid-template-columns:6.6rem minmax(0,1fr) auto}
+  .tabs button{padding:8px 10px 7px;font-size:12px}
+  .tabs button[aria-selected="true"]{padding-bottom:8px}
+}
+@media (pointer:coarse){   /* sheet controls reach the 40px-ish floor the pad and HUD keys meet */
+  .sheet .small{min-height:36px;padding-inline:12px}
+  .sheet .seg button{min-height:34px}
+  .tabs button{min-height:38px}
+  #sheet-close{width:40px;height:40px}
+}
+/* ==================== MOBILE LAYOUT v7 (studio/mobile/mobile-layout.md), re-applied on v8 ====================
+   Phones: the page is one full-height column that never scrolls:
+     HUD row (hold | stats | next [| pause]) · meter row (ink meter [+ goal strip in Run]) · WELL · strip row (Run) · pad.
+   .center is a size container, so the well is simply the largest 1:2 box that fits whatever is left;
+   no per-state calc(100dvh - Npx). Touch controls: .gestures on #app hides the pad (Settings > Touch controls).
+   Strip row (Run, phones): a fixed 30px row that hosts the Bank button (#bank-m, stars-tracker-design 1.6.2) at the left of
+   the charm strip. The row is 30px tall whether or not Bank shows, so 1★ never resizes the well. Desktop, tablet and phone
+   landscape put #bank in the goal row instead (26px tall with -4px margins: the 18px row keeps its height). */
+.hud-pause{display:none;flex:none;align-items:center;justify-content:center;border:0;border-radius:2px;padding:0;cursor:pointer;
+  background:var(--paper);color:var(--ink);box-shadow:0 2px 0 var(--shadow);touch-action:manipulation}
+.hud-pause svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:square}
+.hud-pause:active{transform:translateY(2px);box-shadow:0 0 0 var(--shadow)}
+.hud-pause:focus-visible{outline-color:var(--paper)}
+.sheet .touch-sec{display:none}
+#touch-seg{margin-top:0}
+.strip-row{display:none;grid-column:1/-1;width:100%;max-width:26rem;justify-self:center;box-sizing:border-box;align-items:center;gap:6px}
+.strip-row .charm-strip{display:flex;flex:1 1 auto;min-width:0;width:auto;max-width:none}
+/* Bank +$N (money action, so sunflower; flat and square). Markup only: the stars engineer wires it (canBank, bankPress) */
+.bank-btn{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:26px;margin:-4px 0;padding:0 9px;
+  background:var(--sun);color:var(--ink);border:2px solid var(--ink);border-radius:2px;box-shadow:2px 2px 0 var(--ink);box-sizing:border-box;
+  font:800 11.5px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;cursor:pointer;touch-action:manipulation;position:relative}
+.bank-btn kbd{font:700 10px var(--f-num);padding:0 3px;border:1.5px solid var(--ink);border-bottom-width:2.5px;background:var(--paper)}
+.bank-btn.armed{background:var(--ink);color:var(--sun)}
+.bank-btn.queued{opacity:.6}
+.bank-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+.bank-btn:focus-visible{outline-color:var(--paper)}
+#bank-m{height:30px;margin:0;width:104px;min-width:0}   /* fixed: "Bank +$N" and the armed "Tap again" share one box, so the charm tickets never jump mid double-tap */
+#bank{min-width:110px}   /* desktop: "Bank +$N [B]" and "B again" share one width, so the goal bar's star notches hold still */
+#bank-m::after{content:"";position:absolute;inset:-7px -5px}   /* 40px touch target (inset is from the padding edge, inside the 2px border): the slop stays inside the 6px gaps above and below the row */
+/* narrow wells (the 360x600 viewer in Run is ~200px wide): the over-screen stamp and the near-miss line stay on one line each,
+   and the Overs receipt line may wrap instead of pushing the receipt wider than the sheet */
+@container (max-width:240px){
+  .overlay .ostamp{font-size:17px;letter-spacing:.03em;padding:3px 8px 2px}
+  .overlay .near{font-size:17px;padding:0 6px}
+  .overlay .sub.receipt{max-width:100%}   /* .sub's 30ch cap beat the receipt's own max-width:100% and ran it 10px past the sheet */
+  .receipt div.overs{flex-wrap:wrap}
+  .receipt div.overs i{min-width:12px}
+  /* stars pass: the 3-star receipt (stars + free reroll lines) still fits a 406px well with no internal scroll */
+  .receipt{line-height:1.4;padding:6px 8px 12px}
+  .overlay .final{font-size:11px}
+  .overlay .big.tag{font-size:26px;padding:4px 12px 4px 22px}
+  .overlay .sub.receipt{margin-block:-2px}
+}
+@media (max-width:700px){ #bank{display:none !important} }
+@media (min-width:701px){ #bank-m{display:none !important} }
+@media (pointer:coarse){ .bank-btn kbd{display:none} }
+@media (pointer:coarse){
+  .sheet .touch-sec{display:flex}
+  .gestures .pad{display:none}
+  .gestures .hud-pause{display:flex}
+  .gestures .hold-panel{cursor:pointer;touch-action:none}
+}
+@media (pointer:coarse) and (min-width:701px) and (min-height:501px){   /* tablets in gesture mode: the well gets the pad's room back */
+  .app.gestures .center{--wellh:min(46rem, calc(100dvh - 92px))}
+  .app.gestures.is-run .center{--wellh:min(46rem, calc(100dvh - 118px))}
+  .gestures .hud-pause{width:100%;height:44px}
+  /* v7 bug: with 5 charms the right column outgrew the well and pushed the pad 121px below a 1024x768 tablet.
+     The column now takes the row's height (set by the well) and the charm list scrolls inside it. */
+  .app > .right{align-self:stretch;height:0;min-height:100%}
+  .right .charms-panel{flex:0 1 auto;min-height:0}   /* shrinks only when it would overflow: same look with 3 charms */
+  .right .charm-list{max-height:none;flex:0 1 auto;min-height:0}
+}
+/* shared by phone portrait and phone landscape: the centre column */
+@media (max-width:700px), (pointer:coarse) and (orientation:landscape) and (max-height:500px){
+  .center,.is-run .center{
+    container-type:size;min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);
+    align-content:center;gap:5px 6px;
+    /* meter row 24 + gap 5 above the well; 16px of width kept for the boss outline (2+2 each side) and the tier plate.
+       Callouts (cascade words) and anything else sized from --wellh resolve these cq units against .center too. */
+    --wellh:min(calc(100cqh - 29px), calc(200cqw - 16px));
+  }
+  .heat,.goal-row{width:auto;min-width:0}
+  .heat{grid-column:1/-1;height:24px;gap:8px;padding:0 8px;container-type:inline-size}
+  .is-run .heat{grid-column:1}
+  .goal-row{grid-column:2;height:24px}
+  .heat .mult{font-size:15px;padding:0 5px}
+  @container (max-width:170px){ .heat .streak{display:none} }   /* the fuse alone when the meter shares its row */
+  .goal .gname,.goal .ghp{font-size:11px;line-height:12px}          /* numbers stay >= 11px */
+  .is-run:not(.is-boss) .goal{height:18px}
+  .is-boss .goal{height:20px}
+  .boss-tag{height:20px;line-height:20px}
+  .well-frame{grid-column:1/-1;justify-self:center}
+  .well-wrap{max-width:none}
+}
+@media (max-width:700px){
+  .app{display:flex;flex-direction:column;height:100dvh;min-height:0;gap:6px;
+    padding-block:max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-bottom, 0px))}
+  .left{flex:none;gap:6px}
+  .left .hold-panel,.left .next-mini{width:16%}
+  .left .panel{padding:4px 5px 5px;gap:2px;box-sizing:border-box}
+  #hold,#next-m{min-height:28px}
+  .stats{grid-template-columns:max-content minmax(0,auto) minmax(0,auto);justify-content:space-between;gap:2px 6px}   /* score/round column never truncates */
+  .stat{gap:0}
+  .stat dt{line-height:10px;letter-spacing:.06em;overflow:hidden;text-overflow:clip}
+  .stat dd,.stat.score dd{line-height:14px}
+  .hud-pause{width:40px}
+  .center,.is-run .center{flex:1 1 0;width:100%}
+  .is-run .strip-row{display:flex;flex:none;height:30px;align-self:center}
+  .is-run .charm-strip{display:flex}
+  .charm-strip{gap:5px}
+  .pad{flex:none;align-self:center;gap:6px}
+  .pad button{height:44px}
+}
+/* short phones (Chrome with its bar ~660, in-app viewers ~600): one row of 7 keys; pause moves to the HUD.
+   The drop key keeps its instant-retry job on the over screen (far right, under the right thumb). */
+@media (max-width:700px) and (max-height:700px){
+  .pad{grid-template-columns:repeat(7, minmax(0,1fr));gap:5px}
+  .pad button{height:46px;font-size:11px;letter-spacing:.04em}
+  .pad [data-act="pause"]{display:none}
+  .pad [data-act="hold"]{order:0} .pad [data-act="left"]{order:1} .pad [data-act="soft"]{order:2} .pad [data-act="right"]{order:3}
+  .pad [data-act="ccw"]{order:4} .pad [data-act="cw"]{order:5} .pad [data-act="hard"]{order:6}
+  .hud-pause{display:flex}
+  .left .hold-panel,.left .next-mini{width:15%}
+}
+@media (max-width:700px) and (pointer:coarse){ .gestures .left .hold-panel,.gestures .left .next-mini{width:15%} }
+/* phone landscape: hold + stats | well | next + charms | pad (2 x 4); no brand, no scroll */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:500px){
+  .app{height:100dvh;min-height:0;gap:12px;align-items:stretch;
+    grid-template-columns:8.5rem minmax(0,1fr) 8.5rem auto;grid-template-rows:minmax(0,1fr);grid-template-areas:"left well right pad";
+    padding-block:max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-bottom, 0px))}
+  .brand,.well-frame::before{display:none}   /* crop marks sit 12px outside the sheet: no room */
+  .is-boss .well-wrap{outline-width:2px;outline-offset:2px}
+  .side{min-height:0;gap:8px}
+  .panel{padding:6px 8px 8px;gap:4px}
+  #hold{aspect-ratio:2/1}
+  #next{aspect-ratio:1/1}
+  .stats{grid-template-columns:1fr 1fr;gap:4px 8px}
+  .stat.score{grid-column:1/-1}
+  .stat dt,.label{font-size:9.5px;letter-spacing:.08em}
+  .stat dd{font-size:13px}.stat.score dd{font-size:15px}
+  .stat .short{display:inline}.stat .long{display:none}
+  .next-panel{flex:none}
+  .charms-panel{flex:1 1 0;min-height:0;overflow:hidden}
+  .charm-list{max-height:none;flex:1;min-height:0}
+  .charm-list li[data-charm]{padding:4px 8px}
+  .charm-list span{display:none}
+  .is-run .strip-row{display:none}
+  #bank{height:32px;margin:-7px 0}   /* a bigger thumb target; the 24px goal row keeps its height */
+  #shop-ticket{padding-block:4px}   /* the full-screen shop: about 40px more for the charm cards */
+  .shop-actions{padding:6px 0 8px}
+  .is-run .center{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}   /* the goal strip shares its row with #bank: give it the room */
+  .pad{grid-area:pad;grid-template-columns:repeat(2, 4.6rem);grid-auto-rows:46px;align-content:center;width:auto;max-width:none;gap:8px}
+  .pad button{height:auto}
+  .gestures .hud-pause{width:100%;height:44px}
+  /* the menu, pause, poster and result sheets go full screen like Settings and the Shop: a 160px sheet can't hold them */
+  .overlay{position:fixed;inset:0;gap:6px;padding:10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px))}
+  /* ...except the pad column in Buttons mode: the pad's pause key resumes and its drop key is the instant retry */
+  .app:not(.gestures) .overlay{right:calc(max(16px, env(safe-area-inset-right, 0px)) + 9.2rem + 14px);padding-right:16px}
+  .overlay h2{font-size:30px}
+  .overlay .sub:not(.receipt){max-width:52ch}
+  .t-stars small{display:none}   /* a 160px well: the glyphs stamp; the Bank button and the stats slip carry the numbers */   /* stars pass: the run-over stat line (now with "23★ · 4 perfect") stays on one line */
+  #overlay.poster{padding-top:40px}
+  #overlay.poster .motif{display:none}
+}
+/* ==================== /MOBILE LAYOUT v7 ==================== */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.15s !important;animation-delay:0s !important;animation-iteration-count:1 !important;transition-duration:.1s !important}
   .callout.show{animation:fade 1.3s linear forwards !important}
@@ -712,6 +971,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   .card.foil .k::after,.card.foil:hover .k::after,.cards.deal .card.foil .k::after{animation:none !important;opacity:0}
   .cards.deal .card.foil::before,#ov-main.go{animation:none !important}
   .near-g i{animation:none !important}
+  .gstars i.new,.ts-g i.new,.ostars i.new,.bank-btn.new{animation:none !important}   /* stars just appear */
 }
 </style>
 </head>
@@ -740,6 +1000,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       <span class="label">Next</span>
       <canvas id="next-m" aria-label="Next piece"></canvas>
     </div>
+    <button type="button" class="hud-pause" id="hud-pause" aria-label="Pause"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
   </aside>
 
   <div class="center">
@@ -749,7 +1010,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     <span class="streak" id="h-streak">Clear lines fast</span>
   </div>
   <div class="goal-row">
-    <div class="goal" id="goal" aria-hidden="true"><div class="glag" id="g-lag"></div><div class="gfill" id="g-fill"></div><i class="gnotch" id="g-n1"></i><i class="gnotch n2" id="g-n2"></i><div class="glabels"><span class="gname" id="g-name"></span><span class="gpips" id="g-pips"><i></i><i></i><i></i></span><span class="ghp" id="g-hp"></span></div></div>
+    <div class="goal" id="goal" aria-hidden="true"><div class="glag" id="g-lag"></div><div class="gfill" id="g-fill"></div><div class="gfill2" id="g-fill2"></div><i class="gnotch" id="g-n1"></i><i class="gnotch n2" id="g-n2"></i><div class="glabels"><span class="gname" id="g-name"></span><span class="gpips" id="g-pips"><i></i><i></i><i></i></span><span class="ghp" id="g-hp"></span></div><span class="gstars" id="g-stars"><i></i><i></i><i></i></span></div>
+    <button type="button" class="bank-btn" id="bank" hidden></button>
     <span class="boss-tag" id="boss-tag"></span>
   </div>
   <div class="well-frame">
@@ -760,6 +1022,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       <div class="t-name" id="t-name"></div>
       <div class="t-row"><span class="bx t-pts" id="t-pts"></span><span class="t-op">×</span><span class="bx t-mult" id="t-mult"></span><span class="t-op" id="t-xop">×</span><span class="bx t-x" id="t-x"></span></div>
       <div class="t-total" id="t-total"><span class="pl a" id="t-tot-a"></span><span class="pl b" id="t-tot-b" aria-hidden="true"></span></div>
+      <div class="t-stars" id="t-stars" hidden><span class="ts-g" aria-hidden="true"><i></i><i></i><i></i></span><small id="t-stars-l"></small></div>
       <ul class="t-notes" id="t-notes"></ul>
     </div>
     <div class="overlay" id="overlay">
@@ -772,6 +1035,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       <div class="eyebrow" id="ov-eyebrow" hidden></div>
       <div class="sigil" id="ov-sigil" aria-hidden="true" hidden></div>
       <h2 id="ov-title">Stackfall</h2>
+      <div class="ostars" id="ov-stars" hidden><i></i><i></i><i></i></div>
       <div class="epithet" id="ov-epithet" hidden></div>
       <div class="seg" id="mode-seg" role="group" aria-label="Game mode">
         <button type="button" data-mode="marathon">Marathon</button>
@@ -830,7 +1094,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     </div>
   </aside>
 
-  <div class="charm-strip" id="charm-strip" aria-label="Your charms"></div>
+  <div class="strip-row" id="strip-row">
+    <button type="button" class="bank-btn" id="bank-m" hidden></button>
+    <div class="charm-strip" id="charm-strip" aria-label="Your charms"></div>
+  </div>
   <div class="pad" id="pad">
     <button type="button" data-act="hold" aria-label="Hold piece">Hold</button>
     <button type="button" data-act="ccw" aria-label="Rotate left"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg></button>
@@ -844,16 +1111,25 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 </main>
 
 <div class="sheet" id="sheet" hidden>
-  <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Settings and records">
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-label="Settings, records and stats">
     <div class="sheet-head">
       <div class="tabs" role="tablist">
         <button type="button" role="tab" id="tab-settings" aria-selected="true">Settings</button>
         <button type="button" role="tab" id="tab-records" aria-selected="false">Records</button>
+        <button type="button" role="tab" id="tab-stats" aria-selected="false">Stats</button>
       </div>
       <button type="button" class="x" id="sheet-close" aria-label="Close">×</button>
     </div>
 
     <div class="sheet-body" id="pane-settings">
+      <section class="touch-sec">
+        <h3>Touch controls</h3>
+        <div class="seg light" id="touch-seg" role="group" aria-label="Touch controls">
+          <button type="button" data-touch="buttons" aria-pressed="true">Buttons</button>
+          <button type="button" data-touch="gestures" aria-pressed="false">Gestures</button>
+        </div>
+        <p class="note">Gestures hide the pad so the well gets the room. On the well: drag sideways to move, drag down to soft drop, tap the left or right half to rotate that way, flick down to hard drop. Flick up, tap with two fingers or tap the Hold slip to hold. Pause sits at the top right.</p>
+      </section>
       <section>
         <h3>Handling</h3>
         <label class="range"><span class="t">Auto-repeat delay</span><output id="out-das"></output>
@@ -871,7 +1147,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         <div id="keymap"></div>
         <p class="note warn" id="key-note"></p>
         <p class="note">Fixed keys: Enter starts, M sound, N music, G ghost.</p>
-        <p class="note">Gamepad: D-pad or left stick moves, Up hard drops, A rotates right, B rotates left, X or LB holds, Start pauses.</p>
+        <p class="note">Gamepad: D-pad or left stick moves, Up hard drops, A rotates right, B rotates left, X or LB holds, Start pauses, Back banks a Run round.</p>
         <button class="small" id="keys-reset" type="button">Reset keys</button>
       </section>
       <section>
@@ -903,6 +1179,21 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       <div id="rec-list"></div>
       <button class="small danger" id="rec-clear" type="button">Clear these records</button>
     </div>
+
+    <div class="sheet-body" id="pane-stats" hidden>
+      <p class="priv">Stays on this device. Nothing is sent anywhere.</p>
+      <p class="note" id="st-since"></p>
+      <div id="st-body"></div>
+      <section class="st-data">
+        <h3>Your play data</h3>
+        <label class="check"><input type="checkbox" id="set-track"> Record play data</label>
+        <div class="st-btns"><button class="small" id="st-export" type="button">Export play data</button>
+          <button class="small" id="st-copy" type="button">Copy as text</button>
+          <button class="small danger" id="st-clear" type="button">Clear play data</button></div>
+        <p class="note" id="st-msg" aria-live="polite"></p>
+        <textarea id="st-text" readonly hidden rows="6" aria-label="Play data as JSON"></textarea>
+      </section>
+    </div>
   </div>
 </div>
 
@@ -933,6 +1224,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 
 <script>
 (() => {
+  const APP_VERSION = '7.2.0';   // bumped with each release; the play tracker stores it per session
   const COLS = 10, ROWS = 22, HIDDEN = 2;
   const LOCK = 0.5, MAX_RESETS = 15, CLEAR_T = 0.2;
   const SPRINT_LINES = 40, ULTRA_SECS = 120;
@@ -993,16 +1285,19 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const DEFAULT_KEYS = {
     left: ['ArrowLeft'], right: ['ArrowRight'], soft: ['ArrowDown'], hard: ['Space'],
     cw: ['ArrowUp', 'KeyX'], ccw: ['KeyZ', 'ControlLeft', 'ControlRight'],
-    hold: ['KeyC', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'],
+    hold: ['KeyC', 'ShiftLeft', 'ShiftRight'], pause: ['KeyP', 'Escape'], bank: ['KeyB'],
   };
   const DEFAULTS = { sound: true, music: true, ghost: true, shake: !reducedMotion, particles: true, glow: true,
-    das: 130, arr: 35, sdi: 35, sfxVol: 70, musVol: 45, mode: 'marathon', startLevel: 1, keys: DEFAULT_KEYS };
+    das: 130, arr: 35, sdi: 35, sfxVol: 70, musVol: 45, mode: 'marathon', startLevel: 1, keys: DEFAULT_KEYS,
+    touch: 'buttons', track: true };   // track: "Record play data" (stars-tracker-design 2.1)   // MOBILE LAYOUT v7: 'buttons' (pad) or 'gestures' (on the well)
   const clone = o => JSON.parse(JSON.stringify(o));
   let prefs = clone(DEFAULTS);
   try {
     const saved = JSON.parse(localStorage.getItem('stackfall-prefs') || '{}');
     prefs = Object.assign(clone(DEFAULTS), saved);
     prefs.keys = Object.assign(clone(DEFAULT_KEYS), saved.keys || {});
+    // Bank (B) is new: an existing custom binding of B to another action wins, and Bank starts with no key
+    if (saved.keys && !saved.keys.bank && Object.keys(prefs.keys).some(a => a !== 'bank' && (prefs.keys[a] || []).includes('KeyB'))) prefs.keys.bank = [];
     if (!MODES[prefs.mode]) prefs.mode = 'marathon';
   } catch (e) {}
   const savePrefs = () => { try { localStorage.setItem('stackfall-prefs', JSON.stringify(prefs)); } catch (e) {} };
@@ -1030,6 +1325,399 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (!r || !r.length) return null;
     return r[0];
   }
+
+  // ---------- play tracker (stars-tracker-design.md 2): on this device only, no personal data ----------
+  // One localStorage key (try/catch, memory fallback). Finished games, rounds, shops, quits wait in `pend` and are folded
+  // into the all-time `life` and the daily `days` rollups at batch points (read, merge, write); never while a piece is in play.
+  const PLAY_KEY = 'stackfall-playdata', PLAY_SCHEMA = 1, PLAY_CAP = 250000, PLAY_DAYS = 180;
+  const TH_EDGES = [0.35, 0.5, 0.75, 1, 1.5, 2.5, 4];           // think-time buckets (s), spawn to lock
+  const TH_LABEL = ['<.35', '<.5', '<.75', '<1', '<1.5', '<2.5', '<4', '4s+'];
+  const MIGRATE = {};                                            // fromSchema -> store => store at fromSchema + 1
+  const PLAY_LEGEND = {
+    store: 'schema, since (first day), life (all-time totals), days (daily rollups, last 180 play days), sessions (oldest first; oldest roll over past 250,000 characters)',
+    session: { id: 'random, this page load only', t: 'start, local YYYY-MM-DDTHH:MM', dur: 'visible seconds', end: 'open | pagehide | idle (30 min hidden)', app: 'app version',
+      host: 'artifact | app | web', dev: 'touch, w, h (CSS px, rounded to 10), dpr, rm (reduced motion)',
+      sets: 'settings snapshots: das, arr, sdi (ms), snd, mus, sv, mv (volumes), gh ghost, sk shake, pa particles, gl plate, kc keys customised, tc touch controls b|g', g: 'games', q: 'quits' },
+    game: { m: 'mode', sv: 'index into sets', t: 'start, seconds from session start', d: 'play seconds', open: '1 while in progress',
+      res: 'topout | time | clear | won | pieces | abandon | menu | restart | closed', sc: 'score (Run: run total)', ln: 'lines', lv: 'level (Run: ante)', sl: 'start level',
+      pc: 'pieces placed', ppm: 'pieces per minute', top: 'stack height at the end (0..20)', hold: 'holds', ts: 'T-spin clears', tsm: 'mini T-spin clears', q4: 'quads', pcl: 'perfect clears',
+      ch: 'best chain wave', sp: 'detonations [blot, rule, spot]', tier: 'peak streak tier', str: 'best streak (lines)',
+      th: 'think-time histogram, buckets <.35 <.5 <.75 <1 <1.5 <2.5 <4 4s+', ths: 'think-time sum, tenths of a second', inp: 'discrete inputs (moves, rotations, holds; no auto-repeat, no drops)',
+      src: 'inputs by source [keyboard, touch, gamepad]', near: '1 if a near-miss message showed', retry: '1 retry, 2 retry after a near miss', rt: 'seconds on the over screen before the retry',
+      won: 'Run won', a: 'Run ante reached', r: 'Run round reached (0 small, 1 big, 2 boss)', bosses: 'bosses beaten', stars: 'total stars', perf: '3-star rounds', fc: 'final charms (* = foil)', rd: 'rounds', sh: 'shops' },
+    round: { a: 'ante', r: 'round 0..2', b: 'boss id or null', ph: 'boss phase reached', tg: 'target', sc: 'played score (banked, or at the loss)', st: 'stars (boss win = 1, loss = 0)',
+      how: 'bank | max | pieces | jam | boss | lost-pieces | lost-topout | abandon | menu | closed', s: 'pieces used when 1, 2 and 3 stars landed (0 = never)',
+      pu: 'pieces used', pl: 'pieces left at the end', fo: 'pieces forfeited by a jam', ov: 'Overs points', m0: 'money at the intro', m1: 'money after the receipt',
+      pay: '[reward, stars, leftover, interest, piggy, boss bonus]', c: 'charms at the start (* = foil)', near: '1 if the run-over near miss showed' },
+    shop: { a: 'ante just cleared', r: 'round just cleared', m0: 'money on open', m1: 'money on leaving', seen: 'charm cards dealt incl. rerolls (* = foil)',
+      buy: 'charms bought', up: 'upgrades as type + new level', sell: 'charms sold', rr: 'paid rerolls', rf: 'free rerolls', tk: 'ticket prize', tkh: 's scratched | b button | l on leaving' },
+    quit: { t: 'seconds from session start', k: 'hidden | pagehide', m: 'mode', st: 'game status', a: 'Run ante', r: 'Run round', sc: 'score', pc: 'pieces', back: '1 once the page was visible again' },
+    days: '{ s: seconds, p: pieces, m: { mode: [games, best, sum] } }; sprint counts finished 40-line times (best = fastest), run uses the ante reached (9 = won)',
+  };
+  const Play = (() => {
+    const p2 = n => String(n).padStart(2, '0');
+    const dayOf = (d = new Date()) => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    const minuteOf = (d = new Date()) => dayOf(d) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+    const zeros = n => Array(n).fill(0);
+    const r1 = n => Math.round(n * 10) / 10;
+    const inc = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; };
+    const lifeNew = () => ({ sessions: 0, secs: 0, pieces: 0, games: { marathon: 0, sprint: 0, ultra: 0, zen: 0, run: 0 },
+      ends: { done: 0, menu: 0, restart: 0, abandon: 0, closed: 0 }, hid: 0, back: 0, think: {}, thinkS: {}, retries: [0, 0],
+      run: { reach: zeros(9), die: {}, dieHow: { pieces: 0, topout: 0, abandon: 0, menu: 0, closed: 0 }, dieWhy: {}, stars: [0, 0, 0, 0],
+        bank: { bank1: 0, bank2: 0, max3: 0, pieces1: 0, pieces2: 0, jam1: 0, jam2: 0 }, quick: 0, pushed: 0,
+        buys: {}, buysF: {}, foilSeen: 0, foilBuy: 0, shops: 0, rerolls: 0, rerollFree: 0, sells: 0, carry: 0, tickets: {}, quitAt: {} } });
+    const storeNew = () => ({ schema: PLAY_SCHEMA, since: dayOf(), life: lifeNew(), days: {}, sessions: [] });
+    function fillIn(o, d) {   // older or partial stores gain any missing field
+      for (const k in d) {
+        const a = o[k], b = d[k];
+        if (a == null || typeof a !== typeof b || Array.isArray(a) !== Array.isArray(b)) o[k] = b;
+        else if (b && typeof b === 'object' && !Array.isArray(b)) fillIn(a, b);
+      }
+      return o;
+    }
+    let sess = null, t0 = 0, durAcc = 0, visT = 0, hidAt = 0, cur = null, round = null, shop = null;
+    let pend = [], mem = null, dirty = false, ro = false, storeOK = true, begun = false, idleQ = 0;
+    let seq = 0;   // every pend item gets a running number; the stored session keeps the last folded one (fs), so no item is folded twice
+    const push = it => { it.n = ++seq; pend.push(it); };
+    const quitKey = q => q && q.a != null ? q.a + '.' + q.r + '.' + q.st : '';
+    const secs = () => Math.round((Date.now() - t0) / 1000);
+    const tick = () => { if (visT) { const n = performance.now(); durAcc += (n - visT) / 1000; visT = n; } if (sess) sess.dur = Math.round(durAcc); };
+
+    // ----- storage -----
+    function read() {   // the stored object (validated, migrated), the memory copy when storage is blocked, or null when read-only
+      if (ro) return null;
+      if (!storeOK) return mem || (mem = storeNew());
+      let raw = null;
+      try { raw = localStorage.getItem(PLAY_KEY); } catch (e) { storeOK = false; return mem || (mem = storeNew()); }
+      let st = null;
+      if (raw) { try { st = JSON.parse(raw); } catch (e) { st = null; } }   // corrupt: start fresh, overwrite only on the next good flush
+      if (st && typeof st === 'object' && !Array.isArray(st) && typeof st.schema === 'number') {
+        if (st.schema > PLAY_SCHEMA) { ro = true; return null; }           // a newer build wrote it: never overwrite
+        while (st && st.schema < PLAY_SCHEMA && MIGRATE[st.schema]) st = MIGRATE[st.schema](st);
+        if (!st || st.schema !== PLAY_SCHEMA || !st.life || typeof st.life !== 'object' || !Array.isArray(st.sessions) || !st.days || typeof st.days !== 'object') st = null;
+      } else st = null;
+      return st ? fillIn(st, storeNew()) : storeNew();
+    }
+    function upsert(st) {
+      if (!sess) return;
+      const c = JSON.parse(JSON.stringify(sess)), i = st.sessions.findIndex(x => x && x.id === c.id);
+      if (i >= 0) st.sessions[i] = c; else st.sessions.push(c);
+    }
+    function pruneDays(st) { const ds = Object.keys(st.days).sort(); while (ds.length > PLAY_DAYS) delete st.days[ds.shift()]; }
+    function trimOne(st) {   // rollover: oldest other session, then the oldest finished game of this one, then old days
+      const i = st.sessions.findIndex(x => !sess || !x || x.id !== sess.id);
+      if (i >= 0) { st.sessions.splice(i, 1); return true; }
+      const me = sess && st.sessions.find(x => x && x.id === sess.id);
+      if (me && Array.isArray(me.g)) {
+        const j = me.g.findIndex(g => !g.open);
+        if (j >= 0) { me.g.splice(j, 1); const k = sess.g.findIndex(g => !g.open); if (k >= 0) sess.g.splice(k, 1); return true; }
+      }
+      const ds = Object.keys(st.days).sort();
+      if (ds.length > PLAY_DAYS) { delete st.days[ds[0]]; return true; }
+      return false;
+    }
+    function live() {   // the open game's running totals, so a closed tab still leaves sensible numbers
+      if (!cur) return;
+      if (cur.m === 'run') { if (R) cur.sc = R.totalScore; if (round) { round.d = Math.round(S.time || 0); round.sc = S.roundScore; round.pu = S.pieces; } }
+      else { cur.d = r1(S.time || 0); cur.sc = S.score; cur.ln = S.lines; cur.lv = S.level; }
+    }
+    function write(sync) {
+      if (!prefs.track || !begun || (!pend.length && !dirty)) return;
+      if (!sync && S.status === 'playing' && !document.hidden) return;   // never during play: the next batch point writes it
+      tick(); live();
+      let st = read();
+      if (!st) st = mem || (mem = storeNew());                            // read-only: this session lives in memory
+      const me = st.sessions.find(x => x && sess && x.id === sess.id), done = (me && me.fs) || 0;
+      for (const it of pend) if (!(it.n <= done)) fold(st, it);   // a hot reload's old page may have folded these already
+      sess.fs = Math.max(done, seq);
+      upsert(st); pruneDays(st);
+      let s = JSON.stringify(st);
+      while (s.length > PLAY_CAP && trimOne(st)) s = JSON.stringify(st);
+      if (!ro && storeOK) {
+        try { localStorage.setItem(PLAY_KEY, s); }
+        catch (e) {                                                       // quota: roll two more, then give up on storage for this page load
+          let ok = false;
+          if (trimOne(st) && trimOne(st)) { try { localStorage.setItem(PLAY_KEY, JSON.stringify(st)); ok = true; } catch (_) {} }
+          if (!ok) storeOK = false;
+        }
+      }
+      mem = st; pend = []; dirty = false;
+    }
+    function flush(sync) {
+      if (!prefs.track || !begun || (!pend.length && !dirty)) return;
+      if (sync) { write(true); return; }
+      if (idleQ) return;
+      const go = () => { idleQ = 0; write(false); };
+      idleQ = window.requestIdleCallback ? requestIdleCallback(go, { timeout: 2000 }) : setTimeout(go, 0);
+    }
+
+    // ----- folding: a pure function of the store and one finished item -----
+    const dayRec = (st, d) => st.days[d] || (st.days[d] = { s: 0, p: 0, m: {} });
+    function fold(st, it) {
+      const L = st.life, RN = L.run;
+      if (it.k === 'session') L.sessions++;
+      else if (it.k === 'game') {
+        L.secs = r1(L.secs + it.d); L.pieces += it.pc; inc(L.games, it.m);
+        inc(L.ends, ['menu', 'restart', 'abandon', 'closed'].includes(it.res) ? it.res : 'done');
+        const th = L.think[it.m] || (L.think[it.m] = zeros(8)); (it.th || []).forEach((n, i) => { th[i] += n || 0; }); inc(L.thinkS, it.m, it.ths || 0);
+        const D = dayRec(st, it.day); D.s = r1(D.s + it.d); D.p += it.pc;
+        const v = it.m === 'sprint' ? it.time : it.m === 'run' ? it.reach : it.m === 'zen' ? 0 : it.sc;
+        if (it.m !== 'sprint' || v > 0) {
+          const mm = D.m[it.m] || (D.m[it.m] = [0, 0, 0]);
+          mm[0]++; mm[2] = r1(mm[2] + v); mm[1] = it.m === 'sprint' ? (mm[1] ? Math.min(mm[1], v) : v) : Math.max(mm[1], v);
+        }
+        if (it.m === 'run') {
+          RN.reach[Math.max(0, Math.min(8, it.reach - 1))]++;
+          if (it.reach < 9) {
+            const key = it.die || '?', how = ['pieces', 'topout', 'menu', 'closed'].includes(it.res) ? it.res : 'abandon';
+            inc(RN.die, key); inc(RN.dieHow, how); inc(RN.dieWhy[key] || (RN.dieWhy[key] = {}), how);
+          }
+        }
+      } else if (it.k === 'round') {
+        if (!it.b && ['bank', 'max', 'pieces', 'jam', 'lost-pieces', 'lost-topout'].includes(it.how)) {
+          RN.stars[Math.min(3, it.st)]++;
+          if (it.st >= 1) {
+            inc(RN.bank, it.how + it.st);
+            if (it.s0) { if (it.how === 'bank' && it.pu - it.s0 <= 2) RN.quick++; if (it.pu - it.s0 >= 3) RN.pushed++; }
+          }
+        }
+      } else if (it.k === 'shop') {
+        RN.shops++; RN.rerolls += it.rr; RN.rerollFree += it.rf; RN.sells += it.sell; RN.carry += it.m1; RN.foilSeen += it.foilSeen;
+        for (const id of it.buy) { const b = id.replace('*', ''); inc(RN.buys, b); if (id !== b) { RN.foilBuy++; inc(RN.buysF, b); } }
+        if (it.tk) inc(RN.tickets, it.tk);
+      } else if (it.k === 'quit') { L.hid++; if (it.key) inc(RN.quitAt, it.key); }
+      else if (it.k === 'unquit') { L.hid = Math.max(0, L.hid - 1); if (it.key && RN.quitAt[it.key] > 0 && !--RN.quitAt[it.key]) delete RN.quitAt[it.key]; }   // a hot reload's unload was not a quit
+      else if (it.k === 'back') L.back++;
+      else if (it.k === 'retry') { L.retries[0]++; if (it.near) L.retries[1]++; }
+      else if (it.k === 'close') closeOpen(st, it.sid);
+    }
+    function closeOpen(st, sid) {   // games left open by a page that closed mid-game: finished once, as 'closed'
+      for (const se of st.sessions) {
+        if (!se || se.id === sid || !Array.isArray(se.g)) continue;
+        if (se.end === 'open') se.end = 'pagehide';
+        for (const g of se.g) {
+          if (!g || !g.open) continue;
+          delete g.open; g.res = 'closed';
+          let rd = null;
+          if (Array.isArray(g.rd)) for (const r of g.rd) if (r && !r.how) { r.how = 'closed'; rd = r; }
+          const reach = g.m === 'run' ? g.a || 1 : 0;
+          fold(st, { k: 'game', day: String(se.t || '').slice(0, 10) || dayOf(), m: g.m, res: 'closed', d: r1((g.d || 0) + (rd ? rd.d || 0 : 0)), pc: g.pc || 0,
+            th: g.th || [], ths: g.ths || 0, sc: g.sc || 0, time: 0, reach, die: reach + '.' + (g.r || 0) + (rd && rd.b ? '.' + rd.b : '') });
+        }
+      }
+    }
+
+    // ----- session -----
+    function host() {
+      try {
+        if (window.claude || location.origin === 'null' || /(^|\.)claude(usercontent)?\.(ai|com)$/.test(location.hostname)) return 'artifact';
+        if (matchMedia('(display-mode: standalone)').matches || navigator.standalone) return 'app';
+      } catch (e) {}
+      return 'web';
+    }
+    function newSession() {
+      let id = '';
+      try { const a = new Uint8Array(8); crypto.getRandomValues(a); a.forEach(v => { id += (v % 36).toString(36); }); } catch (e) {}
+      while (id.length < 8) id += Math.floor(Math.random() * 36).toString(36);
+      t0 = Date.now(); durAcc = 0; visT = document.hidden ? 0 : performance.now();
+      sess = { id, t: minuteOf(), dur: 0, end: 'open', app: APP_VERSION, host: host(),
+        dev: { touch: matchMedia('(pointer:coarse)').matches ? 1 : 0, w: Math.round(innerWidth / 10) * 10, h: Math.round(innerHeight / 10) * 10,
+          dpr: r1(window.devicePixelRatio || 1), rm: reducedMotion ? 1 : 0 },
+        sets: [], g: [], q: [] };
+      push({ k: 'session' }); dirty = true;
+    }
+    function begin() {
+      if (begun) return true;
+      if (!prefs.track) return false;
+      begun = true; read(); newSession(); push({ k: 'close', sid: sess.id });
+      return true;
+    }
+    function setsIndex() {
+      const kc = Object.keys(DEFAULT_KEYS).some(a => (prefs.keys[a] || []).join() !== DEFAULT_KEYS[a].join()) ? 1 : 0;
+      const o = { das: prefs.das, arr: prefs.arr, sdi: prefs.sdi, snd: +!!prefs.sound, mus: +!!prefs.music, sv: prefs.sfxVol, mv: prefs.musVol,
+        gh: +!!prefs.ghost, sk: +!!prefs.shake, pa: +!!prefs.particles, gl: +!!prefs.glow, kc, tc: prefs.touch === 'gestures' ? 'g' : 'b' };
+      const j = JSON.stringify(o); let i = sess.sets.findIndex(x => JSON.stringify(x) === j);
+      if (i < 0) { sess.sets.push(o); i = sess.sets.length - 1; }
+      return i;
+    }
+    function addQuit(k) {
+      const run = S.mode === 'run' && !!R, q = { t: secs(), k, m: S.mode, st: S.status, sc: run ? R.totalScore : S.score, pc: cur ? cur.pc : S.pieces };
+      if (run) { q.a = R.ante; q.r = R.round; }
+      sess.q.push(q); push({ k: 'quit', key: quitKey(q) }); dirty = true;
+    }
+    const midGame = () => !!cur && S.status !== 'ready' && S.status !== 'over';
+
+    // ----- events (no-ops while "Record play data" is off; a tracker error never reaches the game) -----
+    const ev = fn => (...a) => { if (!prefs.track) return; try { fn(...a); } catch (e) {} };
+    const both = f => { if (cur) f(cur); if (round) f(round); };
+    function roundEnd(e, how) {
+      if (!cur || !round) return;
+      const r = round; round = null;
+      r.how = how; r.sc = e ? S.bankScore || S.roundScore : S.roundScore;
+      r.st = e ? (e.boss ? 1 : e.stars || 0) : 0; r.s = (S.starPc || [0, 0, 0]).slice();
+      r.pu = S.pieces; r.pl = e ? (S.banked === 'jam' ? 0 : e.left) : S.piecesLeft; r.fo = S.forfeit || 0; r.ov = e ? e.finale || 0 : 0;
+      r.m1 = R.money; r.pay = e ? [e.pay, e.starPay || 0, e.leftover, e.interest, e.piggy, e.bonus] : [];
+      r.ph = S.bx ? S.bx.phase : 0; r.ln = S.lines; r.tier = S.peakTier || 0; r.d = Math.round(S.time || 0); r.near = S.near ? 1 : 0;
+      cur.d = r1(cur.d + (S.time || 0)); cur.ln += S.lines; cur.tier = Math.max(cur.tier, S.peakTier || 0); cur.str = Math.max(cur.str, S.bestStreak || 0);
+      push({ k: 'round', b: r.b ? 1 : 0, st: r.st, how, s0: r.s[0], pu: r.pu });
+      dirty = true; flush();
+    }
+    function gameEnd(res) {
+      if (!cur) return;
+      const g = cur, run = g.m === 'run';
+      if (run && round) roundEnd(null, res === 'menu' || res === 'closed' ? res : 'abandon');
+      cur = round = shop = null;
+      delete g.open; g.res = res;
+      if (run && R) {
+        Object.assign(g, { sc: R.totalScore, won: res === 'won' ? 1 : 0, a: R.ante, r: R.round, lv: R.ante, bosses: R.bossesBeaten || 0, stars: R.stars || 0, perf: R.perfect || 0,
+          fc: R.charms.map(c => c.id + (c.foil ? '*' : '')), near: S.near ? 1 : 0 });
+        g.ch = Math.max(g.ch, R.bestChain || 0);
+      } else {
+        Object.assign(g, { sc: S.score, ln: S.lines, lv: S.level, d: S.time || 0, tier: S.peakTier || 0, str: S.bestStreak || 0, near: S.near ? 1 : 0 });
+        g.ch = Math.max(g.ch, S.bestChain || 0);
+      }
+      g.d = r1(g.d); g.ppm = g.d > 1 ? Math.round(g.pc / g.d * 60) : 0;
+      let top = 0; if (S.board) for (let x = 0; x < COLS; x++) top = Math.max(top, colHeight(x)); g.top = Math.min(20, top);
+      const reach = run ? (g.won ? 9 : g.a) : 0;
+      push({ k: 'game', day: dayOf(), m: g.m, res, d: g.d, pc: g.pc, th: g.th.slice(), ths: g.ths, sc: g.sc,
+        time: g.m === 'sprint' && res === 'clear' ? Math.round((S.time || 0) * 100) / 100 : 0, reach,
+        die: run && !g.won ? g.a + '.' + g.r + (R && R.boss && res !== 'abandon' ? '.' + R.boss : '') : '' });
+      dirty = true; flush();
+    }
+    const api = {
+      gameStart: ev(mode => {
+        if (!begin()) return;
+        if (cur) gameEnd('restart');
+        cur = { m: mode, sv: setsIndex(), t: secs(), d: 0, open: 1, res: '', sc: 0, ln: 0, lv: 0, sl: mode === 'marathon' ? S.startLevel || 1 : 1, pc: 0, ppm: 0, top: 0,
+          hold: 0, ts: 0, tsm: 0, q4: 0, pcl: 0, ch: 0, sp: [0, 0, 0], tier: 0, str: 0, th: zeros(8), ths: 0, inp: 0, src: [0, 0, 0], near: 0 };
+        if (mode === 'run') Object.assign(cur, { won: 0, a: 1, r: 0, bosses: 0, stars: 0, perf: 0, fc: [], rd: [], sh: [] });
+        sess.g.push(cur); round = shop = null; dirty = true;
+      }),
+      piece: ev(pt => {   // hot path: no allocation, no DOM, no storage
+        if (!cur) return;
+        let b = 0; while (b < 7 && pt >= TH_EDGES[b]) b++;
+        const ts = Math.round(pt * 10);
+        cur.th[b]++; cur.ths += ts; cur.pc++;
+        if (round) { round.th[b]++; round.ths += ts; }
+      }),
+      input: ev(src => { if (cur) { cur.inp++; cur.src[src | 0]++; } }),
+      lines: ev((n, spin, pc) => {   // a line clear (the spec's Play.clear(n, spin, pc); renamed: Play.clear() wipes the data)
+        if (!cur || !n) return;
+        both(o => { if (spin === 'full') o.ts++; if (n === 4) o.q4++; });
+        if (spin === 'mini') cur.tsm++; if (pc) cur.pcl++;
+      }),
+      hold: ev(() => both(o => { o.hold++; })),
+      blast: ev(hits => { for (const h of hits) { const i = { b: 0, r: 1, s: 2 }[h[2]]; if (i != null) both(o => { o.sp[i]++; }); } }),
+      chain: ev(w => both(o => { o.ch = Math.max(o.ch, w); })),
+      roundStart: ev(() => {
+        if (!cur || cur.m !== 'run' || !R) return;
+        if (round && !round.how && !round.pu) cur.rd.splice(cur.rd.indexOf(round), 1);   // a round set up again before it was played
+        round = { a: R.ante, r: R.round, b: R.boss || null, ph: 0, tg: S.target, sc: 0, st: 0, how: '', s: [0, 0, 0], pu: 0, pl: 0, fo: 0, ov: 0,
+          m0: R.money, m1: 0, pay: [], c: R.charms.map(c => c.id + (c.foil ? '*' : '')), ln: 0, hold: 0, ts: 0, q4: 0, ch: 0, sp: [0, 0, 0],
+          tier: 0, th: zeros(8), ths: 0, d: 0, near: 0 };
+        cur.rd.push(round); cur.a = R.ante; cur.r = R.round; dirty = true;
+      }),
+      star: ev(() => { if (round) round.s = S.starPc.slice(); }),
+      bank: ev(how => { if (round) { round.how = how; round.pl = S.winLeft; } }),
+      roundEnd: ev(roundEnd),
+      shopOpen: ev(() => {
+        if (!cur || cur.m !== 'run' || !R) return;
+        shop = { a: R.ante, r: R.round, m0: R.money, m1: 0, seen: [], buy: [], up: [], sell: [], rr: 0, rf: 0, tk: '', tkh: '' };
+        cur.sh.push(shop); dirty = true;
+      }),
+      dealt: ev(cards => { if (shop) for (const o of cards) shop.seen.push(o.id + (o.foil ? '*' : '')); }),
+      buy: ev((id, foil) => { if (shop) shop.buy.push(id + (foil ? '*' : '')); }),
+      up: ev((t, lv) => { if (shop) shop.up.push(t + lv); }),
+      sell: ev(id => { if (shop) shop.sell.push(id); }),
+      reroll: ev(free => { if (shop) free ? shop.rf++ : shop.rr++; }),
+      ticket: ev((prize, how) => { if (shop && !shop.tk) { shop.tk = prize; shop.tkh = how; } }),
+      shopLeave: ev(() => {
+        if (!shop) return;
+        const s = shop; shop = null; s.m1 = R ? R.money : 0;
+        push({ k: 'shop', rr: s.rr, rf: s.rf, sell: s.sell.length, m1: s.m1, buy: s.buy.slice(), foilSeen: s.seen.filter(x => x.endsWith('*')).length, tk: s.tk });
+        dirty = true; flush();
+      }),
+      gameEnd: ev(gameEnd),
+      retry: ev(() => {
+        const g = sess && sess.g[sess.g.length - 1]; if (!g || g.open || g.retry) return;
+        g.retry = S.near ? 2 : 1; g.rt = S.overAt ? r1((performance.now() - S.overAt) / 1000) : 0;
+        push({ k: 'retry', near: S.near ? 1 : 0 }); dirty = true;
+      }),
+      hidden: ev(() => {
+        if (!begun) return;
+        tick(); visT = 0; hidAt = Date.now();
+        if (midGame() && sess.end !== 'pagehide') addQuit('hidden');   // Chromium fires pagehide before the last visibilitychange: one close is one quit
+        flush(true);
+      }),
+      visible: ev(() => {
+        if (!begun) return;
+        const away = hidAt ? Date.now() - hidAt : 0; hidAt = 0; visT = performance.now(); sess.end = 'open';
+        const q = sess.q[sess.q.length - 1];
+        if (q && !q.back) { q.back = 1; push({ k: 'back' }); dirty = true; }
+        if (away > 30 * 60000) {   // a new session after more than 30 minutes away; an open game moves with it
+          const g = cur; if (g) sess.g = sess.g.filter(x => x !== g);
+          sess.end = 'idle'; dirty = true; write(true);
+          newSession(); if (g) { g.t = 0; sess.g.push(g); }
+        }
+      }),
+      pagehide: ev(() => {
+        if (!begun) return;
+        tick(); visT = 0;
+        const q = sess.q[sess.q.length - 1];
+        if (midGame()) { if (q && q.k === 'hidden' && !q.back) q.k = 'pagehide'; else addQuit('pagehide'); }
+        sess.end = 'pagehide'; dirty = true; write(true);
+      }),
+      begin: () => { try { return begin(); } catch (e) { return false; } },
+      flush: sync => { try { flush(sync); } catch (e) {} },
+      data() {   // the merged view for Stats: stored (or memory) data plus anything not yet written
+        let base = null;
+        try { base = ro || !storeOK ? mem : read(); } catch (e) {}
+        const st = JSON.parse(JSON.stringify(base || mem || storeNew()));
+        if (begun) { const me = sess && st.sessions.find(x => x && x.id === sess.id), done = (me && me.fs) || 0; for (const it of pend) if (!(it.n <= done)) fold(st, it); live(); upsert(st); }
+        return { since: st.since, life: st.life, days: st.days, sessions: st.sessions, storeOK, ro };
+      },
+      clear() {
+        try { localStorage.removeItem(PLAY_KEY); } catch (e) {}
+        mem = storeNew(); pend = []; dirty = false; ro = false;
+        if (begun) { const g = cur; newSession(); if (g) { g.t = 0; sess.g.push(g); } }
+      },
+      host,
+      snapshot: () => JSON.parse(JSON.stringify({ sess, pend, seq, ro, storeOK, t0, durAcc, begun, hidAt,
+        ci: cur && sess ? sess.g.indexOf(cur) : -1, ri: cur && round && cur.rd ? cur.rd.indexOf(round) : -1, si: cur && shop && cur.sh ? cur.sh.indexOf(shop) : -1,
+        mem: storeOK && !ro ? null : mem })),
+      boot(p) {   // with a hot-reload snapshot: same session, same open game; without: a new session (nothing is written here)
+        try {
+          if (p && p.sess && p.sess.id) {
+            sess = p.sess; pend = Array.isArray(p.pend) ? p.pend : []; ro = !!p.ro; storeOK = p.storeOK !== false; t0 = p.t0 || Date.now();
+            durAcc = p.durAcc || 0; begun = p.begun !== false; hidAt = p.hidAt || 0; mem = p.mem || null; dirty = true;
+            cur = p.ci >= 0 ? sess.g[p.ci] || null : null;
+            round = cur && cur.rd && p.ri >= 0 ? cur.rd[p.ri] || null : null;
+            shop = cur && cur.sh && p.si >= 0 ? cur.sh[p.si] || null : null;
+            visT = document.hidden ? 0 : performance.now();
+            seq = Math.max(p.seq || 0, ...pend.map(it => it.n || 0));
+            // The old page may have written after the snapshot (its pagehide / visibilitychange): those items are folded and
+            // carry numbers up to the stored fs, and its quit rows are a reload, not a player leaving. Nothing is written here.
+            const st = read(), me = st && st.sessions.find(x => x && x.id === sess.id), q = sess.q;
+            if (me) {
+              const extra = (me.fs || 0) > seq && Array.isArray(me.q) ? me.q.slice(q.length) : [];
+              seq = Math.max(seq, me.fs || 0);
+              pend = pend.filter(it => !(it.n <= (me.fs || 0)));   // already folded by the old page
+              for (const x of extra) if (x && !x.back) push({ k: 'unquit', key: quitKey(x) });
+            }
+            const lq = q[q.length - 1];   // snapshot taken while the old page was hiding or unloading: its quit was the reload too
+            if (!document.hidden && lq && !lq.back && (p.hidAt || sess.end === 'pagehide')) { q.pop(); push({ k: 'unquit', key: quitKey(lq) }); }
+            if (!document.hidden) { hidAt = 0; sess.end = 'open'; }
+            return;
+          }
+          begin();
+        } catch (e) {}
+      },
+      _debug: { get store() { try { return localStorage.getItem(PLAY_KEY); } catch (e) { return null; } }, get mem() { return mem; }, get pend() { return pend; },
+        get sess() { return sess; }, get cur() { return cur; }, get round() { return round; }, get shop() { return shop; },
+        get storeOK() { return storeOK; }, get ro() { return ro; }, flush: () => write(true), fold, trimOne, storeNew },
+    };
+    return api;
+  })();
 
   // ---------- audio v6 "Press Room": adaptive music + SFX, pure Web Audio ----------
   // Spec: studio/audio-design.md (reference: studio/audio-v6.js). Reads prefs, S, R at call time.
@@ -1666,6 +2354,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     function coin(t, k) { voice('coin', COIN[Math.min(k, COIN.length - 1)], t, 0.09, { bus: sfxBus, prio: 1 }); nz(t, 0.02, { type: 'highpass', f: 5000, vol: 0.03 }, sfxBus); }
     function buzz(t) { voice('sawb', 33, t, 0.22, { bus: sfxBus, prio: 1, vol: 1.1, slide: 31 }); voice('organ', 34, t, 0.22, { bus: sfxBus, prio: 1 }); thump(t, 0.7, sfxBus, 90, 40, 0.2); }
 
+    const STAR_EV = {   // A major, rising with k
+      1: [['d', 0, 'k', 0.8], ['v', 0, 'bell', 88, 0.5, 1], ['v', 0.09, 'bell', 93, 0.9, 1]],
+      2: [['d', 0, 'K', 0.8], ['v', 0, 'bell', 88, 0.35, 1], ['v', 0.08, 'bell', 93, 0.35, 1], ['v', 0.16, 'bell', 97, 1.0, 1.1]],
+      3: [['d', 0, 'K', 1], ['d', 0, 'x', 0.6], ['c', 0, 'brass', [57, 61, 64, 69], 0.5, 1],
+          ['v', 0, 'bell', 88, 0.3, 1], ['v', 0.08, 'bell', 93, 0.3, 1], ['v', 0.16, 'bell', 97, 0.3, 1], ['v', 0.24, 'bell', 100, 1.2, 1.2]],
+    };
     const fx = fn => (...args) => { if (prefs.sound && prefs.sfxVol > 0 && ensure()) fn(...args); };
     const now = () => ac.currentTime + 0.005;
 
@@ -1750,6 +2444,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         }
         tallyEnd = tEnd + 0.25; lastSlam = tEnd;
       }),
+      // ===== stars (stars-tracker-design 1.7): A major, the round-clear family; no new patches =====
+      star: fx(k => { const t = Math.max(now(), tallyEnd); play(STAR_EV[k] || STAR_EV[1], t);          // just after the tally's stamp thump
+        for (let i = 0; i < (k >= 2 ? k : 0); i++) coin(t + 0.32 + i * 0.06, i + 3); if (k >= 3) duck(0.55, 0.6); }),
+      bankArm: fx(() => { const t = now(); for (const d of [0, 0.1]) voice('tickM', 84, t + d, 0.05, { bus: sfxBus, prio: 1, vol: 0.7 }); }),   // "sure?"
+      bank: fx(k => { const t = now(); thump(t, 1, sfxBus, 120, 40, 0.2); DRUM.m(t + 0.04, 0.6, sfxBus);   // date stamp + platen
+        for (let i = 0; i < k; i++) voice('bell', [88, 93, 97][i], t + 0.06 + i * 0.05, 0.3, { bus: sfxBus, prio: 1, vol: 0.8 }); }),
+      jam: fx(() => { const t = now(); nz(t, 0.35, { type: 'bandpass', f: 2200, f2: 300, q: 1.5, vol: 0.12 }, sfxBus);   // paper crumple; not a fail sting
+        DRUM.m(t + 0.05, 1, sfxBus); thump(t + 0.1, 0.9, sfxBus, 110, 45, 0.2); voice('tickM', 76, t + 0.3, 0.08, { bus: sfxBus, prio: 1, slide: 69 }); }),
       slam: fx(() => { const t = now(); if (t - lastSlam < 0.06) return; lastSlam = t; thump(t, 0.9, sfxBus, 110, 38, 0.25); nz(t, 0.12, { type: 'lowpass', f: 600, vol: 0.1 }, sfxBus); }),
       cash: fx(n => {
         const t = Math.max(now(), tallyEnd, quietUntil - 0.35);        // a boss payout waits for the fanfare tail
@@ -1890,7 +2592,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       bx: null, bossPhase: 0, lastClear: false, danger: false,   // bx: per-round boss state (makeBx); bossPhase mirrors bx.phase (0 = no boss)
       // juice pass: specials (nextMark / holdMk / cur.mk), cascade (casc), Overs payout (fin), near miss + instant retry
       casc: null, nextMark: null, holdMk: null, b2bN: 0, handMult: 0, bestChain: 0,
-      fin: null, winLeft: 0, finPts: 0, near: '', overAt: 0 };
+      fin: null, winLeft: 0, finPts: 0, near: '', overAt: 0,
+      // play on for stars (stars-tracker-design 1.5): starPc = pieces used when each star landed
+      stars: 0, bankReq: false, bankArmT: 0, bankScore: 0, banked: '', forfeit: 0, starPc: [0, 0, 0] };
   }
   let S = fresh(true);
   let particles = [];
@@ -1902,7 +2606,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const CLEAR_NAMES = { single: 'Single', double: 'Double', triple: 'Triple', quad: 'Quad', tspin: 'T-spin' };
   // Balance (game-design.md 1.5-1.6): ante 1 is learnable, antes 3-5 need a build, antes 7-8 need a real synergy.
   // juice-design.md 5: antes 3-8 retuned +9..17% to absorb cascades, Overs and tickets
-  const ANTE_T = [500, 1500, 4200, 7500, 12000, 18500, 27500, 42000];
+  // stars-tracker-design.md 1.8: antes 4-8 +~5% more, because playing on for stars pays builds that are ahead of the curve
+  const ANTE_T = [500, 1500, 4200, 7900, 12600, 19400, 28900, 44000];   // was [..., 7500, 12000, 18500, 27500, 42000]
   const FOIL_P = 0.05;                                   // each shop charm card rolls foil once, when dealt
   const PAYOUT_SHOW = 20, PAY_X = [3, 6, 0, 4, 7, 1, 5, 2];   // Overs: at most 20 animated pieces; drop columns
   // scratch ticket prizes (juice-design.md 8): weight, ticket text, tier (0 blank .. 3 top)
@@ -1921,6 +2626,20 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const upCost = lv => 2 + lv;                          // upgrade price: Lv1->2 costs $3, Lv4->5 costs $6
   const LEFTOVER_CAP = 3;                               // $1 per 5 pieces left, at most $3
   const BOSS_BONUS = ante => 2 + ante;                  // extra $ when a boss falls ($3 .. $9)
+  // ---------- play on for stars (stars-tracker-design.md 1): reaching the target is 1 star and the round keeps going ----------
+  const STAR_X = [1, 1.5, 2.25], STAR_PAY = [0, 0, 2, 4];          // STAR_PAY[stars]: cumulative $ (small and big rounds only). 3★ was 2x: the bot put 42% of
+                                                                 // ante 1-3 small rounds at 3★ against the 35% gate (stars-tracker-design 1.8), so the gate's own fix
+  const STAR_WORDS = ['', 'On target!', 'Fine print!', 'Press perfect!'];
+  const BANK_ARM = 2.5;                                          // seconds the first Bank press stays armed
+  const STAR_D = 'M6 .8l1.5 3.4 3.7.3-2.8 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.8 4.5l3.7-.3z';
+  const STAR_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="' + STAR_D + '"/></svg>';
+  const STAR_SVG2 = '<svg viewBox="0 0 12 12" aria-hidden="true"><path class="pl" transform="translate(1.2 1.2)" d="' + STAR_D + '"/><path d="' + STAR_D + '"/></svg>';   // + the pink plate, off register
+  const starAt = k => Math.round(S.target * STAR_X[k - 1]);       // k = 1..3
+  const playOn = () => S.mode === 'run' && !!R && !R.boss;        // stars apply to small and big rounds
+  const nextStarAt = () => starAt(Math.min(3, S.stars + 1));
+  const bankValue = () => STAR_PAY[S.stars] + Math.min(LEFTOVER_CAP, Math.floor(S.piecesLeft / 5));
+  const starRow = n => '★'.repeat(n);
+  const nbs = t => t.replace(/ /g, '\u00a0');   // a star tier and its number never break apart
   const maxCharms = () => (R && R.maxCharms) || BASE_MAX_CHARMS;
 
   // ---------- bosses (game-design.md section 3) ----------
@@ -2085,7 +2804,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     R = { ante: 1, round: 0, money: 4, charms: [], levels: { single: 1, double: 1, triple: 1, quad: 1, tspin: 1 },
       totalScore: 0, bestHand: 0, boss: null, anteBoss: null, usedBosses: [], shop: null, rerollCost: 3,
       maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {},
-      ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0 };   // juice pass: scratch ticket, chain records, ticket +pieces
+      ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0,   // juice pass: scratch ticket, chain records, ticket +pieces
+      stars: 0, perfect: 0 };                                               // total stars, 3-star rounds
     R.anteBoss = anteBossFor();
   }
   const targetFor = (ante, round) => Math.round(ANTE_T[ante - 1] * ROUND_F[round]);
@@ -2110,10 +2830,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     for (const c of R.charms) if (c.id === 'speed') c.val = 0;
     resetInput(); refill();
     Audio.setMusic({ boss: null }); Audio.setDanger(false); Audio.setFinal(false);
+    layoutGoal(); goalEl.classList.remove('done'); $('t-stars').hidden = true;
     showOverlay(); renderCharms(); Audio.musicSync();
     if (R.boss) { onBossIntro(R.boss); $('ov-main').focus({ preventScroll: true }); }
+    Play.roundStart();
   }
-  function startRun() { newRun(); Audio.musicReset(); Audio.start(); setupRound(); }
+  function startRun() { Play.gameEnd('restart'); newRun(); Play.gameStart('run'); Audio.musicReset(); Audio.start(); setupRound(); }
   function beginRound() {
     if (R) R.ticketNote = '';
     if (R && R.boss && S.bx) { S.status = 'countdown'; S.bx.cdT = 2.4; S.bx.cdN = 4; showOverlay(); return; }
@@ -2240,24 +2962,81 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     shake(4); onBossEvent(R.boss, 'garbage');
   }
   // returns true when the round ended and no next piece should spawn
+  // a piece boundary: the round ends here (boss falls, 3 stars, a queued bank, out of pieces) or the next piece spawns
   function runAfterPiece() {
     if (S.mode !== 'run' || S.status !== 'playing') return false;
-    if (S.roundScore >= S.target) { S.cur = null; S.winLeft = S.piecesLeft; R.boss && S.bx ? bossDefeat() : (S.winT = S.winLeft > 0 ? 1.0 : 1.3, Audio.roundClear(), Audio.musicSync()); return true; }
-    if (S.piecesLeft <= 0) { endRun(false, 'pieces'); return true; }
+    if (R.boss && S.bx) {
+      if (S.roundScore >= S.target) { S.cur = null; S.winLeft = S.piecesLeft; S.bankScore = S.roundScore; bossDefeat(); return true; }
+    } else if (S.stars >= 3) { bankRound('max'); return true; }
+    else if (S.bankReq && S.stars >= 1) { bankRound('bank'); return true; }
+    if (S.piecesLeft <= 0) { S.stars >= 1 ? bankRound('pieces') : endRun(false, 'pieces'); return true; }
     if (S.bx) bossTick();
-    if (S.status === 'playing' && S.piecesLeft === 3 && S.roundScore < S.target) callout('', '3 PIECES · ' + fmt(S.target - S.roundScore) + ' TO GO');   // goal gradient
+    if (S.status === 'playing' && S.piecesLeft === 3) {          // goal gradient, star-aware
+      if (S.roundScore < S.target) callout('', '3 PIECES · ' + fmt(S.target - S.roundScore) + ' TO GO');
+      else if (playOn() && S.stars < 3) callout('', '3 PIECES · ' + fmt(nextStarAt() - S.roundScore) + ' TO ' + starRow(S.stars + 1));
+    }
     return S.status !== 'playing';   // a rivet or garbage row can top the player out
   }
+  // ---------- stars: the check after every scored hand or chain wave, the bank, the jam ----------
+  function starCheck() {
+    if (!playOn() || S.status !== 'playing' || S.winT > 0 || S.fin) return;
+    let k = S.stars; while (k < 3 && S.roundScore >= starAt(k + 1)) k++;
+    if (k === S.stars) return;
+    const from = S.stars; S.stars = k;
+    for (let i = from; i < k; i++) S.starPc[i] = S.pieces;
+    if (from === 0) { Audio.setFinal(true); goalEl.classList.add('done'); }   // the push-on stretch: the music's esc layer joins
+    onStar(k, from);
+  }
+  // narrow wells (the ~200px 360x600 in-app viewer) get the short form, so the label stays on one line; the Bank button says the rest
+  const STAR_LABEL = (k, short) => k === 1 ? 'ON TARGET · BANK +$' + bankValue() + (short ? '' : ' OR PLAY ON')
+    : k === 2 ? 'FINE PRINT · ★★★ AT ' + fmt(starAt(3)) : 'PRESS PERFECT · +$' + STAR_PAY[3] + (short ? ' + REROLL' : ' + FREE REROLL');
+  let starT = 0;
+  function onStar(k, from) {   // feel hook: the stars stamp onto the tally (a scoring hand or wave always just showed it)
+    const ts = $('t-stars'), gl = ts.querySelectorAll('.ts-g i'), gg = $('g-stars').querySelectorAll('i');
+    ts.hidden = false; $('t-stars-l').textContent = STAR_LABEL(k, $('wellWrap').clientWidth < 230);
+    clearTimeout(starT);
+    gl.forEach((g, i) => { g.classList.toggle('on', i < k); g.classList.remove('new', 'wait'); });
+    gg.forEach(g => g.classList.remove('new'));
+    void ts.offsetWidth;
+    for (let i = from; i < k; i++) { gl[i].classList.add(reducedMotion ? 'wait' : 'new'); if (!reducedMotion) gg[i].classList.add('new'); }
+    starT = setTimeout(() => { gl.forEach(g => g.classList.remove('wait')); if (!reducedMotion) plateSlip(0.14); }, 800);
+    if (S.casc) S.casc.star = 1;   // the next wave's tally keeps the row
+    Audio.star(k); Play.star(k); juice('star', { k, from });
+  }
+  function bankRound(how) {   // how: 'bank' | 'max' | 'pieces' | 'jam'
+    S.cur = null; S.bankReq = false; S.bankArmT = 0; S.banked = how; S.bankScore = S.roundScore;
+    if (how === 'jam') { S.forfeit = S.piecesLeft; S.piecesLeft = 0; }
+    S.winLeft = S.piecesLeft; S.winT = S.winLeft > 0 ? 1.0 : 1.3;   // then winT -> startPayout() (if winLeft > 0) -> roundWon(), as before
+    const st = starRow(S.stars);
+    if (how === 'jam') { callout('Press jammed', 'BANKED AT ' + st + ' · ' + S.forfeit + (S.forfeit === 1 ? ' PIECE' : ' PIECES') + ' LOST'); shake(6); Audio.jam(); }
+    else { callout(how === 'max' ? STAR_WORDS[3] : 'Banked!', st + (S.winLeft ? ' · ' + S.winLeft + (S.winLeft === 1 ? ' PIECE' : ' PIECES') + ' TO THE OVERS' : '')); Audio.bank(S.stars); }
+    Audio.roundClear(); Audio.musicSync(); resetInput();
+    Play.bank(how);
+  }
+  function canBank() { return playOn() && S.status === 'playing' && S.stars >= 1 && S.stars < 3 && !S.winT && !S.fin && !S.bankReq; }
+  const canBankPaused = () => playOn() && S.status === 'paused' && S.stars >= 1 && S.stars < 3 && !S.winT && !S.fin && !S.bankReq;
+  function bankPress() {   // the first press arms, a second press within BANK_ARM banks
+    if (!canBank()) return;
+    if (S.bankArmT > 0) { S.bankArmT = 0; requestBank(); return; }
+    S.bankArmT = BANK_ARM; Audio.bankArm();
+    const coarse = matchMedia('(pointer:coarse)').matches, k = prefs.keys.bank[0];
+    callout('', (coarse || !k ? 'TAP BANK AGAIN' : 'PRESS ' + keyName(k).toUpperCase() + ' AGAIN') + ' · +$' + bankValue());
+  }
+  function requestBank() { if (S.clearRows.length || S.casc) { S.bankReq = true; return; } bankRound('bank'); }   // a clear or chain finishes and scores first
   function roundWon(quiet) {   // quiet: hot-reload boot finishing an Overs tail (no sound before a gesture)
-    const left = Math.max(S.winLeft || 0, S.piecesLeft);       // Overs spends S.piecesLeft; S.winLeft keeps the count at the win
+    const left = S.banked === 'jam' ? 0 : Math.max(S.winLeft || 0, S.piecesLeft);   // Overs spends S.piecesLeft; S.winLeft keeps the count at the bank
     const e = { pay: ROUND_PAY[R.round], left, finale: S.finPts || 0,
       leftover: Math.min(LEFTOVER_CAP, Math.floor(left / 5)),
       interest: Math.min(5, Math.floor(R.money / 5)), piggy: cv('piggy', 2, 3),
       bonus: R.boss && R.boss !== 'keystone' ? BOSS_BONUS(R.ante) : 0, spoil: null, boss: R.boss };
     if (R.boss) { R.bossesBeaten++; const sp = BOSSES[R.boss].spoil; if (sp) { SPOILS[sp].apply(); e.spoil = sp; } }
-    e.total = e.pay + e.leftover + e.interest + e.piggy + e.bonus;
+    e.stars = R.boss ? 0 : S.stars; e.starPay = STAR_PAY[e.stars]; e.reroll = e.stars >= 3; e.forfeit = S.forfeit || 0; e.banked = S.banked;
+    if (e.reroll) R.next.freeReroll = true;                          // the next shop's first reroll is free (existing one-shot)
+    R.stars = (R.stars || 0) + e.stars; if (e.stars >= 3) R.perfect = (R.perfect || 0) + 1;
+    e.total = e.pay + e.starPay + e.leftover + e.interest + e.piggy + e.bonus;
     R.money += e.total; S.earn = e;
     S.cur = null; S.fin = null; resetInput(); fx.defeat = null;
+    Play.roundEnd(e, R.boss ? 'boss' : S.banked || 'bank');
     if (R.round === 2 && R.ante === ANTE_T.length) { endRun(true, 'won'); return; }
     R.tickets = (R.tickets || 0) + 1;
     R.ticket = { prize: rollTicket(), done: false, no: R.tickets };   // rolled and stored now, so a reload never rerolls it
@@ -2267,13 +3046,15 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
   function recordRun(won) {
     const date = new Date().toISOString().slice(0, 10);
-    return addRecord('run', { won: won ? 1 : 0, ante: R.ante, round: R.round, score: R.totalScore, best: R.bestHand, bosses: R.bossesBeaten || 0, chain: R.bestChain || 0, date });
+    return addRecord('run', { won: won ? 1 : 0, ante: R.ante, round: R.round, score: R.totalScore, best: R.bestHand, bosses: R.bossesBeaten || 0, chain: R.bestChain || 0, stars: R.stars || 0, date });
   }
   function endRun(won, reason) {
     S.status = 'over'; S.cur = null; S.result = reason; S.casc = null; S.fin = null;
     S.near = won ? '' : nearMiss(reason); S.overAt = performance.now();
     goalEl.classList.remove('notch-hot');
     S.rank = recordRun(won);
+    Play.roundEnd(null, reason === 'pieces' ? 'lost-pieces' : reason === 'topout' ? 'lost-topout' : 'abandon');   // a no-op once the round was won
+    Play.gameEnd(won ? 'won' : reason === 'abandoned' ? 'abandon' : reason);
     if (won) Audio.runComplete(); else Audio.runOver();
     resetInput(); showOverlay(); Audio.musicSync();
     if (won && prefs.particles && !reducedMotion) [0, 350, 700].forEach(ms => setTimeout(() => { if (S.status === 'over') firework(C.pink); }, ms));   // the print run is done
@@ -2322,10 +3103,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     tags.forEach(t => note(c, t, ''));
     const name = c.spin ? 'T-spin' + ['', ' single', ' double', ' triple'][n] : CLEAR_NAMES[type] + (pc ? ' · perfect clear' : '');
     showTally(name + (lv > 1 ? ' · Lv ' + lv : ''), c.pts, c.mult, c.x * sx, shown, c.notes, !!c.void);
-    Audio.tally(c.notes, total, S.roundScore >= S.target ? 1 : total / S.target, S.combo);
+    Audio.tally(c.notes, total, playOn() ? Math.min(0.99, total / S.target) : (S.roundScore >= S.target ? 1 : total / S.target), S.combo);   // the crossing fanfare is Audio.star's
     if (c.void) voidStamp(rows); else floater('+' + fmt(total), '', rows);
     renderCharms();
     bossCheckPhase();
+    starCheck();
   }
 
   // tally (points × mult) display
@@ -2333,6 +3115,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const tA = $('t-tot-a'), tB = $('t-tot-b');   // two ink plates (blue points, pink mult) that register over each other
   function showTally(name, pts, mult, x, total, notes, voided) {
     $('t-total').classList.toggle('void', !!voided);
+    if (!(S.casc && S.casc.star)) $('t-stars').hidden = true;   // a star earned earlier in this chain stays on the next wave's tally
     $('t-name').textContent = name;
     $('t-pts').textContent = fmt(pts);
     $('t-mult').textContent = fmt(mult);
@@ -2418,6 +3201,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     // foil rolls once per card, when dealt, and is stored on the card (a reload never rerolls it)
     R.shop.charms = picked.map((id, i) => ({ id, sold: false, free: i === 0 && !!R.shop.freeCharm, foil: Math.random() < FOIL_P }));
     R.shop.freeCharm = false;   // Mirror shard: only the first roll gets the free card; rerolling forfeits it
+    Play.dealt(R.shop.charms);
   }
   function openShop() {
     S.status = 'shop';
@@ -2425,6 +3209,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     R.shop = { charms: [], boosts: shuffled(Object.keys(CLEAR_NAMES)).slice(0, 2).map(t => ({ t, sold: false })),
       extra: nx.extra || 0, freeCharm: !!nx.freeCharm, freeUpgrades: !!nx.freeUpgrades, freeRerolls: 0, upDiscount: 0 };
     R.rerollCost = nx.freeReroll ? 0 : 3; R.next = {};
+    Play.shopOpen();
     rollCharms();
     showOverlay(); dealNext = true;
     shopEl.hidden = false; renderShop();   // visible first, so the ticket coat can size itself
@@ -2433,6 +3218,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
   function nextRound() {
     revealTicket(true);   // leaving never loses the prize
+    Play.shopLeave();
     shopEl.hidden = true;
     R.round++;
     if (R.round > 2) { R.round = 0; R.ante++; R.anteBoss = anteBossFor(); }
@@ -2462,9 +3248,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     return P.text;
   }
-  function revealTicket(leaving) {
+  function revealTicket(leaving, how) {   // how (play tracker): 's' scratched, 'b' the Reveal button; leaving is 'l'
     const tk = R && R.ticket; if (!tk || tk.done) return;
     tk.done = true; tk.shown = applyPrize(tk.prize, !!leaving);
+    Play.ticket(tk.prize, leaving ? 'l' : how || 'b');
     if (leaving) return;
     const tier = (TICKET[tk.prize] || TICKET.blank).tier;
     tk.lift = true;                       // renderTicket plays the coat lift + prize stamp once
@@ -2542,7 +3329,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const cc = $('tk-coat'); let last = null, frac = 0, flakeT = 0;
     const check = force => { const now = performance.now(); if (!force && now - scratchT < 150) return; scratchT = now;
       if (!R || !R.ticket || R.ticket.done) return;
-      frac = coatCleared(cc.getContext('2d'), cc.width, cc.height); if (frac >= 0.5) revealTicket(); };
+      frac = coatCleared(cc.getContext('2d'), cc.width, cc.height); if (frac >= 0.5) revealTicket(false, 's'); };
     const scratch = e => {
       if (!R || !R.ticket || R.ticket.done) return;
       const r = cc.getBoundingClientRect(); if (!r.width) return;
@@ -2560,7 +3347,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     cc.addEventListener('pointermove', e => { if (e.buttons) scratch(e); });
     const up = () => { if (last) check(true); last = null; };
     cc.addEventListener('pointerup', up); cc.addEventListener('pointercancel', up);
-    $('tk-reveal').addEventListener('click', () => revealTicket());
+    $('tk-reveal').addEventListener('click', () => revealTicket(false, 'b'));
   })();
 
   // die-cut ticket: rarity stub (perforated), name, description, hanging price tag, BUY stamp bar
@@ -2589,7 +3376,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const nx = $('shop-next'); nx.innerHTML = '';
     const b = document.createElement('b'); b.textContent = 'Next: ante ' + na + ' · ' + ROUND_NAME[nr].toLowerCase();
     const bn = R.bonusNext || 0;
-    nx.append(b, document.createTextNode(' · target ' + fmt(targetFor(na, nr)) + ' · ' + (roundPieces() + bn) + ' pieces' + (bn ? ' (ticket +' + bn + ')' : '') + '.'));
+    const tg = targetFor(na, nr), plan = nr < 2 ? ' · ' + nbs('★★ ' + fmt(Math.round(tg * STAR_X[1]))) + ' · ' + nbs('★★★ ' + fmt(Math.round(tg * STAR_X[2]))) : '';
+    nx.append(b, document.createTextNode(' · ' + nbs('target ' + fmt(tg)) + plan + ' · ' + nbs((roundPieces() + bn) + ' pieces') + (bn ? ' (ticket +' + bn + ')' : '') + '.'));
     $('shop').style.setProperty('--boss', bossId ? 'var(--boss-' + bossId + ')' : 'var(--ink)');
     $('shop').style.setProperty('--boss-on', ['arbiter', 'surge', 'keystone'].includes(bossId) ? 'var(--ink)' : 'var(--paper)');
     if (boss) {   // boss preview: chip in the boss ink, then rules, spoils and owned-charm notes so the player can buy counters
@@ -2612,7 +3400,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         desc: (o.foil ? d.fdesc || d.desc : d.desc) + (o.free && !o.sold ? ' Free · lost if you reroll.' : '') + (o.foilGift && !o.sold ? ' Ticket foil · base price.' : ''),
         label, enabled: !o.sold && !full && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
         if (o.sold || full || R.money < price) return;
-        R.money -= price; R.charms.push({ id: o.id, val: 0, foil: !!o.foil }); o.sold = true; o.free = false;
+        R.money -= price; R.charms.push({ id: o.id, val: 0, foil: !!o.foil }); o.sold = true; o.free = false; Play.buy(o.id, !!o.foil);
         Audio.buy('charm'); if (o.foil) setTimeout(() => Audio.foil(-1), 160);   // a shorter foil shimmer after the till
         renderShop(); renderCharms();
         if (o.foil && !reducedMotion) for (const el of document.querySelectorAll('.charm-list li.foil, .row-o.foil')) if (el.textContent.includes(d.name)) { el.classList.remove('bought'); void el.offsetWidth; el.classList.add('bought'); }
@@ -2629,7 +3417,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         label: o.sold ? 'Sold' : R.money < price ? 'Need $' + (price - R.money) : price ? 'Buy' : 'Take free',
         enabled: !o.sold && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
           if (o.sold || R.money < price) return;
-          R.money -= price; o.lv = R.levels[o.t]; o.price = price; R.levels[o.t]++; o.sold = true;
+          R.money -= price; o.lv = R.levels[o.t]; o.price = price; R.levels[o.t]++; o.sold = true; Play.up(o.t, R.levels[o.t]);
           if (!R.shop.freeUpgrades) R.shop.upDiscount = 0;   // the ticket discount covers one upgrade
           Audio.buy('plate'); renderShop();
         } }));
@@ -2644,24 +3432,30 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       const ds = document.createElement('span'); ds.textContent = charmDesc(ch);
       const sell = document.createElement('button'); sell.type = 'button'; sell.className = 'small'; sell.textContent = 'Sell $' + sellValue(ch);
       sell.setAttribute('aria-label', 'Sell ' + (ch.foil ? 'foil ' : '') + d.name + ' for $' + sellValue(ch));
-      sell.addEventListener('click', () => { R.money += sellValue(ch); R.charms.splice(i, 1); Audio.sell(); renderShop(); renderCharms(); });
+      sell.addEventListener('click', () => { R.money += sellValue(ch); R.charms.splice(i, 1); Play.sell(ch.id); Audio.sell(); renderShop(); renderCharms(); });
       row.append(nb, sell);
       if (d.live || ch.foil) { const em = document.createElement('em'); em.textContent = (ch.foil ? 'FOIL · ' : '') + (d.live ? d.live(ch) : 'boosted'); row.append(em); }
       row.append(ds); ow.append(row);
     });
-    const rr = $('reroll'), freeR = (R.shop.freeRerolls || 0) > 0 || !R.rerollCost;
-    rr.textContent = freeR ? 'Reroll charms free' : 'Reroll charms $' + R.rerollCost; rr.disabled = !freeR && R.money < R.rerollCost;
+    const rr = $('reroll'), freeR = (R.shop.freeRerolls || 0) > 0 || !R.rerollCost, ph = shopNarrow();
+    rr.textContent = (ph ? 'Reroll ' : 'Reroll charms ') + (freeR ? 'free' : '$' + R.rerollCost); rr.disabled = !freeR && R.money < R.rerollCost;
+    if (!armedBtns.has($('abandon'))) $('abandon').textContent = abandonLabel();
   }
+  // phones: short labels so Abandon and Reroll share one row of the sticky footer, with Next round full width below
+  const shopNarrow = () => matchMedia('(max-width:700px)').matches;
+  const abandonLabel = () => shopNarrow() ? 'Abandon' : 'Abandon run';
   $('reroll').addEventListener('click', () => {
     const tk = (R.shop.freeRerolls || 0) > 0;   // a ticket reroll is free and leaves the reroll price alone
     if (!tk && R.money < R.rerollCost) return;
+    Play.reroll(tk || R.rerollCost === 0);
     if (tk) R.shop.freeRerolls--;
     else { R.money -= R.rerollCost; R.rerollCost = R.rerollCost === 0 ? 3 : R.rerollCost + 1; }
     rollCharms(); Audio.reroll(); dealNext = true; renderShop();
   });
   $('next-round').addEventListener('click', () => { Audio.ensure(); Audio.pageTurn(); nextRound(); });
-  $('abandon').addEventListener('click', e => confirmTwice(e.currentTarget, 'Abandon run', 'abandon', () => {
+  $('abandon').addEventListener('click', e => confirmTwice(e.currentTarget, abandonLabel(), 'abandon', () => {
     revealTicket(true);
+    Play.shopLeave();
     shopEl.hidden = true;
     // the round that just ended was won (a boss may have just fallen): clear its boss state and record the run as reaching the next round
     S.bx = null; R.boss = null; resetBossFx();
@@ -2736,7 +3530,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function holdPiece() {
     if (!S.cur || S.holdUsed) return;
     if (bossIs('warden')) { callout('', 'HOLD IS SEALED'); Audio.lockDenied(); fx.sealT = 0.4; return; }
-    S.usedHold = true;
+    S.usedHold = true; Play.hold();
     Audio.hold();
     const t = S.cur.t, mk = S.cur.mk || null, h = S.hold, hm = S.holdMk || null;   // a mark travels with its piece
     S.hold = t; S.holdMk = mk;
@@ -2776,7 +3570,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     });
     S.cur = null;
     S.holdUsed = false;
-    S.pieces++;
+    S.pieces++; Play.piece(S.pieceT);
     if (S.mode === 'run') { S.piecesLeft--; runOnPlace(c.t, S.pieceT <= QUICK_T); }
     if (prefs.glow) fx.lockFlash = { cells: ROT[c.t][c.r].map(([cx, cy]) => [c.x + cx, c.y + cy]), life: 0.14 };
     if (S.pieceT <= QUICK_T) {
@@ -2795,7 +3589,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const pc = rows.length > 0 && S.board.every((row, y) => rows.includes(y) || row.every(v => !v));
     if (rows.length) S.b2bN = (rows.length === 4 || spin) ? S.b2bN + 1 : 0;   // hard clears in a row (b2b rule); non-clearing pieces don't break it
     const mk = markFor(rows.length, spin, pc, rows.length ? S.combo + 1 : -1);  // score() is about to move S.combo to this value
-    score(rows.length, spin, pc, rows, mk);
+    score(rows.length, spin, pc, rows, mk); Play.lines(rows.length, spin, pc);
     if (mk) {
       if (!S.nextMark || MK[mk].rank > MK[S.nextMark].rank) S.nextMark = mk;
       if (S.mode === 'run') callout('', 'NEXT PIECE · ' + MK[mk].name.toUpperCase());
@@ -2950,7 +3744,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       S.roundScore += total; R.totalScore += total; R.cascTotal = (R.cascTotal || 0) + total; k.sum += total;
       if (n) { S.lines += n; const tags = []; addHeat(n, false, false, tags); tags.forEach(t => note(c, t, '')); }
       showTally('Chain ' + k.wave + ' · ' + CHAIN_WORDS[w].replace('!', ''), c.pts, c.mult, c.x * sx, total, c.notes, false);
-      Audio.tally(c.notes, total, S.roundScore >= S.target ? 1 : total / S.target, Math.min(4, k.wave + 1), true);   // the tick ladder starts higher each wave; chain() carries the bells
+      Audio.tally(c.notes, total, playOn() ? Math.min(0.99, total / S.target) : (S.roundScore >= S.target ? 1 : total / S.target), Math.min(4, k.wave + 1), true);   // the tick ladder starts higher each wave; chain() carries the bells
       k.lastExtra = 'CHAIN ' + k.wave + ' · +' + fmt(k.sum);   // the running chain total rides the callout (the tally shows this wave)
       callout(CHAIN_SHOW[w], k.lastExtra, 'c' + w);
       renderCharms();
@@ -2964,11 +3758,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     if (ys.length) floater('+' + fmt(total), '', ys, w);
     onChainWave(k.wave, total, n, cells);
-    if (S.mode === 'run') bossCheckPhase();
+    if (S.mode === 'run') { bossCheckPhase(); starCheck(); }
   }
   function endCascade() {
     const k = S.casc; S.casc = null;
-    S.bestChain = Math.max(S.bestChain || 0, k.wave);
+    S.bestChain = Math.max(S.bestChain || 0, k.wave); Play.chain(k.wave);
     if (S.mode === 'run' && R) R.bestChain = Math.max(R.bestChain || 0, k.wave);   // the chain total is on the last wave's callout
     onChainEnd(k.wave, k.sum);
     if (S.status !== 'playing') return;
@@ -2985,7 +3779,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function blastFx(w, wave) {                                                                 // a wave detonates: w.hits are the specials, w.cells the blast area
     const kind = w.hits.reduce((a, h) => !a || MK[h[2]].rank > MK[a].rank ? h[2] : a, null) || 'b';
     const i = Math.min(wave, CHAIN_CAP);
-    Audio.blast(kind, wave); Audio.chain(wave);
+    Audio.blast(kind, wave); Audio.chain(wave); Play.blast(w.hits);
     shake(CHAIN_SHAKE[i], i >= 3 ? CHAIN_SHAKE[i] * 0.5 * (i % 2 ? 1 : -1) : 0); plateSlip(CHAIN_SLIP[i]);
     if (i >= 3) fx.stopT = Math.min(0.12, 0.05 + 0.02 * (i - 3));   // hit-stop: the impact frame holds on big chains
     for (const h of w.hits.slice(0, 10)) fx.blasts.push({ k: h[2], x: h[0], y: h[1], c: h[3], w: i, t: 0, seed: (Math.random() * 1e9) | 0 });
@@ -3068,7 +3862,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function nearMiss(reason) {   // S.nearG = [have, need]: the gauge under the message (feel pass), always real numbers
     S.nearG = null;
     if (S.mode === 'run') {
-      if (reason !== 'pieces' && reason !== 'topout') return '';
+      if ((reason !== 'pieces' && reason !== 'topout') || S.stars >= 1) return '';   // only a round lost below 1 star
       const short = S.target - S.roundScore;
       if (short > 0 && short <= 0.15 * S.target) { S.nearG = [S.roundScore, S.target]; return 'Missed by ' + fmt(short) + '!'; }
       return '';
@@ -3097,7 +3891,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   function topOut() {
-    if (S.mode === 'run') { endRun(false, 'topout'); return; }
+    if (S.mode === 'run') { if (playOn() && S.stars >= 1) { bankRound(S.piecesLeft > 0 ? 'jam' : 'pieces'); return; } endRun(false, 'topout'); return; }   // after 1 star a jam banks; the unused pieces are lost (none left: simply out of pieces)
     if (S.mode === 'zen') {
       S.board = Array.from({length: ROWS}, emptyRow);
       S.combo = -1; S.b2b = false;
@@ -3117,6 +3911,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (S.mode === 'marathon' && S.score > 0) S.rank = addRecord('marathon', { score: S.score, lines: S.lines, level: S.level, streak: S.bestStreak, chain: S.bestChain || 0, v: 7, date });
     if (S.mode === 'ultra' && S.score > 0) S.rank = addRecord('ultra', { score: S.score, lines: S.lines, streak: S.bestStreak, chain: S.bestChain || 0, v: 7, date });
     if (S.mode === 'sprint' && reason === 'clear') S.rank = addRecord('sprint', { time: Math.round(S.time * 100) / 100, ppm: ppm(), date });
+    Play.gameEnd(reason);
     if (reason === 'clear' || reason === 'time') Audio.win(); else Audio.over();
     resetInput();
     showOverlay();
@@ -3124,10 +3919,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   function startGame() {
+    Play.gameEnd('restart');   // a no-op unless a game is still open (Restart on the pause screen)
     if (prefs.mode === 'run') { startRun(); return; }
     S = fresh(false, prefs.mode);
     S.startLevel = S.mode === 'marathon' ? prefs.startLevel : 1;
     S.level = S.startLevel;
+    Play.gameStart(S.mode);
     S.status = 'playing';
     particles = []; resetBossFx();
     resetInput();
@@ -3138,6 +3935,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     Audio.musicSync();
   }
   function toMenu() {
+    Play.gameEnd('menu');      // a no-op if nothing is open
     S = fresh(true, prefs.mode);
     resetBossFx(); Audio.setMusic({ boss: null }); Audio.setDanger(false); Audio.setFinal(false);
     refill();
@@ -3147,7 +3945,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function pause() {
     if (S.status === 'countdown') { S.status = 'intro'; resetInput(); showOverlay(); return; }   // back to the boss card
     if (S.status !== 'playing') return;
-    S.status = 'paused'; resetInput(); Audio.blip(); showOverlay(); Audio.musicSync();
+    S.status = 'paused'; S.bankArmT = 0; resetInput(); Audio.blip(); showOverlay(); Audio.musicSync();
   }
   function resume() {
     if (S.status !== 'paused' || !sheet.hidden) return;
@@ -3157,6 +3955,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
   function primary() {
     if (!sheet.hidden) return;
+    if (S.status === 'over') Play.retry();
     if (S.status === 'ready' || S.status === 'over') startGame();
     else if (S.status === 'paused') resume();
     else if (S.status === 'intro') beginRound();
@@ -3167,12 +3966,13 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const held = { left: false, right: false, soft: false };
   let dasDir = 0, dasT = 0, arrT = 0;
   function resetInput() { held.left = held.right = held.soft = false; dasDir = 0; dasT = arrT = 0; }
+  // src (play tracker): 0 keyboard, 1 touch (pad, gestures, Hold slip), 2 gamepad
   function slideToWall(d) { let moved = false; while (tryMove(d, 0)) moved = true; return moved; }
-  function pressDir(d) {
+  function pressDir(d, src = 0) {
     const k = d < 0 ? 'left' : 'right';
     if (held[k]) return;
     held[k] = true; dasDir = d; dasT = 0; arrT = 0;
-    if (S.status === 'playing' && S.cur && tryMove(d, 0)) Audio.move();
+    if (S.status === 'playing' && S.cur) { Play.input(src); if (tryMove(d, 0)) Audio.move(); }
   }
   function releaseDir(d) {
     const k = d < 0 ? 'left' : 'right';
@@ -3182,8 +3982,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (held[other]) { dasDir = -d; dasT = 0; arrT = 0; } else dasDir = 0;
     }
   }
-  function act(a) {
+  function act(a, src = 0) {
     if (S.status !== 'playing' || !S.cur) return;
+    if (a !== 'hard') Play.input(src);
     if (a === 'cw') rotate(1);
     else if (a === 'ccw') rotate(-1);
     else if (a === 'hard') hardDrop();
@@ -3223,6 +4024,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (code === 'KeyG') { e.preventDefault(); if (!e.repeat) toggleGhost(); return; }
     const a = actionFor(code);
     if (S.fin && S.status === 'playing' && a !== 'pause') { e.preventDefault(); if (!e.repeat) skipPayout(); return; }   // any key skips Overs
+    if (a === 'bank') { e.preventDefault(); if (!e.repeat) bankPress(); return; }
     if (code === 'Enter' || code === 'NumpadEnter') { e.preventDefault(); if (!e.repeat) primary(); return; }
 
     if (!a) return;
@@ -3241,7 +4043,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     else if (a === 'soft') held.soft = false;
   });
   window.addEventListener('blur', () => { pause(); resetInput(); });
-  document.addEventListener('visibilitychange', () => { Audio.visibility(document.hidden); if (document.hidden) pause(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) Play.hidden(); else Play.visible();   // the quit is logged with the status before the pause
+    Audio.visibility(document.hidden); if (document.hidden) pause();
+  });
+  window.addEventListener('pagehide', () => Play.pagehide());
   document.addEventListener('pointerdown', () => Audio.kick(), { capture: true });   // any tap or click may start the music
   $('wellWrap').addEventListener('pointerdown', () => { if (S.fin && S.status === 'playing') skipPayout(); });   // a tap on the sheet skips Overs
 
@@ -3257,10 +4063,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (S.fin && S.status === 'playing') { skipPayout(); return; }
       if (a === 'hard' && retryReady()) { primary(); return; }   // instant retry from the over screen
       if (S.status !== 'playing') return;
-      if (a === 'left') pressDir(-1);
-      else if (a === 'right') pressDir(1);
+      if (a === 'left') pressDir(-1, 1);
+      else if (a === 'right') pressDir(1, 1);
       else if (a === 'soft') held.soft = true;
-      else act(a);
+      else act(a, 1);
     };
     const up = () => {
       btn.classList.remove('on');
@@ -3275,6 +4081,97 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     btn.addEventListener('contextmenu', e => e.preventDefault());
   });
 
+  // ---------- MOBILE LAYOUT v7: touch controls (Buttons | Gestures), HUD pause, tap the Hold slip ----------
+  // Gestures, on the well only, touch or pen only (a mouse never triggers them):
+  //   drag sideways   move one column per 0.8 cell of finger travel (axis locks: no soft drop after a sideways drag)
+  //   drag down       soft drop, the piece follows the finger row by row (1 point a row, as the pad)
+  //   tap             rotate: left half of the well = left (ccw), right half = right (cw)
+  //   flick down      hard drop
+  //   flick up / two-finger tap / tap the Hold slip   hold
+  // Hard-drop guards: the flick must be fast (>= 0.85 px/ms over its last 100 ms, ~3x a soft-drag), mostly vertical, at least 2.5 cells
+  // long and must not follow a sideways drag; a gesture dies the moment the piece it started on locks, so a finger
+  // that is still down can never drop the next piece. Nothing steers during a chain, the win beat, a boss hit-stop or Overs:
+  // a tap on the sheet during Overs falls through to the #wellWrap skip, as in Buttons mode.
+  function applyTouch() {
+    if (prefs.touch !== 'gestures') prefs.touch = 'buttons';
+    $('app').classList.toggle('gestures', prefs.touch === 'gestures');
+    document.querySelectorAll('#touch-seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.touch === prefs.touch)));
+  }
+  document.querySelectorAll('#touch-seg button').forEach(b => b.addEventListener('click', () => {
+    prefs.touch = b.dataset.touch; savePrefs(); applyTouch();
+  }));
+  $('hud-pause').addEventListener('click', e => {   // as the pad's pause key, except that on the over screen it waits for the retry guard
+    e.currentTarget.blur(); Audio.kick();
+    if (S.status === 'playing' || S.status === 'countdown') pause();
+    else if (S.status !== 'over' || retryReady()) primary();
+  });
+  document.querySelector('.hold-panel').addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' || S.status !== 'playing') return;
+    e.preventDefault();
+    if (S.fin) { skipPayout(); return; }   // any control skips Overs
+    act('hold', 1);
+  });
+  const gBoard = $('board');
+  const gest = { id: null, x0: 0, y0: 0, ax: 0, ay: 0, t0: 0, mode: '', cur: null, pts: [] };   // mode: '' | h | v | up | done
+  const gCell = () => { const r = gBoard.getBoundingClientRect(); return Math.max(8, Math.min(r.width / COLS, r.height / (ROWS - HIDDEN))); };
+  const gLive = () => S.status === 'playing' && !!S.cur && !S.fin && !S.casc && !(S.winT > 0) && !(S.clearRows && S.clearRows.length) && !(S.bx && S.bx.hitT > 0);
+  const gSame = () => gLive() && S.cur === gest.cur;
+  gBoard.addEventListener('pointerdown', e => {
+    if (prefs.touch !== 'gestures' || e.pointerType === 'mouse') return;
+    e.preventDefault();
+    if (gest.id !== null) {   // second finger: a two-finger tap holds, unless the first finger already started something
+      if (gest.mode === '' && e.timeStamp - gest.t0 < 350 && gSame()) act('hold', 1);
+      gest.mode = 'done';
+      return;
+    }
+    if (!gLive()) return;
+    Object.assign(gest, { id: e.pointerId, x0: e.clientX, y0: e.clientY, ax: e.clientX, ay: e.clientY, t0: e.timeStamp, mode: '', cur: S.cur,
+      pts: [[e.timeStamp, e.clientX, e.clientY]] });
+    try { gBoard.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  gBoard.addEventListener('pointermove', e => {
+    if (e.pointerId !== gest.id || gest.mode === 'done') return;
+    if (!gSame()) { gest.mode = 'done'; return; }
+    const x = e.clientX, y = e.clientY, cs = gCell(), dx = x - gest.x0, dy = y - gest.y0;
+    gest.pts.push([e.timeStamp, x, y]);
+    while (gest.pts.length > 2 && e.timeStamp - gest.pts[0][0] > 160) gest.pts.shift();
+    if (gest.mode === '') {
+      if (Math.abs(dx) >= cs * 0.5 && Math.abs(dx) > Math.abs(dy)) { gest.mode = 'h'; Play.input(1); }
+      else if (dy >= cs * 0.8 && dy > Math.abs(dx) * 1.5) gest.mode = 'v';
+      else if (-dy >= cs * 0.8 && -dy > Math.abs(dx) * 1.5) gest.mode = 'up';
+    }
+    if (gest.mode === 'h') {
+      const step = Math.max(14, cs * 0.8); let moved = false;
+      while (x - gest.ax >= step) { gest.ax += step; if (tryMove(1, 0)) moved = true; }
+      while (gest.ax - x >= step) { gest.ax -= step; if (tryMove(-1, 0)) moved = true; }
+      if (moved) Audio.move();
+    } else if (gest.mode === 'v') {
+      const step = Math.max(12, cs * 0.9);
+      while (y - gest.ay >= step) { gest.ay += step; if (tryMove(0, 1)) S.score += 1; }
+    }
+  });
+  const gEnd = e => {
+    if (e.pointerId !== gest.id) return;
+    gest.id = null;
+    if (e.type !== 'pointerup' || gest.mode === 'done' || !gSame()) return;
+    const now = e.timeStamp, cs = gCell(), dx = e.clientX - gest.x0, dy = e.clientY - gest.y0;
+    const p0 = gest.pts.find(p => now - p[0] <= 100) || gest.pts[gest.pts.length - 1];
+    const span = Math.max(16, now - p0[0]), vy = (e.clientY - p0[2]) / span, vx = (e.clientX - p0[1]) / span;
+    if (gest.mode === '') {
+      if (Math.hypot(dx, dy) < Math.max(10, cs * 0.5) && now - gest.t0 < 350) {
+        const r = gBoard.getBoundingClientRect(); act(e.clientX < r.left + r.width / 2 ? 'ccw' : 'cw', 1);
+      }
+    } else if (gest.mode === 'v') {
+      if (dy >= cs * 2.5 && vy >= 0.85 && vy > Math.abs(vx) * 2) act('hard', 1);
+    } else if (gest.mode === 'up') {
+      if (-dy >= cs * 2 && vy <= -0.9 && -vy > Math.abs(vx) * 2) act('hold', 1);
+    }
+  };
+  gBoard.addEventListener('pointerup', gEnd);
+  gBoard.addEventListener('pointercancel', gEnd);
+  gBoard.addEventListener('contextmenu', e => { if (prefs.touch === 'gestures') e.preventDefault(); });
+  // ---------- /MOBILE LAYOUT v7 ----------
+
   // gamepad (standard mapping)
   const padPrev = {};
   function pollGamepads() {
@@ -3284,19 +4181,20 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       const b = i => !!(gp.buttons[i] && gp.buttons[i].pressed);
       const ax = gp.axes[0] || 0, ay = gp.axes[1] || 0;
       const st = { left: b(14) || ax < -0.5, right: b(15) || ax > 0.5, soft: b(13) || ay > 0.5, hard: b(12),
-        cw: b(0) || b(5), ccw: b(1), hold: b(2) || b(3) || b(4), start: b(9) };
+        cw: b(0) || b(5), ccw: b(1), hold: b(2) || b(3) || b(4), start: b(9), bank: b(8) };   // bank: Back / Select
       const prev = padPrev[gp.index] || {};
       const edge = k => st[k] && !prev[k];
-      if (st.left !== !!prev.left) st.left ? pressDir(-1) : releaseDir(-1);
-      if (st.right !== !!prev.right) st.right ? pressDir(1) : releaseDir(1);
+      if (st.left !== !!prev.left) st.left ? pressDir(-1, 2) : releaseDir(-1);
+      if (st.right !== !!prev.right) st.right ? pressDir(1, 2) : releaseDir(1);
       if (st.soft !== !!prev.soft) held.soft = st.soft;
       if (edge('start')) { Audio.ensure(); S.status === 'playing' || S.status === 'countdown' ? pause() : primary(); }
       if (S.fin && S.status === 'playing' && (edge('hard') || edge('cw') || edge('ccw') || edge('hold'))) skipPayout();
       if (edge('hard') && retryReady()) primary();
-      if (edge('hard')) act('hard');
-      if (edge('cw')) act('cw');
-      if (edge('ccw')) act('ccw');
-      if (edge('hold')) act('hold');
+      if (edge('hard')) act('hard', 2);
+      if (edge('cw')) act('cw', 2);
+      if (edge('ccw')) act('ccw', 2);
+      if (edge('hold')) act('hold', 2);
+      if (edge('bank')) bankPress();
       padPrev[gp.index] = st;
     }
   }
@@ -3306,11 +4204,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const sheet = $('sheet');
   $('ov-main').addEventListener('click', e => { e.currentTarget.blur(); Audio.ensure(); primary(); });
   $('ov-alt').addEventListener('click', e => { const b = e.currentTarget;
+    if (canBankPaused()) { b.blur(); resume(); requestBank(); return; }   // the pause screen is already deliberate: one press banks
+    if (S.mode === 'run' && (S.winT > 0 || S.fin)) return;   // hidden then (showOverlay): the banked round finishes first
     if (runAtStake()) { confirmTwice(b, 'Abandon run', 'abandon', () => { b.blur(); endRun(false, 'abandoned'); }); return; }
     b.blur(); startGame(); });
   $('ov-menu').addEventListener('click', e => { const b = e.currentTarget;
     if (runAtStake()) { confirmTwice(b, 'Menu', 'quit the run', () => { b.blur(); recordRun(false); toMenu(); }); return; }   // recorded, then back to the menu
     b.blur(); toMenu(); });
+  for (const id of ['bank', 'bank-m']) $(id).addEventListener('click', e => { e.currentTarget.blur(); Audio.ensure(); bankPress(); });   // blurred: a focused button would swallow Space (hard drop)
   $('ov-settings').addEventListener('click', () => openSheet('settings'));
   $('ov-records').addEventListener('click', () => openSheet('records'));
   $('customize').addEventListener('click', () => openSheet('settings'));
@@ -3368,6 +4269,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const poster = !!bossId && st === 'intro';
     if (poster !== ov.classList.contains('poster')) { ov.classList.toggle('poster', poster); ov.style.animation = 'none'; void ov.offsetWidth; ov.style.animation = ''; }
     const ost = $('ov-stamp'); ost.hidden = true; ost.className = 'ostamp';
+    const ostars = $('ov-stars'); ostars.hidden = true;
     const near = $('ov-near'); near.hidden = true; $('ov-nearg').hidden = true; clearTimeout(showOverlay.go); $('ov-main').classList.remove('go');
     const won = S.mode === 'run' && st === 'over' && S.result === 'won';
     const taped = st === 'over' && (won || (!!bossId && S.result !== 'won'));   // a boss loss keeps the boss tape across the sheet; a won run gets its own
@@ -3387,15 +4289,18 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         $('lvl-down').disabled = prefs.startLevel <= 1; $('lvl-up').disabled = prefs.startLevel >= 15;
       }
       m.textContent = 'Start ' + MODES[prefs.mode].name.toLowerCase();
-      hint.textContent = coarse ? 'Use the pad below the well' : 'Enter to start';
+      hint.textContent = coarse ? (prefs.touch === 'gestures' ? 'Drag to move · tap to turn · flick down to drop' : 'Use the pad ' + (matchMedia('(orientation:landscape) and (max-height:500px)').matches ? 'beside' : 'below') + ' the well') : 'Enter to start';
     } else if (st === 'paused') {
       t.textContent = 'Paused'; p.hidden = true;
       f.hidden = false;
       f.textContent = S.mode === 'run'
-        ? 'Ante ' + R.ante + ' · ' + fmt(S.roundScore) + ' / ' + fmt(S.target) + ' · ' + S.piecesLeft + ' pieces left'
+        ? nbs('Ante ' + R.ante) + ' · ' + nbs(fmt(S.roundScore) + ' / ' + fmt(S.target)) + ' · ' + nbs(S.piecesLeft + ' pieces left') + (S.stars ? ' · ' + nbs(starRow(S.stars)) : '')
         : MODES[S.mode].name + ' · ' + fmt(S.score) + ' pts · ' + fmtTime(S.time, S.mode === 'sprint');
       m.textContent = 'Resume'; alt.hidden = false; menu.hidden = false;
       if (S.mode === 'run') alt.textContent = 'Abandon run';   // two clicks, and the run is recorded
+      if (S.mode === 'run' && (S.winT > 0 || S.fin)) alt.hidden = true;   // a banked round (bank pause, Overs) is already won: no Abandon to throw it away
+      if (canBankPaused()) { alt.textContent = 'Bank ' + starRow(S.stars) + ' +$' + bankValue(); alt.setAttribute('aria-label', 'Bank the round now for $' + bankValue()); }   // abandon stays on Menu
+      else alt.removeAttribute('aria-label');
       hint.textContent = coarse ? '' : 'P or Enter to resume';
     } else if (st === 'intro' && bossId) {
       // boss card: eyebrow, sigil, name, epithet, rules, HP, spoils, charm notes, Face button
@@ -3435,29 +4340,36 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       t.textContent = ROUND_NAME[R.round];
       big.hidden = false; big.textContent = fmt(S.target);
       f.hidden = false; f.textContent = 'Score target · ' + S.piecesLeft + ' pieces';
-      p.textContent = 'Reward $' + ROUND_PAY[R.round] + ', plus $1 for every 5 pieces left (up to $' + LEFTOVER_CAP + '). Leftover pieces pay out points.';
+      p.textContent = 'Reward $' + ROUND_PAY[R.round] + '. Reach the target, then bank or play on for stars. Unused pieces pay $1 per 5 (up to $' + LEFTOVER_CAP + ') and burst for points.';
+      sk.hidden = false;   // the star plan
+      sk.textContent = [nbs('★ ' + fmt(starAt(1))), nbs('★★ ' + fmt(starAt(2)) + ' +$' + STAR_PAY[2]), nbs('★★★ ' + fmt(starAt(3)) + ' +$' + STAR_PAY[3]) + ' + reroll'].join(' · ');
       if (R.ticketNote) { rk.hidden = false; rk.textContent = R.ticketNote; }
       m.textContent = 'Play round'; menu.hidden = false;
       hint.textContent = coarse ? '' : 'Enter to play';
     } else if (st === 'cleared') {
       const e = S.earn, boss = e.boss ? BOSSES[e.boss] : null;
-      t.textContent = boss ? boss.name + ' falls' : 'Round cleared'; p.hidden = true;
+      const es = e.stars || 0;
+      t.textContent = boss ? boss.name + ' falls' : es >= 3 ? 'Press perfect' : 'Round cleared'; p.hidden = true;
       if (boss) { sg.hidden = false; sg.innerHTML = sigilSVG(e.boss); sg.classList.add('broken'); }
-      big.hidden = false; big.textContent = '+$' + e.total; big.classList.add('tag');
-      f.hidden = false; f.textContent = fmt(S.roundScore) + ' / ' + fmt(S.target);
-      sk.hidden = false; sk.classList.add('receipt');   // till receipt: one line per payout, dotted leaders, bold total
-      if (e.finale) {   // Overs: points, not money, so a muted line above the till and outside TOTAL
-        const d = document.createElement('div'); d.className = 'overs';
-        const sp = document.createElement('span'); sp.textContent = 'Overs · ' + e.left + (e.left === 1 ? ' piece' : ' pieces');
-        const b = document.createElement('span'); b.textContent = '+' + fmt(e.finale) + ' pts';
-        d.append(sp, document.createElement('i'), b); sk.append(d);
+      ostars.hidden = false; ostars.className = 'ostars';   // the star row (hidden on short screens by CSS); a boss gets BOSS DOWN
+      if (boss) { ostars.innerHTML = '<span class="ostamp ok">Boss down</span>'; ostars.setAttribute('aria-label', 'Boss down'); }
+      else {
+        ostars.innerHTML = '<i>' + STAR_SVG + '</i><i>' + STAR_SVG + '</i><i>' + STAR_SVG + '</i>'; ostars.setAttribute('aria-label', es + (es === 1 ? ' star' : ' stars'));
+        ostars.querySelectorAll('i').forEach((g, i) => { if (i < es) { g.classList.add('on', 'new'); g.style.animationDelay = (0.2 + 0.12 * i) + 's'; } });
       }
-      [['Reward', e.pay], ['Boss bonus', e.bonus], [e.left + ' pieces left', e.leftover], ['Interest', e.interest], ['Piggy Bank', e.piggy], ['TOTAL', e.total]]
-        .forEach(([k, v], i, a) => { if (!v && i < a.length - 1 && i > 0) return;
-          const d = document.createElement('div'); if (i === a.length - 1) d.className = 'tot';
-          const sp = document.createElement('span'); sp.textContent = k;
-          const b = document.createElement('span'); b.textContent = '$' + v;
-          d.append(sp, document.createElement('i'), b); sk.append(d); });
+      big.hidden = false; big.textContent = '+$' + e.total; big.classList.add('tag');
+      f.hidden = false; f.textContent = boss || !e.banked ? fmt(S.bankScore || S.roundScore) + ' / ' + fmt(S.target) : 'Played ' + fmt(S.bankScore || S.roundScore) + ' · target ' + fmt(S.target);
+      sk.hidden = false; sk.classList.add('receipt');   // till receipt: one line per payout, dotted leaders, bold total
+      const line = (k, v, cls) => { const d = document.createElement('div'); if (cls) d.className = cls;
+        const sp = document.createElement('span'); sp.textContent = k; const b = document.createElement('span'); b.textContent = v;
+        d.append(sp, document.createElement('i'), b); sk.append(d); };
+      if (e.banked === 'jam') line('Jam · ' + e.forfeit + (e.forfeit === 1 ? ' piece' : ' pieces') + ' lost', '—', 'overs jam');   // the unused pieces were forfeited
+      else if (e.finale) line('Overs ×' + e.left, '+' + fmt(e.finale) + ' pts', 'overs');   // points, not money: muted, outside TOTAL
+      line('Reward', '$' + e.pay);
+      if (e.starPay) line(starRow(es) + ' Stars', '$' + e.starPay);
+      if (e.reroll) line('Free reroll', 'NEXT SHOP');
+      [['Boss bonus', e.bonus], [e.left + ' pieces left', e.leftover], ['Interest', e.interest], ['Piggy Bank', e.piggy]].forEach(([k, v]) => { if (v) line(k, '$' + v); });
+      line('TOTAL', '$' + e.total, 'tot');
       if (e.spoil) { spl.hidden = false; spl.innerHTML = ''; const sb = document.createElement('b'); sb.textContent = 'Spoils: ' + SPOILS[e.spoil].name + '. ';
         spl.append(sb, document.createTextNode(SPOILS[e.spoil].desc)); }
       m.textContent = 'Open shop';
@@ -3478,7 +4390,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         f.hidden = false; f.textContent = won ? 'All 8 antes cleared' : 'Reached ante ' + R.ante + ' · ' + ROUND_NAME[R.round].toLowerCase()
           + (!won && R.boss && BOSSES[R.boss] ? ' · ' + BOSSES[R.boss].name : '');
         const nb = R.bossesBeaten || 0;
-        sk.hidden = false; sk.textContent = [nb + (nb === 1 ? ' boss' : ' bosses') + ' beaten', R.bestHand ? 'Best clear ' + fmt(R.bestHand) : '',
+        sk.hidden = false; sk.textContent = [nb + (nb === 1 ? ' boss' : ' bosses') + ' beaten', R.stars ? R.stars + '★' + (R.perfect ? ' · ' + R.perfect + ' perfect' : '') : '', R.bestHand ? 'Best clear ' + fmt(R.bestHand) : '',
           (R.bestChain || 0) >= 2 ? 'Best chain ×' + R.bestChain : '', R.charms.length + (R.charms.length === 1 ? ' charm' : ' charms')].filter(Boolean).map(x => x.replace(/ /g, '\u00a0')).join(' · ');   // each stat wraps whole
         m.textContent = S.near ? 'Try again' : 'New run';   // a retry is always a new run: nothing undoes a loss
         hint.textContent = coarse ? '' : S.near ? 'Space or Enter to try again' : 'Enter for a new run';
@@ -3518,11 +4430,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const set = (id, on, label) => { const b = $(id); b.setAttribute('aria-pressed', String(on)); b.textContent = label + (on ? ' on' : ' off'); };
     set('opt-sound', prefs.sound, 'Sound'); set('opt-music', prefs.music, 'Music'); set('opt-ghost', prefs.ghost, 'Ghost');
     $('set-sound').checked = prefs.sound; $('set-music').checked = prefs.music; $('set-ghost').checked = prefs.ghost;
-    $('set-shake').checked = prefs.shake; $('set-particles').checked = prefs.particles; $('set-glow').checked = prefs.glow;
+    $('set-shake').checked = prefs.shake; $('set-particles').checked = prefs.particles; $('set-glow').checked = prefs.glow; $('set-track').checked = !!prefs.track;
     for (const [id, key, unit] of [['das','das',' ms'],['arr','arr',' ms'],['sdi','sdi',' ms'],['sfx','sfxVol','%'],['mus','musVol','%']]) {
       $('set-' + id).value = prefs[key];
       $('out-' + id).textContent = (key === 'arr' || key === 'sdi') && prefs[key] === 0 ? 'Instant' : prefs[key] + unit;
     }
+    applyTouch();   // MOBILE LAYOUT v7
   }
   function toggleSound() {
     prefs.sound = !prefs.sound; savePrefs(); syncOpts();
@@ -3550,7 +4463,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   // ---------- settings + records sheet ----------
-  const ACTION_LABEL = { left: 'Move left', right: 'Move right', soft: 'Soft drop', hard: 'Hard drop', cw: 'Rotate right', ccw: 'Rotate left', hold: 'Hold', pause: 'Pause' };
+  const ACTION_LABEL = { left: 'Move left', right: 'Move right', soft: 'Soft drop', hard: 'Hard drop', cw: 'Rotate right', ccw: 'Rotate left', hold: 'Hold', pause: 'Pause', bank: 'Bank (Run)' };
   const KEYNAMES = { ArrowLeft: '←', ArrowRight: '→', ArrowUp: '↑', ArrowDown: '↓', Space: 'Space', ShiftLeft: 'L Shift', ShiftRight: 'R Shift',
     ControlLeft: 'L Ctrl', ControlRight: 'R Ctrl', AltLeft: 'L Alt', AltRight: 'R Alt', MetaLeft: 'L Cmd', MetaRight: 'R Cmd',
     Escape: 'Esc', Enter: 'Enter', NumpadEnter: 'Num Enter', Tab: 'Tab', Backspace: 'Bksp', Slash: '/', Period: '.', Comma: ',',
@@ -3573,14 +4486,13 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     showOverlay();
   }
   function showTab(tab) {
-    $('tab-settings').setAttribute('aria-selected', String(tab === 'settings'));
-    $('tab-records').setAttribute('aria-selected', String(tab === 'records'));
-    $('pane-settings').hidden = tab !== 'settings';
-    $('pane-records').hidden = tab !== 'records';
+    for (const t of ['settings', 'records', 'stats']) { $('tab-' + t).setAttribute('aria-selected', String(tab === t)); $('pane-' + t).hidden = tab !== t; }
     if (tab === 'records') { recMode = S.mode !== 'zen' ? S.mode : recMode; renderRecords(); }
+    if (tab === 'stats') { Play.flush(true); renderStats(); }   // the game is already paused by openSheet
   }
   $('tab-settings').addEventListener('click', () => showTab('settings'));
   $('tab-records').addEventListener('click', () => showTab('records'));
+  $('tab-stats').addEventListener('click', () => showTab('stats'));
   $('sheet-close').addEventListener('click', closeSheet);
   sheet.addEventListener('pointerdown', e => { if (e.target === sheet) closeSheet(); });
 
@@ -3596,7 +4508,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   $('set-glow').addEventListener('change', e => { prefs.glow = e.target.checked; savePrefs(); });
   $('keys-reset').addEventListener('click', () => { prefs.keys = clone(DEFAULT_KEYS); capturing = null; $('key-note').textContent = ''; savePrefs(); renderKeymap(); renderControls(); });
   $('all-reset').addEventListener('click', () => {
-    const keep = { mode: prefs.mode, startLevel: prefs.startLevel };
+    const keep = { mode: prefs.mode, startLevel: prefs.startLevel, track: prefs.track };   // a reset never turns play recording back on
     prefs = Object.assign(clone(DEFAULTS), keep); capturing = null; $('key-note').textContent = '';
     savePrefs(); syncOpts(); renderKeymap(); renderControls(); Audio.volumes(); Audio.musicSync();
   });
@@ -3622,7 +4534,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const rows = [
       ['Move', prefs.keys.left.length && prefs.keys.right.length ? keyName(prefs.keys.left[0]) + ' ' + keyName(prefs.keys.right[0]) : '—'],
       ['Soft drop', k('soft')], ['Hard drop', k('hard')], ['Rotate right', k('cw')], ['Rotate left', k('ccw')],
-      ['Hold', k('hold')], ['Pause', k('pause')], ['Sound', 'M', true], ['Music', 'N'], ['Ghost', 'G'],
+      ['Hold', k('hold')], ['Pause', k('pause')], ['Bank', k('bank')], ['Sound', 'M', true], ['Music', 'N'], ['Ghost', 'G'],
     ];
     for (const [label, key, sep] of rows) {
       const li = document.createElement('li'); if (sep) li.className = 'sep'; if (/^Rotate/.test(label)) li.classList.add('rot');
@@ -3652,10 +4564,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         : 'No ' + MODES[recMode].name + ' scores yet. Finish a game to set your first record.';
       wrap.append(d); return;
     }
-    const cols = recMode === 'run' ? ['#', 'Result', 'Score', 'Best clear', 'Date'] : recMode === 'sprint' ? ['#', 'Time', 'Pieces/min', 'Date']
+    const cols = recMode === 'run' ? ['#', 'Result', '★', 'Score', 'Best clear', 'Date'] : recMode === 'sprint' ? ['#', 'Time', 'Pieces/min', 'Date']
       : recMode === 'marathon' ? ['#', 'Score', 'Lines', 'Level', 'Streak', 'Date'] : ['#', 'Score', 'Lines', 'Streak', 'Date'];
     const tw = document.createElement('div'); tw.className = 'rec-wrap';
-    const tb = document.createElement('table'); tb.className = 'rec';
+    const tb = document.createElement('table'); tb.className = 'rec' + (recMode === 'run' ? ' run' : '');
     const thead = document.createElement('tr');
     cols.forEach(c => { const th = document.createElement('th'); th.textContent = c; thead.append(th); });
     tb.append(thead);
@@ -3665,7 +4577,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       const tr = document.createElement('tr'); if (i === 0) tr.className = 'top';
       const date = (r.date || '—') + (marks && !r.v ? (anyClassic = true, ' · classic') : '');
       const cells = recMode === 'run'
-        ? [[i + 1, 'r'], [(r.won ? 'Won' : 'Ante ' + r.ante + ' · ' + ['small', 'big', 'boss'][r.round]) + (r.bosses ? ' · ' + r.bosses + (r.bosses === 1 ? ' boss' : ' bosses') : ''), ''], [fmt(r.score), 'n'], [fmt(r.best || 0), ''], [r.date || '—', 'dim']]
+        ? [[i + 1, 'r'], [(r.won ? 'Won' : 'Ante ' + r.ante + ' · ' + ['small', 'big', 'boss'][r.round]) + (r.bosses ? ' · ' + r.bosses + (r.bosses === 1 ? ' boss' : ' bosses') : ''), ''], [r.stars != null ? r.stars + '★' : '—', ''], [fmt(r.score), 'n'], [fmt(r.best || 0), ''], [r.date || '—', 'dim']]
         : recMode === 'sprint'
         ? [[i + 1, 'r'], [fmtTime(r.time, true), 'n'], [r.ppm ?? '—', ''], [r.date || '—', 'dim']]
         : recMode === 'marathon'
@@ -3677,6 +4589,187 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     tw.append(tb); wrap.append(tw);
     if (anyClassic) { const n = document.createElement('p'); n.className = 'note'; n.textContent = 'Classic: set before special blocks. Sprint has none.'; wrap.append(n); }
   }
+
+  // ---------- Stats tab (stars-tracker-design.md 2.6): DOM built with createElement and textContent only ----------
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const dayLabel = d => d && d.length >= 10 ? +d.slice(8, 10) + ' ' + MON[+d.slice(5, 7) - 1] : '—';
+  const sumOf = a => a.reduce((x, y) => x + (+y || 0), 0);
+  const pctOf = (a, b) => b ? Math.round(a / b * 100) + '%' : '0%';
+  const durText = s => { s = Math.round(s || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? h + ' h ' + m + ' m' : m ? m + ' m' : s + ' s'; };
+  const ROUND_SHORT = ['small', 'big', 'boss'];
+  let stMode = null;
+  function stSection(title) { const s = el('section', 'st'); s.append(el('h3', '', title)); return s; }
+  function stRc(rows) {   // till-receipt lines: [label, value, 'm' for money]
+    const w = el('div', 'st-rc');
+    for (const [k, v, c] of rows) { const d = el('div'); d.append(el('span', '', k), el('i'), el('b', c || '', String(v))); w.append(d); }
+    return w;
+  }
+  function stBars(rows) {   // rows: [label, value, text, colour?, note?]; every row prints its value, so nothing depends on colour
+    const max = Math.max(1, ...rows.map(r => r[1])), g = el('div', 'bars');
+    for (const [label, v, text, c, note] of rows) {
+      const l = el('span', '', label); l.title = label;
+      const bt = el('span', 'bt'), i = el('i'); i.style.setProperty('--w', (v / max).toFixed(4)); if (c) i.style.setProperty('--c', c); bt.append(i);
+      const bv = el('span', 'bv', text); if (note) bv.append(el('small', '', note));
+      g.append(l, bt, bv);
+    }
+    return g;
+  }
+  function stChart(D, sec) {   // the last 30 play days of one mode: daily average columns, a tick for the daily best
+    const days = Object.keys(D.days).sort(), val = (d, m) => (D.days[d].m || {})[m];
+    const opts = ['marathon', 'ultra', 'sprint', 'run'], has = m => days.some(d => val(d, m) && val(d, m)[0]);
+    if (!opts.some(has)) return false;
+    if (!stMode || !has(stMode)) stMode = has(S.mode) && opts.includes(S.mode) ? S.mode : opts.find(has);
+    const seg = el('div', 'seg light'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Chart mode');
+    const wrap = el('div', 'st-chart');
+    for (const m of opts) {
+      const b = el('button', '', MODES[m].name); b.type = 'button'; b.disabled = !has(m); b.setAttribute('aria-pressed', String(m === stMode));
+      b.addEventListener('click', () => { stMode = m; seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); draw(); });
+      seg.append(b);
+    }
+    const draw = () => {
+      wrap.innerHTML = '';
+      const m = stMode, pts = days.filter(d => val(d, m) && val(d, m)[0]).slice(-30), N = pts.length;
+      const avg = pts.map(d => val(d, m)[2] / val(d, m)[0]), best = pts.map(d => val(d, m)[1]);
+      const sprint = m === 'sprint', run = m === 'run', top = Math.max(1e-9, ...avg, ...(sprint ? [] : best));
+      const show = v => sprint ? fmtTime(v, true) : run ? (v >= 9 ? 'won' : 'ante ' + (Math.round(v * 10) / 10)) : fmt(Math.round(v));
+      const svg = document.createElementNS(SVGNS, 'svg');
+      svg.setAttribute('viewBox', '0 0 ' + 10 * N + ' 100'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('role', 'img');
+      const allBest = sprint ? Math.min(...best) : Math.max(...best);
+      svg.setAttribute('aria-label', MODES[m].name + (sprint ? ' daily average time' : run ? ' daily average ante reached' : ' daily average') + ', last ' + N + (N === 1 ? ' play day' : ' play days')
+        + ', from ' + show(Math.min(...avg)) + ' to ' + show(Math.max(...avg)) + '; best ' + show(allBest));
+      for (const y of [25, 50, 75]) { const ln = document.createElementNS(SVGNS, 'line');
+        for (const [k, v] of [['x1', 0], ['x2', 10 * N], ['y1', y], ['y2', y], ['stroke', 'var(--nonrepro)'], ['vector-effect', 'non-scaling-stroke']]) ln.setAttribute(k, v); svg.append(ln); }
+      const H = v => Math.max(1, v / top * 92);
+      pts.forEach((d, i) => {
+        const r = document.createElementNS(SVGNS, 'rect'), h = H(avg[i]);
+        for (const [k, v] of [['x', i * 10 + 1.5], ['y', 100 - h], ['width', 7], ['height', h], ['fill', run ? 'var(--fed)' : 'var(--blue)']]) r.setAttribute(k, v); svg.append(r);   // blue is points ink: Run plots antes
+        const t = document.createElementNS(SVGNS, 'rect'), hb = H(best[i]);   // the day's best: a 2-unit ink tick
+        for (const [k, v] of [['x', i * 10 + 0.5], ['y', Math.max(0, 100 - hb - 1)], ['width', 9], ['height', 2], ['fill', 'var(--ink)']]) t.setAttribute(k, v); svg.append(t);
+      });
+      const ax = el('div', 'st-axis'); ax.append(el('span', '', dayLabel(pts[0])), el('span', '', N > 1 ? dayLabel(pts[N - 1]) : ''));
+      const last7 = pts.slice(-7), n7 = sumOf(last7.map(d => val(d, m)[0])), a7 = n7 ? sumOf(last7.map(d => val(d, m)[2])) / n7 : 0;
+      const cap = el('p', 'st-cap', (run ? 'Furthest ' : 'Best ') + show(allBest) + ' · last ' + last7.length + (last7.length === 1 ? ' play day' : ' play days') + ' avg ' + show(a7)
+        + (sprint ? ' · lower is better' : run ? ' · columns: ante reached, 9 = won' : ''));
+      wrap.append(svg, ax, cap);
+    };
+    sec.append(seg, wrap); draw();
+    return true;
+  }
+  function renderStats() {
+    const D = Play.data(), L = D.life, body = $('st-body'); body.innerHTML = '';
+    $('set-track').checked = !!prefs.track;
+    $('st-since').textContent = 'Since ' + dayLabel(D.since) + ' · on this device' + (!D.storeOK ? ' · storage blocked, this session only' : '')
+      + (D.ro ? ' · saved by a newer version, so this one leaves it alone and shows this session only' : '') + (prefs.track ? '' : ' · recording is off');
+    const txt = exportText(true), kb = Math.max(1, Math.ceil(txt.length / 1024));
+    $('st-export').textContent = Play.host() === 'artifact' ? 'Export · ' + kb + ' KB (try Copy if blocked)' : 'Export play data · ' + kb + ' KB';
+    const games = sumOf(Object.values(L.games || {}));
+    if (!games) { body.append(el('p', 'empty', 'Play a game and your stats show up here.')); return; }
+    let sec = stSection('At a glance'); const tiles = el('div', 'st-tiles');
+    for (const [v, l] of [[fmt(L.sessions), 'Sessions'], [durText(L.secs), 'Time played'], [fmt(games), 'Games'], [fmt(L.pieces), 'Pieces']]) { const t = el('div', 'st-tile'); t.append(el('b', '', v), el('span', '', l)); tiles.append(t); }
+    sec.append(tiles); body.append(sec);
+    sec = stSection('Games by mode');
+    sec.append(stBars(['marathon', 'sprint', 'ultra', 'zen', 'run'].filter(m => L.games[m]).map(m => [MODES[m].name, L.games[m], fmt(L.games[m])]))); body.append(sec);
+    sec = stSection('Over time'); if (stChart(D, sec)) body.append(sec);
+    const RN = L.run;
+    if (L.games.run) {
+      sec = stSection('Run');
+      sec.append(el('p', 'st-cap', 'Furthest ante'));
+      sec.append(stBars(RN.reach.map((n, i) => [i < 8 ? 'Ante ' + (i + 1) : 'Won', n, fmt(n), i === 8 ? 'var(--green)' : ''])));
+      const die = Object.entries(RN.die).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      if (die.length) {
+        sec.append(el('p', 'st-cap', 'Where runs end'));
+        const WHY = { pieces: 'out of pieces', topout: 'topped out', abandon: 'abandoned', menu: 'quit to menu', closed: 'closed' };
+        const ul = el('ul', 'st-list');
+        for (const [k, n] of die) {
+          const [a, r, b] = k.split('.'), name = 'Ante ' + a + ' · ' + (ROUND_SHORT[+r] || '?') + (b && BOSSES[b] ? ' · ' + BOSSES[b].name : '');
+          const why = Object.entries((RN.dieWhy || {})[k] || {}).sort((x, y) => y[1] - x[1]).map(([h, c]) => c + ' ' + (WHY[h] || h)).join(' · ');
+          const li = el('li'), l = el('span', '', name), c = el('b', '', String(n));
+          li.append(l, c, el('small', '', why)); ul.append(li);
+        }
+        sec.append(ul);
+      }
+      const ST = RN.stars, nst = sumOf(ST);
+      if (nst) {
+        sec.append(el('p', 'st-cap', 'Stars (small and big rounds)'));
+        const sb = el('div', 'stackbar'); sb.setAttribute('role', 'img');
+        const cols = ['var(--red)', 'var(--ink)', 'color-mix(in srgb, var(--sun) 60%, var(--paper))', 'var(--sun)'], names = ['0★', '★', '★★', '★★★'];
+        sb.setAttribute('aria-label', 'Rounds by stars: ' + names.map((x, i) => x + ' ' + ST[i]).join(', '));
+        ST.forEach((n, i) => { if (!n) return; const s = el('i'); s.style.setProperty('--w', String(n)); s.style.setProperty('--c', cols[i]); sb.append(s); });
+        sec.append(sb, el('p', 'st-cap', names.map((x, i) => x + ' ' + pctOf(ST[i], nst)).join(' · ')));
+        const B = RN.bank, won1 = sumOf(Object.values(B));
+        if (won1) sec.append(el('p', 'st-cap', 'Bank or push'), stRc([['Banked right away', pctOf(RN.quick, won1)], ['Pushed on', pctOf(RN.pushed, won1)],
+          ['→ ★★', pctOf((B.bank2 || 0) + (B.pieces2 || 0) + (B.jam2 || 0), won1)], ['→ ★★★', pctOf(B.max3 || 0, won1)],
+          ['Jammed', (B.jam1 || 0) + (B.jam2 || 0)], ['Out of pieces', (B.pieces1 || 0) + (B.pieces2 || 0)]]));
+      }
+      const buys = Object.entries(RN.buys).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      if (buys.length) {
+        sec.append(el('p', 'st-cap', 'Most-bought charms'));
+        sec.append(stBars(buys.map(([id, n]) => { const f = (RN.buysF || {})[id] || 0; return [CHARMS[id] ? CHARMS[id].name : id, n, fmt(n), '', f ? '· ' + f + ' foil' : '']; })));
+      }
+      if (RN.shops) sec.append(el('p', 'st-cap', 'Shop habits'), stRc([['Rerolls per shop', Math.round((RN.rerolls + RN.rerollFree) / RN.shops * 10) / 10],
+        ['Carried out, avg', '$' + Math.round(RN.carry / RN.shops), 'm'], ['Foils bought', RN.foilBuy + ' of ' + RN.foilSeen]]));
+      body.append(sec);
+    }
+    const TM = Object.keys(L.think || {}).filter(m => sumOf(L.think[m]));
+    if (TM.length) {
+      sec = stSection('Think time');
+      sec.append(stBars(TM.map(m => { const a = (L.thinkS[m] || 0) / 10 / sumOf(L.think[m]); return [MODES[m] ? MODES[m].name : m, a, a.toFixed(2) + ' s']; })));
+      const H = Array(8).fill(0); TM.forEach(m => L.think[m].forEach((n, i) => { H[i] += n || 0; }));
+      const hm = Math.max(1, ...H), tot = sumOf(H);
+      const q = el('div', 'st-hl'); const qs = el('span', 'q', 'QUICK'); qs.style.gridColumn = '1 / 5'; qs.style.borderLeft = '0'; qs.style.borderBottom = '2px solid var(--teal)'; q.append(qs);
+      const hist = el('div', 'st-hist'); hist.setAttribute('role', 'img');
+      hist.setAttribute('aria-label', 'Pieces by think time: ' + TH_LABEL.map((l, i) => l + ' ' + H[i]).join(', ') + '; quick (under 1 s) ' + pctOf(sumOf(H.slice(0, 4)), tot));
+      H.forEach((n, i) => { const b = el('i', i < 4 ? 'q' : ''); b.style.height = (n / hm * 100).toFixed(1) + '%'; b.title = TH_LABEL[i] + ': ' + n; hist.append(b); });
+      const lab = el('div', 'st-hl'); TH_LABEL.forEach(l => lab.append(el('span', '', l)));
+      sec.append(q, hist, lab, el('p', 'st-cap', 'Seconds from spawn to lock · ' + pctOf(sumOf(H.slice(0, 4)), tot) + ' quick (under 1 s keeps the streak fuse topped up)'));
+      body.append(sec);
+    }
+    sec = stSection('Leaving');
+    const E = L.ends;
+    sec.append(stBars([['Played out', E.done], ['Quit to menu', E.menu], ['Restarted', E.restart], ['Abandoned', E.abandon], ['Closed mid-game', E.closed, '', 'var(--red)']].map(([l, n, , c]) => [l, n || 0, fmt(n || 0), c])));
+    const rc = [['Left mid-game', L.hid + ' · back ' + L.back]];
+    if (L.retries[0]) rc.push(['Retries', L.retries[0]], ['After a near miss', L.retries[1]]);
+    sec.append(stRc(rc));
+    const qa = Object.entries(RN.quitAt || {}).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    if (qa.length) sec.append(el('p', 'st-cap', 'Run quit spots'), stRc(qa.map(([k, n]) => { const [a, r, st] = k.split('.'); return ['Ante ' + a + ' · ' + (ROUND_SHORT[+r] || '?') + ' · ' + st, n]; })));
+    body.append(sec);
+  }
+  // export, copy, clear (stars-tracker-design.md 2.7)
+  const fileName = () => 'stackfall-playdata-' + new Date().toLocaleDateString('en-CA') + '.json';   // local YYYY-MM-DD
+  function exportText(noFlush) {
+    if (!noFlush) Play.flush(true);
+    return JSON.stringify({ app: 'stackfall', kind: 'playdata', schema: PLAY_SCHEMA, version: APP_VERSION,
+      exported: new Date().toLocaleDateString('en-CA'), legend: PLAY_LEGEND, ...Play.data() });
+  }
+  const stMsg = t => { $('st-msg').textContent = t; };
+  async function exportPlay() {
+    const txt = exportText(), name = fileName(), kb = Math.max(1, Math.ceil(txt.length / 1024));
+    try {                                                              // 1. share sheet (Android, iOS)
+      const f = new File([txt], name, { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Stackfall play data' }); stMsg('Shared ' + name + ' (' + kb + ' KB).'); return; }
+    } catch (e) { if (e && e.name === 'AbortError') { stMsg(''); return; } }   // the player cancelled: do nothing
+    try {                                                              // 2. download
+      const url = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = name; a.hidden = true; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      stMsg('Saved ' + name + ' (' + kb + ' KB). Nothing downloaded? Use Copy as text.');
+    } catch (e) { copyPlay(); }                                        // 3. copy
+  }
+  async function copyPlay() {
+    const txt = exportText();
+    try { await navigator.clipboard.writeText(txt); stMsg('Copied ' + Math.max(1, Math.ceil(txt.length / 1024)) + ' KB of play data. Paste it into a file named ' + fileName() + '.'); return; } catch (e) {}
+    const ta = $('st-text'); ta.hidden = false; ta.value = txt; ta.focus(); ta.select();   // 4. selectable text
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    stMsg(ok ? 'Copied.' : 'Select all the text below and copy it.');
+  }
+  $('st-export').addEventListener('click', () => { exportPlay(); });
+  $('st-copy').addEventListener('click', () => { copyPlay(); });
+  $('st-clear').addEventListener('click', e => confirmTwice(e.currentTarget, 'Clear play data', 'clear play data', () => {
+    Play.clear(); $('st-text').hidden = true; $('st-text').value = ''; renderStats(); stMsg('Play data cleared.');
+  }));
+  $('set-track').addEventListener('change', e => { prefs.track = e.target.checked; savePrefs(); if (prefs.track) Play.begin(); renderStats(); });
 
   // ---------- effects ----------
   const wellWrap = $('wellWrap');
@@ -3849,6 +4942,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       return;
     }
     if (S.status !== 'playing') return;
+    if (S.bankArmT > 0 && (S.bankArmT -= dt) <= 0) S.bankArmT = 0;   // the first Bank press disarms after BANK_ARM
     if (S.bx && S.bx.hitT > 0) { S.bx.hitT -= dt; return; }   // hit-stop on boss defeat
     if (S.fin) { stepPayout(dt); return; }                      // Overs: leftover pieces pay out before the receipt
     if (S.winT > 0) { S.winT -= dt; if (S.winT <= 0) { S.winT = 0; S.mode === 'run' && S.winLeft > 0 ? startPayout() : roundWon(); } return; }
@@ -4441,7 +5535,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (f.tail <= 0) {   // skip band along the foot of the sheet
       const h = Math.round(cs * 0.9);
       bx.globalAlpha = 0.85; bx.fillStyle = C.paper; bx.fillRect(ox, oy + Hd - h, Wd, h); bx.globalAlpha = 1;
-      bx.font = '800 ' + Math.max(9, Math.round(cs * 0.36)) + 'px ' + MONO; bx.fillStyle = C.ink2;
+      bx.font = '800 ' + Math.max(Math.round(10 * dpr), Math.round(cs * 0.36)) + 'px ' + MONO; bx.fillStyle = C.ink2;   // floors are CSS px x dpr: phone text >= 10px
       bx.fillText(matchMedia('(pointer:coarse)').matches ? 'TAP TO SKIP' : 'TAP OR PRESS ANY KEY TO SKIP', ox + Wd / 2, oy + Hd - h / 2);
     }
   }
@@ -4457,7 +5551,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, Math.round(1.5 * dpr)); bx.strokeRect(x0 + 0.5, y0 + 0.5, w - 1, h - 1);
     bx.setLineDash([3 * dpr, 3 * dpr]); bx.beginPath(); bx.moveTo(x0 + cs * 0.2, y0 + h * 0.42); bx.lineTo(x0 + w - cs * 0.2, y0 + h * 0.42); bx.stroke(); bx.setLineDash([]);
     bx.textBaseline = 'middle'; bx.textAlign = 'left';
-    const lab = Math.max(8, Math.round(cs * 0.34));
+    const lab = Math.max(Math.round(10 * dpr), Math.round(cs * 0.34));
     bx.font = '800 ' + lab + 'px ' + MONO; bx.fillStyle = C.ink2;
     bx.fillText(fin ? 'OVERS · PAID' : 'OVERS · ' + Math.min(f.i, f.left) + '/' + f.left, x0 + cs * 0.25, y0 + h * 0.22);
     // running total: the number presses in on every plate (scale pop) with its pink plate knocked off register
@@ -4582,8 +5676,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     if ((id === 'tide' || id === 'keystone') && !fx.defeat && !winning() && S.status !== 'over' && S.status !== 'cleared') {   // "TIDE IN 3" stamp, gap marker in Tide phase 2
       const label = (id === 'tide' ? 'TIDE IN ' : 'RISE IN ') + Math.max(0, b.tideIn);
-      bx.font = '800 ' + Math.round(cs * 0.42) + 'px ' + MONO;
-      const w = bx.measureText(label).width + cs * 0.4, h = cs * 0.62, x = ox + Wd - w - cs * 0.2, y = oy + cs * 0.25;
+      const fs = Math.max(Math.round(10 * dpr), Math.round(cs * 0.42));
+      bx.font = '800 ' + fs + 'px ' + MONO;
+      const w = bx.measureText(label).width + cs * 0.4, h = Math.max(cs * 0.62, fs * 1.4), x = ox + Wd - w - cs * 0.2, y = oy + cs * 0.25;
       bx.fillStyle = C.boss; bx.fillRect(x, y, w, h); bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, 2 * dpr * 0.75); bx.strokeRect(x, y, w, h);
       bx.fillStyle = C.bossOn; bx.fillText(label, x + w / 2, y + h / 2 + 1);
       if (b.gapCol >= 0) { const gx = ox + b.gapCol * cs + cs / 2; bx.fillStyle = C.ink;
@@ -4593,9 +5688,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       const rows = b.phase >= 2 ? 3 : 2, top = oy + Hd - rows * cs, w = Math.max(2, Math.round(cs * 0.1));
       bx.fillStyle = C.ink;
       bx.fillRect(ox, top, w, rows * cs); bx.fillRect(ox, top, cs * 0.4, w); bx.fillRect(ox, oy + Hd - w, cs * 0.4, w);
-      const lx = ox + w + cs * 0.1, ly = top - cs * 0.55;
-      bx.fillStyle = C.boss; bx.fillRect(lx, ly, cs * 0.95, cs * 0.5); bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, cs * 0.05); bx.strokeRect(lx, ly, cs * 0.95, cs * 0.5);
-      bx.font = '800 ' + Math.round(cs * 0.36) + 'px ' + MONO; bx.fillStyle = C.ink; bx.fillText(rows + '+', lx + cs * 0.475, ly + cs * 0.27);
+      const fs = Math.max(Math.round(10 * dpr), Math.round(cs * 0.36)), bw = Math.max(cs * 0.95, fs * 2), bh = Math.max(cs * 0.5, fs * 1.3);
+      const lx = ox + w + cs * 0.1, ly = top - bh - cs * 0.05;
+      bx.fillStyle = C.boss; bx.fillRect(lx, ly, bw, bh); bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, cs * 0.05); bx.strokeRect(lx, ly, bw, bh);
+      bx.font = '800 ' + fs + 'px ' + MONO; bx.fillStyle = C.ink; bx.fillText(rows + '+', lx + bw / 2, ly + bh * 0.54);
     }
     if (id === 'glass' && b.phase >= 2 && b.flipIn > 0 && b.flipIn <= 3) {   // flip countdown numeral printed on the fold
       bx.globalAlpha = 0.85; stampText(bx, String(b.flipIn), ox + Wd / 2, oy + Hd * 0.42, cs * 3.2, C.boss, C.ink, Math.max(2, cs * 0.1)); bx.globalAlpha = 1;
@@ -4737,7 +5833,29 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const ui = { score: $('s-score'), level: $('s-level'), lines: $('s-lines'), time: $('s-time'), ppm: $('s-ppm'), best: $('s-best'),
     lTime: $('l-time'), lLines: $('l-lines'), lScore: $('l-score'), lLevel: $('l-level'), lPpm: $('l-ppm'), lBest: $('l-best') };
   const PPM_HTML = ui.lPpm.innerHTML;
-  const goalEl = $('goal'), goalFill = $('g-fill'), goalLag = $('g-lag'), goalPips = $('g-pips');
+  const goalEl = $('goal'), goalFill = $('g-fill'), goalLag = $('g-lag'), goalPips = $('g-pips'), goalFill2 = $('g-fill2');
+  const goalGlyphs = [...$('g-stars').children]; let goalStars = -1;
+  goalEl.style.setProperty('--s1', (100 / STAR_X[2]).toFixed(3) + '%'); goalEl.style.setProperty('--s2', (100 * STAR_X[1] / STAR_X[2]).toFixed(3) + '%');
+  goalGlyphs.forEach(g => { g.innerHTML = STAR_SVG; });
+  $('t-stars').querySelectorAll('.ts-g i').forEach(g => { g.innerHTML = STAR_SVG2; });
+  // the Bank buttons: #bank in the goal row (desktop, tablet, phone landscape), #bank-m in the strip row (phones)
+  const bankEls = [$('bank'), $('bank-m')]; let bankKey = '';
+  function syncBank(live) {
+    const can = live && canBank(), q = live && !can && S.bankReq && S.status === 'playing';
+    const key = can ? [S.stars, bankValue(), S.bankArmT > 0, prefs.keys.bank[0] || ''].join() : q ? 'q' : '';
+    if (key === bankKey) return;
+    const appear = !bankKey && can; bankKey = key;
+    const left = Math.min(LEFTOVER_CAP, Math.floor(S.piecesLeft / 5)), k = prefs.keys.bank[0], coarse = matchMedia('(pointer:coarse)').matches;
+    bankEls.forEach((b, i) => {
+      b.hidden = !can && !q; if (b.hidden) { b.classList.remove('armed', 'queued', 'new'); return; }
+      b.classList.toggle('armed', can && S.bankArmT > 0); b.classList.toggle('queued', !!q);
+      b.textContent = q ? 'Banking…' : S.bankArmT > 0 ? (i === 1 || coarse ? 'Tap again' : k ? keyName(k) + ' again' : 'Click again') : 'Bank +$' + bankValue();
+      if (i === 0 && can && !(S.bankArmT > 0) && k) { const kb = document.createElement('kbd'); kb.textContent = keyName(k); b.append(' ', kb); }
+      b.setAttribute('aria-label', q ? 'Banking after this clear' : 'Bank now: ' + (STAR_PAY[S.stars] ? starRow(S.stars) + ' pays $' + STAR_PAY[S.stars] + ', ' : '')
+        + S.piecesLeft + ' unused pieces pay $' + left);
+      if (appear && !reducedMotion) { b.classList.remove('new'); void b.offsetWidth; b.classList.add('new'); }
+    });
+  }
   let lastUI = '', shownRound = 0;
   const hpBar = { lag: 1, hold: 0, prev: 1 };   // damage-lag state for the boss HP bar
   let goalTxt = '', goalW = 300;                  // goal strip label cache; bar width (ResizeObserver) picks "P1" or "Phase 1"
@@ -4746,8 +5864,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function layoutGoal() {
     const d = S.mode === 'run' && R && R.boss && S.bx ? BOSSES[R.boss] : null;
     [$('g-n1'), $('g-n2')].forEach((n, i) => {
-      n.hidden = !d || d.phases.length <= i;
-      if (d && d.phases[i] != null) n.style.left = ((1 - d.phases[i]) * 100).toFixed(1) + '%';
+      if (!d) { n.hidden = false; n.classList.remove('passed'); n.style.left = 'var(' + (i ? '--s2' : '--s1') + ')'; return; }   // non-boss Run: the 1-star and 2-star notches
+      n.hidden = d.phases.length <= i;
+      if (d.phases[i] != null) n.style.left = ((1 - d.phases[i]) * 100).toFixed(1) + '%';
     });
     hpBar.lag = hpBar.prev = 1; hpBar.hold = 0;
   }
@@ -4777,24 +5896,31 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         [...goalPips.children].forEach((p, i) => p.classList.toggle('lit', i < Math.min(3, b.idle)));
         [$('g-n1'), $('g-n2')].forEach((n, i) => n.classList.toggle('passed', b.phase > i + 1));
       }
-    } else {
-      goalFill.style.transform = 'scaleX(' + (live && S.target ? Math.min(1, S.roundScore / S.target) : 0).toFixed(3) + ')';
+    } else {   // 0 -> target (pink, green at 1 star), target -> STAR_X[2] x target (sunflower); the glyphs follow S.stars, never the Overs score
+      const T = S.target, shown = live && T ? shownRound : 0;
+      goalFill.style.transform = 'scaleX(' + (T ? Math.min(1, shown / T) : 0).toFixed(3) + ')';
+      goalFill2.style.transform = 'scaleX(' + (T ? Math.max(0, Math.min(1, (shown - T) / (T * (STAR_X[2] - 1)))) : 0).toFixed(3) + ')';
       hpBar.key = '';
-      const gt = live && S.target ? fmt(Math.round(shownRound)) + ' / ' + fmt(S.target) : '';
-      if (gt !== goalTxt) { goalTxt = gt; $('g-hp').textContent = gt; }   // the round score against the target, on the strip itself
+      const gt = live && T ? fmt(Math.round(shownRound)) + ' / ' + fmt(S.stars ? nextStarAt() : T) : '';
+      if (gt !== goalTxt) { goalTxt = gt; $('g-name').textContent = gt; }   // the round score against the next goal, at the left of the strip
+      const sk = live ? S.stars : 0;
+      if (sk !== goalStars) { goalStars = sk; goalGlyphs.forEach((g, i) => g.classList.toggle('on', i < sk)); }
     }
-    goalEl.classList.toggle('done', !bossBar && live && S.target > 0 && S.roundScore >= S.target);
+    goalEl.classList.toggle('done', !bossBar && live && S.target > 0 && (S.stars >= 1 || S.roundScore >= S.target));
+    syncBank(live);
     const br = bestFor('run');
+    const nextLbl = live && !bossBar && S.stars >= 1 ? starRow(Math.min(3, S.stars + 1)) + ' at' : 'Target';   // phones rely on the slip: the bar text hides under 250px
     const vals = live
-      ? [fmt(Math.round(shownRound)), fmt(S.target), R.ante + '/8', String(S.piecesLeft), '$' + R.money]
+      ? [fmt(Math.round(shownRound)), fmt(bossBar || !S.stars ? S.target : nextStarAt()), R.ante + '/8', String(S.piecesLeft), '$' + R.money]
       : ['—', '—', '—', '—', '—'];
     vals.push(br ? (br.won ? 'Won' : 'Ante ' + br.ante) : '—');
     const low = live && S.status === 'playing' && S.piecesLeft <= 5;
-    const key = 'run|' + vals.join('|') + low + hpKey;
+    const key = 'run|' + vals.join('|') + low + hpKey + nextLbl + S.stars;
     if (key === lastUI) return; lastUI = key;
-    ui.lScore.textContent = 'Round'; ui.lLines.textContent = 'Target'; ui.lLevel.textContent = 'Ante';
+    ui.lScore.textContent = 'Round'; ui.lLines.textContent = nextLbl; ui.lLevel.textContent = 'Ante';
     ui.lTime.textContent = 'Pieces'; ui.lPpm.textContent = 'Money'; ui.lBest.textContent = 'Best run';
     [ui.score, ui.lines, ui.level, ui.time, ui.ppm, ui.best].forEach((el, i) => { el.textContent = vals[i]; });
+    ui.best.title = ''; ui.best.removeAttribute('aria-label');
     ui.time.parentElement.classList.toggle('low', low);
   }
   function drawStats(dt) {
@@ -4803,11 +5929,16 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const timeTxt = mode === 'ultra' ? fmtTime(Math.ceil(Math.max(0, ULTRA_SECS - S.time))) : fmtTime(S.time, mode === 'sprint' && innerWidth > 700);   // hundredths don't fit the phone slip; the result shows them
     const linesTxt = mode === 'sprint' ? Math.min(S.lines, SPRINT_LINES) + '/' + SPRINT_LINES : String(S.lines);
     const b = bestFor(mode);
-    const bestTxt = !b ? '—' : mode === 'sprint' ? fmtTime(b.time, true) : fmt(Math.max(b.score, mode === 'zen' ? 0 : 0));
-    const key = [S.score, S.level, linesTxt, timeTxt, ppm(), bestTxt, mode].join('|');
+    // phones and phone landscape: a 7-digit Best no longer fits beside a 7-digit Score in the slip, so it reads 1.23M (full number in title / aria)
+    const narrow = innerWidth <= 700 || matchMedia('(orientation:landscape) and (max-height:500px)').matches;
+    const fmtC = n => n >= 1e6 ? +(n / 1e6).toFixed(n >= 1e7 ? 1 : 2) + 'M' : n >= 1e5 ? Math.round(n / 1e3) + 'K' : fmt(n);
+    const bestTxt = !b ? '—' : mode === 'sprint' ? fmtTime(b.time, true) : narrow ? fmtC(b.score) : fmt(b.score);
+    const key = [S.score, S.level, linesTxt, timeTxt, ppm(), bestTxt, mode, narrow].join('|');
     if (key === lastUI) return; lastUI = key;
     ui.score.textContent = fmt(S.score); ui.level.textContent = S.level; ui.lines.textContent = linesTxt;
     ui.time.textContent = timeTxt; ui.ppm.textContent = ppm(); ui.best.textContent = bestTxt;
+    const full = b && mode !== 'sprint' && bestTxt !== fmt(b.score) ? fmt(b.score) : '';
+    ui.best.title = full; if (full) ui.best.setAttribute('aria-label', full); else ui.best.removeAttribute('aria-label');
     if (mode === 'ultra') ui.lTime.innerHTML = '<span class="long">Time left</span><span class="short">Left</span>'; else ui.lTime.textContent = 'Time';
     ui.lScore.textContent = 'Score'; ui.lLines.textContent = 'Lines'; ui.lLevel.textContent = 'Level';
     ui.lPpm.innerHTML = PPM_HTML; ui.lBest.textContent = 'Best'; ui.time.parentElement.classList.remove('low');
@@ -4858,11 +5989,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 
   // ---------- boot (keeps a running game across page updates) ----------
   function boot(data) {
+    Play.boot(data && data.play);   // first: with a snapshot the same session and open game continue; nothing is written during boot
     if (data && data.state && data.state.board) {
       S = Object.assign(fresh(false), data.state);
       if (data.run) {
         R = Object.assign({ maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {}, usedBosses: [],
-          ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0 }, data.run);
+          ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0, stars: 0, perfect: 0 }, data.run);
         for (const k of ['boss', 'anteBoss']) if (R[k] && !BOSSES[R[k]]) R[k] = OLD_BOSS[R[k]] || 'warden';   // v5 boss ids
         R.charms = (R.charms || []).filter(c => CHARMS[c.id]);
         if (R.boss && S.mode === 'run' && !S.bx && ['intro', 'playing', 'paused'].includes(S.status)) { S.bx = makeBx(); S.bossPhase = 1; }
@@ -4871,6 +6003,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (S.status === 'countdown') S.status = 'intro';
       if (S.status === 'playing') S.status = 'paused';   // mid-cascade and mid-Overs too: Resume continues them
       if (S.bx) S.bx.hitT = 0;
+      S.bankArmT = 0;                                      // an armed Bank never survives a reload (the round comes back paused)
+      if (!Array.isArray(S.starPc)) S.starPc = [0, 0, 0];
       S.overAt = 0;                                        // a restored over screen takes the retry key at once
       if (S.cur && S.cur.mk === undefined) S.cur.mk = null;
       if (S.fin && S.fin.tail > 0 && S.mode === 'run' && R) { S.finPts = S.fin.pts; S.fin = null; roundWon(true); }   // the payout was done: straight to the receipt
@@ -4879,10 +6013,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       refill();
     }
     syncOpts(); renderControls(); renderKeymap();
-    showOverlay();
+    showOverlay(); layoutGoal();
     requestAnimationFrame(t => { last = t; frame(t); });
   }
-  window.claude?.hot?.snapshot?.(() => ({ state: JSON.parse(JSON.stringify(S)), run: R ? JSON.parse(JSON.stringify(R)) : null }));
+  window.claude?.hot?.snapshot?.(() => ({ state: JSON.parse(JSON.stringify(S)), run: R ? JSON.parse(JSON.stringify(R)) : null, play: Play.snapshot() }));
   window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 })();
 </script>
