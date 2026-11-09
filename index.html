@@ -149,7 +149,7 @@ kbd{font:700 11px var(--f-num);background:var(--paper);border:1.5px solid var(--
   position:relative;
   height:var(--wellh);aspect-ratio:1/2;max-width:100%;
   background:var(--paper);border-radius:0;overflow:hidden;
-  box-shadow:0 0 0 1px var(--paper-edge), var(--plate) var(--plate) 0 0 var(--tc), 0 6px 0 0 var(--shadow);
+  box-shadow:0 0 0 1px var(--paper-edge), calc(var(--plate) + var(--chain, 0px)) calc(var(--plate) + var(--chain, 0px)) 0 0 var(--tc), 0 6px 0 0 var(--shadow);
   transition:box-shadow .24s var(--e-settle);
 }
 .is-boss .well-wrap{outline:3px solid var(--boss);outline-offset:4px}
@@ -229,6 +229,34 @@ kbd{font:700 11px var(--f-num);background:var(--paper);border:1.5px solid var(--
   80%{opacity:1;transform:none;animation-timing-function:var(--e-slide)}
   100%{opacity:0;transform:translateY(-10px)}
 }
+/* chain steps (juice-design 10.1): the word grows and tilts each wave; clamped to the well so MASTERPRINT! fits a phone */
+.callout.c1{--csz:26px;--k:1;rotate:-3deg} .callout.c2{--csz:30px;--k:2;rotate:2deg} .callout.c3{--csz:34px;--k:3;rotate:-4deg}
+.callout.c4{--csz:38px;--k:4;rotate:3deg} .callout.c5{--csz:44px;--k:5;rotate:-5deg} .callout.c6{--csz:52px;--k:6;rotate:-2deg}
+.callout[class*=" c"]{font-size:min(var(--csz), calc(var(--wellh) * .1));line-height:.95;text-shadow:calc(1px + var(--k, 1) * 1px) calc(1px + var(--k, 1) * 1px) 0 var(--pink)}
+/* the top of the ladder hits harder: a bigger stamp with a register kick, and Masterprint! lands on the sunflower band */
+.callout.c4.show,.callout.c5.show,.callout.c6.show{animation-name:calloutBig}
+@keyframes calloutBig{
+  0%{opacity:0;transform:scale(2.3);animation-timing-function:var(--e-stamp)}
+  6%{opacity:1;transform:scale(.92)}
+  9%{transform:scale(1.04) translate(2px,-1px)}
+  12%{transform:none}
+  80%{opacity:1;transform:none;animation-timing-function:var(--e-slide)}
+  100%{opacity:0;transform:translateY(-10px)}
+}
+.callout .cw{display:inline-block;white-space:pre-line;line-height:.92}   /* Full / bleed! etc. stack on two lines */
+.callout.c5 .cw,.callout.c6 .cw{display:inline;padding:0 .14em;background:linear-gradient(transparent 14%, var(--sun) 14% 88%, transparent 88%);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}   /* one highlighter stroke per stacked line */
+.callout.c5 .cw{background:linear-gradient(transparent 62%, var(--sun) 62% 88%, transparent 88%)}
+/* near miss: the real gap on the highlighter */
+.near-g{position:relative;width:min(13rem,78%);height:10px;margin:-2px auto 2px;border:1.5px solid var(--ink);box-sizing:border-box;
+  background:repeating-linear-gradient(-45deg, var(--pink) 0 2px, var(--paper) 2px 5px)}   /* the hatched gap is what you missed by */
+.near-g i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--f, 0) * 100%);background:var(--ink);animation:nearFill .7s .2s var(--e-settle) both}
+.near-g::after{content:"";position:absolute;right:-3px;top:-6px;bottom:-6px;width:3px;background:var(--ink)}
+@keyframes nearFill{from{width:0}}
+#ov-main.go{animation:nudge .42s ease-out}
+@keyframes nudge{0%{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--pink)}100%{transform:none;box-shadow:3px 3px 0 var(--pink)}}
+.near{font:900 22px/1.1 var(--f-display);font-stretch:condensed;text-transform:uppercase;letter-spacing:.02em;color:var(--ink);padding:0 8px;
+  background:linear-gradient(transparent 12%, var(--sun) 12% 88%, transparent 88%);transform:rotate(-2deg);--r:-2deg;animation:stamp .16s var(--e-stamp) both}
 @keyframes stamp{0%{transform:scale(1.6) rotate(var(--r,0deg));opacity:0}70%{transform:scale(.96) rotate(var(--r,0deg));opacity:1}100%{transform:scale(1) rotate(var(--r,0deg))}}
 @keyframes thump{0%{transform:scale(1.06);background-color:color-mix(in srgb, var(--pink) 35%, var(--paper-2));box-shadow:4px 4px 0 var(--pink)}100%{transform:none;box-shadow:0 0 0 var(--pink)}}
 @keyframes register-a{from{transform:translate(-7px,-4px)}to{transform:none}}
@@ -456,6 +484,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .receipt div{display:flex;align-items:baseline}
 .receipt div i{flex:1;border-bottom:1px dotted var(--ink-2);margin:0 4px 3px}
 .receipt div.tot{font-weight:800;border-top:1px dashed var(--ink-2);margin-top:3px;padding-top:2px}
+.receipt div.overs{color:var(--ink-2);border-bottom:1px dashed var(--paper-edge);margin-bottom:3px;padding-bottom:2px}   /* Overs: points, outside the till total */
 
 /* ---- charms: die-cut tickets ---- */
 .charms-panel{display:none}
@@ -536,6 +565,46 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .card .buy{font:800 13px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;padding:7px 10px;border-radius:0;border:0;background:var(--ink);color:var(--paper);cursor:pointer;margin:4px 10px 0}
 .card .buy:hover:not(:disabled){background:#000}
 .card .buy:disabled{background:var(--paper-2);color:var(--ink-2);cursor:default}
+/* foil: hot-foil stamping (juice-design 7): split-fountain stub, 3-plate name, double keyline, FOIL seal, one paper sheen on deal */
+.card.foil{outline:2px solid var(--ink);outline-offset:2px}
+.card.foil .k{background:linear-gradient(90deg, var(--pink) 0 33.3%, var(--sun) 0 66.6%, var(--aqua) 0);color:var(--ink);overflow:hidden;padding-left:26px}   /* clears the seal */
+.card.foil .k .dots i{background:var(--ink)}
+.card.foil > b,.foil > b,.charm-strip span.foil{text-shadow:1.5px 1.5px 0 var(--pink), -1.5px -1px 0 var(--aqua)}
+.card.foil::before{content:"FOIL";position:absolute;top:-8px;left:-8px;z-index:2;width:30px;height:30px;box-sizing:border-box;border-radius:50%;border:2px solid var(--ink);
+  background:var(--sun);color:var(--ink);font:800 8.5px/26px var(--f-ui);letter-spacing:.08em;text-align:center;transform:rotate(-12deg)}
+.card.foil .k::after{content:"";position:absolute;top:0;bottom:0;left:0;width:30%;background:color-mix(in srgb, var(--paper) 60%, transparent);opacity:0;pointer-events:none;transform:skewX(-20deg) translateX(-140%)}
+.cards.deal .card.foil .k::after{animation:sheen .6s .22s var(--e-slide) both}
+@keyframes sheen{from{opacity:1;transform:skewX(-20deg) translateX(-140%)}to{opacity:1;transform:skewX(-20deg) translateX(420%)}}
+/* feel pass: the foil sheet carries a sunflower halftone overprint (the "gold"), the seal stamps on after the card lands,
+   and the paper sheen sweeps the stub again every few seconds and on hover, so a foil keeps catching the eye */
+.card.foil{background-image:radial-gradient(color-mix(in srgb, var(--sun) 62%, transparent) 21%, transparent 23%);background-size:6px 6px}
+.card.foil:not(.sold) .k::after{animation:sheenIdle 4.6s 1.6s var(--e-slide) infinite}
+.cards.deal .card.foil:not(.sold) .k::after{animation:sheen .6s .22s var(--e-slide) both, sheenIdle 4.6s 2.4s var(--e-slide) infinite}
+.card.foil:not(.sold):hover .k::after{animation:sheen2 .6s var(--e-slide) both}
+@keyframes sheen2{from{opacity:1;transform:skewX(-20deg) translateX(-140%)}to{opacity:1;transform:skewX(-20deg) translateX(420%)}}
+@keyframes sheenIdle{0%{opacity:1;transform:skewX(-20deg) translateX(-140%)}13%{opacity:1;transform:skewX(-20deg) translateX(420%)}13.1%,100%{opacity:0;transform:skewX(-20deg) translateX(420%)}}
+.cards.deal .card.foil::before{animation:sealIn .18s .5s var(--e-stamp) both}
+@keyframes sealIn{0%{transform:rotate(-12deg) scale(2.2);opacity:0}70%{transform:rotate(-12deg) scale(.94);opacity:1}100%{transform:rotate(-12deg) scale(1)}}
+.charm-list li.foil.bought,.row-o.foil.bought{animation:thump .4s ease-out}
+.charm-list li.foil,.row-o.foil,.charm-strip span.foil{background-image:linear-gradient(var(--pink) 0 33.3%, var(--sun) 0 66.6%, var(--aqua) 0);background-size:4px 100%;background-repeat:no-repeat}
+/* scratch ticket (juice-design 8): plain first cut; the feel pass dresses it */
+#shop-ticket{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--paper-2);padding:6px 14px}
+.tk-stub{display:flex;flex-direction:column;gap:1px;font:700 10.5px var(--f-num);color:var(--ink-2);letter-spacing:.04em}
+.tk-stub b{font:900 18px/1 var(--f-display);font-stretch:condensed;text-transform:uppercase;letter-spacing:.02em;color:var(--ink)}
+.tk-field{position:relative;height:44px;min-width:0;background:var(--paper);border:1.5px dashed var(--ink-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tk-prize{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;padding:0 6px;max-width:100%;box-sizing:border-box}
+.tk-prize b{font:900 22px/1 var(--f-display);font-stretch:condensed;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tk-prize small{font:700 10.5px/1 var(--f-num);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tk-prize.long b{font-size:17px}
+.tk-prize.t0 b{font-size:18px;color:var(--ink-2)}
+.tk-prize.t3 b{font-size:26px;padding:0 .12em;background:linear-gradient(transparent 12%, var(--sun) 12% 88%, transparent 88%)}
+.tk-prize.stamp{animation:stamp .16s var(--e-stamp) both}
+#tk-coat{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+#tk-coat.lift{transition:transform .16s var(--e-slide), opacity .16s;transform:translateY(-6px);opacity:0}
+#shop-ticket.thump{animation:thump .4s ease-out}
+#shop-ticket:not(.done) .tk-field{border-color:var(--ink)}
+#shop-ticket:not(.done) #tk-reveal{box-shadow:2px 2px 0 var(--sun)}
+.flake{position:fixed;left:0;top:0;pointer-events:none;z-index:60;will-change:transform}
 .card.sold{opacity:.6}
 .card.sold::after{content:"SOLD";position:absolute;left:50%;top:46%;transform:translate(-50%,-50%) rotate(-12deg);font:900 28px/1 var(--f-display);font-stretch:condensed;letter-spacing:.06em;
   color:var(--red-t);border:3px solid var(--red);padding:3px 10px 1px;background:color-mix(in srgb, var(--paper) 60%, transparent)}
@@ -601,6 +670,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   .card > b.long{font-size:14px;letter-spacing:0}
   .card p{font-size:11.5px}
   .shop-next{font-size:12.5px}
+  .card.foil .k{white-space:nowrap;font-size:9px;letter-spacing:.08em}   /* FOIL · COMMON stays on one line: the stub keeps its 26px */
 }
 /* short wells (small laptops, phones): the poster keeps one charm note and tighter rules so the Face button stays on the sheet */
 #overlay.poster[data-boss="keystone"] .cnotes li:nth-child(n+2){display:none}
@@ -635,6 +705,13 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   .goal.notch-hot .gnotch:not(.passed),.heat.low .fill{animation:none !important}
   .is-boss[data-boss="surge"] .heat .fuse::before{animation:none !important}
   .btn,.btn:hover,.btn:active{transform:none}
+  .callout[class*=" c"]{rotate:none}
+  .card.foil .k::after,.cards.deal .card.foil .k::after{animation:none !important;opacity:0}
+  #tk-coat.lift{transition:none;transform:none}
+  #shop-ticket.thump{animation:none !important}
+  .card.foil .k::after,.card.foil:hover .k::after,.cards.deal .card.foil .k::after{animation:none !important;opacity:0}
+  .cards.deal .card.foil::before,#ov-main.go{animation:none !important}
+  .near-g i{animation:none !important}
 }
 </style>
 </head>
@@ -690,6 +767,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       <div class="tape2" id="ov-tape2" aria-hidden="true"><span id="ov-tape2-t"></span></div>
       <svg class="motif" id="ov-motif" viewBox="0 0 100 100" aria-hidden="true"></svg>
       <div class="ostamp" id="ov-stamp" hidden></div>
+      <div class="near" id="ov-near" hidden></div>
+      <div class="near-g" id="ov-nearg" hidden aria-hidden="true"><i></i></div>
       <div class="eyebrow" id="ov-eyebrow" hidden></div>
       <div class="sigil" id="ov-sigil" aria-hidden="true" hidden></div>
       <h2 id="ov-title">Stackfall</h2>
@@ -831,6 +910,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   <div class="shop-card" role="dialog" aria-modal="true" aria-labelledby="shop-title">
     <div class="shop-head"><h2 id="shop-title">Shop</h2><span class="money" id="shop-money">$0</span></div>
     <p class="shop-next" id="shop-next"></p>
+    <div class="ticket" id="shop-ticket" hidden>
+      <div class="tk-stub"><b>Ticket</b><span id="tk-no"></span></div>
+      <div class="tk-field"><span class="tk-prize" id="tk-prize" aria-live="polite"></span><canvas id="tk-coat" aria-hidden="true"></canvas></div>
+      <button type="button" class="small" id="tk-reveal">Reveal</button>
+    </div>
     <h3>Charms</h3>
     <div class="cards" id="shop-charms"></div>
     <h3>Upgrades</h3>
@@ -983,9 +1067,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       noiseBuf = a.createBuffer(1, a.sampleRate * 2, a.sampleRate);
       const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
+    let gestured = false;   // no AudioContext before the first user gesture (kick() sets it)
     function ensure() {
       if (!prefs.sound && !prefs.music) return null;
       if (!ac) {
+        if (!gestured) return null;
         const A = window.AudioContext || window.webkitAudioContext; if (!A) return null;
         try { ac = new A({ latencyHint: 'interactive' }); } catch (e) { return null; }
         build(ac); volumes();
@@ -1451,7 +1537,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (!prefs.music || prefs.musVol <= 0) return null;
       const stt = S.status, boss = S.mode === 'run' && R && R.boss;
       if (stt === 'ready') return 'menu';
-      if (stt === 'over' || S.winT > 0) return null;                    // the jingle/fanfare plays alone
+      if (stt === 'over' || S.winT > 0 || S.fin) return null;          // the jingle/fanfare (and the Overs payout) play alone
       if (stt === 'countdown') return boss ? 'wait:' + boss : 'play';
       if (stt === 'cleared' || stt === 'shop') return 'shop';
       if (stt === 'intro') return boss ? 'wait:' + boss : (cur === 'menu' || cur === 'shop' ? cur : 'shop');
@@ -1575,7 +1661,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const TICK = [69, 72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96];      // A minor pentatonic ladder
     const COIN = [84, 86, 88, 91, 93, 96, 98, 100];
     const TALLY = { chip: 0.06, note0: 0.14, note: 0.065, count: 0.55 };
-    let tallyEnd = 0, lastHover = -1, lastSlam = -1;
+    let tallyEnd = 0, lastHover = -1, lastSlam = -1, lastLand = -1, lastScratch = -1;
     const kindOf = w => /×/.test(w) ? 'x' : /\$/.test(w) ? 'cash' : /score 0/.test(w) ? 'void' : /mult/.test(w) ? 'mult' : /points/.test(w) ? 'pts' : 'tag';
     function coin(t, k) { voice('coin', COIN[Math.min(k, COIN.length - 1)], t, 0.09, { bus: sfxBus, prio: 1 }); nz(t, 0.02, { type: 'highpass', f: 5000, vol: 0.03 }, sfxBus); }
     function buzz(t) { voice('sawb', 33, t, 0.22, { bus: sfxBus, prio: 1, vol: 1.1, slide: 31 }); voice('organ', 34, t, 0.22, { bus: sfxBus, prio: 1 }); thump(t, 0.7, sfxBus, 90, 40, 0.2); }
@@ -1592,7 +1678,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       visibility(hidden) { if (!ac) return; if (hidden) ac.suspend().catch(() => {}); else if (prefs.sound || prefs.music) ac.resume().catch(() => {}); },
       musicSync, musicReset() { bi = 0; st = 0; lay.tier = 0; },
       // call from user-gesture handlers: creates/resumes the context, then starts the wanted song if none is playing
-      kick() { if (!ensure()) return; if (!timer && wanted()) musicSync(); },
+      kick() { gestured = true; if (!ensure()) return; if (!timer && wanted()) musicSync(); },
       setDanger(on) { want.danger = !!on; },
       setFinal(on) { want.esc = !!on; },                                   // Ultra last 20 s, Sprint last 5 lines
       setMusic(o = {}) { want.phase = o.phase || 1; },                  // boss phase for the loop; the song itself follows R.boss
@@ -1638,7 +1724,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       roundClear: fx(() => { const t = Math.max(endSongForJingle(1.3), tallyEnd); quietUntil = Math.max(quietUntil, t + 1.3); play(ROUND_JINGLE, t); }),
       runComplete: fx(() => { tapeStop(0.25); const t = Math.max(now() + 0.3, tallyEnd, quietUntil - 0.2); /* after the Keystone fanfare */ render(RUN_DONE, t); play(TICK.map((m, k) => ['v', k * 0.06, 'bell', m + 12, 0.6, 0.6]), t + 6); }),
       runOver: fx(() => { tapeStop(0.7); play(RUN_OVER, now() + 0.1); }),
-      tally: fx((notes, total, frac, combo) => {
+      tally: fx((notes, total, frac, combo, quiet) => {   // quiet: a chain wave (chain() carries the bells; no end chord)
         const t0 = now(), off = Math.min(Math.max(combo || 0, 0), 4);
         let i = 0;
         const tick = (t, kind) => {
@@ -1657,9 +1743,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
           nz(t0 + x * TALLY.count, 0.012, { type: 'bandpass', f: mtof(top + k), q: 4, vol: 0.035 }, sfxBus);
         }
         const tEnd = t0 + TALLY.count, chord = frac >= 1 ? [0, 4, 7, 12] : frac >= 0.4 ? [0, 7, 12] : frac >= 0.15 ? [0, 7] : [0];
-        thump(tEnd, frac >= 0.4 ? 1 : 0.6, sfxBus, 110, 38, 0.25);
-        for (const c of chord) voice('bell', top + c, tEnd, 0.5, { bus: sfxBus, prio: 1, vol: 0.9 });
-        if (frac >= 1) DRUM.x(tEnd, 0.6, sfxBus);
+        if (!quiet) {
+          thump(tEnd, frac >= 0.4 ? 1 : 0.6, sfxBus, 110, 38, 0.25);
+          for (const c of chord) voice('bell', top + c, tEnd, 0.5, { bus: sfxBus, prio: 1, vol: 0.9 });
+          if (frac >= 1) DRUM.x(tEnd, 0.6, sfxBus);
+        }
         tallyEnd = tEnd + 0.25; lastSlam = tEnd;
       }),
       slam: fx(() => { const t = now(); if (t - lastSlam < 0.06) return; lastSlam = t; thump(t, 0.9, sfxBus, 110, 38, 0.25); nz(t, 0.12, { type: 'lowpass', f: 600, vol: 0.1 }, sfxBus); }),
@@ -1684,6 +1772,64 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       deny: fx(() => buzz(now())),
       hover: fx(i => { const t = now(); if (t - lastHover < 0.04) return; lastHover = t; voice('tick', TICK[(i * 2) % 8] + 12, t, 0.03, { bus: sfxBus, prio: 1, vol: 0.35 }); }),
       pageTurn: fx(() => nz(now(), 0.18, { type: 'bandpass', f: 3000, f2: 800, q: 1, vol: 0.06 }, sfxBus)),
+      // ===== juice pass (juice-design.md 10.2). First-cut sounds from the spec table; the feel pass owns the mix. =====
+      mark: fx(k => {                                                    // a special is printed on the piece entering the well
+        const t = now(), P = { b: [72, 79], r: [76, 84], s: [79, 88] }[k] || [72, 79];
+        thump(t, 0.6, sfxBus, 150, 60, 0.12);
+        voice('tickM', P[0], t + 0.02, 0.05, { bus: sfxBus, prio: 1 }); voice('tickM', P[1], t + 0.09, 0.06, { bus: sfxBus, prio: 1 });
+        if (k === 's') voice('glass', 88, t + 0.12, 0.6, { bus: sfxBus, prio: 1, vol: 0.7, dry: true });
+      }),
+      blast: fx((kind, w = 1) => {                                       // a special detonates; pitch climbs 2 semitones a wave (cap +10)
+        const t = now(), tr = Math.min(10, 2 * (w - 1)), up = Math.pow(2, tr / 12);
+        if (kind === 'r') { thump(t, 0.9, sfxBus, 170 * up, 55, 0.14); nz(t, 0.18, { type: 'bandpass', f: 5000 * up, f2: 900 * up, q: 0.8, vol: 0.4 }, sfxBus);
+          voice('tickM', 84, t, 0.05, { bus: sfxBus, prio: 1, tr }); voice('tickM', 72, t + 0.06, 0.06, { bus: sfxBus, prio: 1, tr }); }
+        else if (kind === 's') { thump(t, 0.9, sfxBus, 120 * up, 40, 0.22); nz(t, 0.45, { type: 'bandpass', f: 400 * up, f2: 2600 * up, q: 0.9, vol: 0.14 }, sfxBus);
+          [0, 4, 7, 12].forEach((c, k) => voice('glass', 76 + c, t + k * 0.05, 0.4, { bus: sfxBus, prio: 1, vol: 0.85, tr, dry: true })); }
+        else { thump(t, 0.8, sfxBus, 150 * up, 42, 0.2); nz(t, 0.22, { type: 'lowpass', f: 1400 * up, f2: 180, vol: 0.1 }, sfxBus);
+          for (let k = 0; k < 3; k++) nz(t + 0.06 + k * 0.05, 0.03, { type: 'bandpass', f: (900 + k * 400) * up, q: 6, vol: 0.04 }, sfxBus); }
+      }),
+      chain: fx(w => {                                                   // the bell ladder: one bell, a fifth, fifth + octave, then chords
+        const t = now() + 0.04, i = Math.max(1, Math.min(6, w));
+        const C_ = [[], [79], [84, 91], [88, 95, 100], [93, 97, 100], [96, 100, 103], [96, 100, 103]][i];
+        C_.forEach(m => voice('bell', m, t, 0.6, { bus: sfxBus, prio: 1, vol: 0.8 }));
+        duck(i >= 3 ? 0.55 : 0.75, i >= 3 ? 0.6 : 0.4);   // every wave ducks the bed, deeper from wave 3
+        if (i >= 4) DRUM.x(t, i >= 5 ? 0.66 : 0.6, sfxBus);
+        if (i >= 6) [69, 73, 76, 81].forEach(m => voice('brass', m, t + 0.08, 0.5, { bus: sfxBus, prio: 1, vol: 0.8 }));
+      }),
+      land: fx(() => { const t = now(); if (t - lastLand < 0.06) return; lastLand = t; thump(t, 0.35, sfxBus, 160, 70, 0.06); }),
+      payout: fx((i, money, left = 12) => {                              // one Overs plate pays out; money on pieces 5, 10, 15. The ladder spans the real count (top note 103 on the last plate)
+        const n = Math.min(left, 20), t = now(), m = TICK[Math.min(9, Math.round((i - 1) * 9 / Math.max(1, n - 1)))] + 12, pan = ((i * 3) % 7) / 3 - 1;   // the arpeggio climbs the pentatonic ladder
+        voice('coin', m, t, 0.09, { bus: sfxBus, prio: 1, pan: pan * 0.5 }); thump(t, 0.3 + Math.min(0.5, 0.03 * i), sfxBus, 160, 70, 0.06);
+        if (i >= Math.min(8, n - 3)) voice('bell', Math.min(100, m), t + 0.01, 0.25, { bus: sfxBus, prio: 1, vol: 0.25 + 0.03 * Math.max(0, Math.min(12, i - 8)), pan: -pan * 0.4 });   // the run thickens
+        if (money) { coin(t + 0.05, 4); coin(t + 0.1, 6); voice('bell', 96, t + 0.08, 0.5, { bus: sfxBus, prio: 1 }); }
+      }),
+      payoutEnd: fx((n, skipped) => {                                    // the last plate; the till drawer; cash() follows it
+        const t = now();
+        if (skipped) { thump(t, 0.9, sfxBus, 120, 50, 0.15); for (let k = 0; k < 6; k++) coin(t + 0.03 + k * 0.035, k); }
+        const ch = n < 5 ? [0] : n < 10 ? [0, 7] : [0, 4, 7, 12], tc = t + (skipped ? 0.25 : 0.05);
+        ch.forEach(c => voice('bell', 84 + c, tc, 0.6, { bus: sfxBus, prio: 1, vol: 0.85 }));
+        if (n >= 5) { thump(tc, 0.8, sfxBus, 110, 38, 0.25); [0, 4, 7, 12].forEach((c, k) => voice('glass', 88 + c, tc + 0.12 + k * 0.05, 0.4, { bus: sfxBus, prio: 1, vol: 0.45, pan: -0.5 + k / 3, dry: true })); }   // the flourish: PAID stamp + a glass run up
+        nz(tc + 0.1, 0.14, { type: 'bandpass', f: 900, f2: 300, vol: 0.06 }, sfxBus);
+        quietUntil = Math.max(quietUntil, tc + 0.6);
+      }),
+      foil: fx((i = 0) => {                                              // a foil card lands (i < 0: shorter, after buying one)
+        const t = now(), ms = i < 0 ? [88, 95] : [88, 92, 95, 100];
+        ms.forEach((m, k) => voice('glass', m, t + k * 0.045, 0.5, { bus: sfxBus, prio: 1, vol: 0.7, pan: -0.6 + 1.2 * k / Math.max(1, ms.length - 1), dry: true }));
+        if (i >= 0) DRUM.n(t, 0.5, sfxBus);
+      }),
+      scratch: fx((frac = 0) => { const t = now(); if (t - lastScratch < 0.045) return; lastScratch = t;   // frac: share of the coat already off
+        const k = Math.min(1, frac / 0.5);
+        nz(t, 0.03 + Math.random() * 0.015, { type: 'bandpass', f: 2600 + k * 1900 + Math.random() * 900, q: 1.1, vol: 0.16 + 0.08 * k }, sfxBus);
+        if (Math.random() < 0.35) nz(t + 0.012, 0.012, { type: 'highpass', f: 6500, vol: 0.06 }, sfxBus); }),
+      reveal: fx(tier => {                                               // the ticket's prize: 0 a gentle "nope" .. 3 top prize
+        const t = now();
+        if (!tier) { voice('tickM', 69, t, 0.06, { bus: sfxBus, prio: 1, vol: 0.6 }); voice('tickM', 67, t + 0.09, 0.08, { bus: sfxBus, prio: 1, vol: 0.6 }); return; }
+        const coins = [0, 1, 3, 5][tier]; for (let k = 0; k < coins; k++) coin(t + k * 0.05, k + 2);
+        const tb = t + coins * 0.05, bells = tier === 1 ? [88] : tier === 2 ? [88, 93] : [84, 88, 91, 96];
+        bells.forEach((m, k) => voice('bell', m, tb + (tier === 3 ? 0 : k * 0.08), 0.6, { bus: sfxBus, prio: 1, vol: 0.85 }));
+        if (tier >= 2) thump(t, 0.6, sfxBus, 130, 60, 0.1);
+        if (tier === 3) DRUM.x(tb, 0.5, sfxBus);
+      }),
       // v5-era names kept as thin wrappers so either call style works
       lockDenied: fx(() => { const t = now(); clank(t, 1, sfxBus); DRUM.n(t + 0.03, 1, sfxBus); voice('organ', 38, t, 0.18, { bus: sfxBus, prio: 1, vol: 1.2 }); }),
       tideWarn: fx(k => { const t = now(); nz(t, 0.9, { type: 'bandpass', f: 300, f2: 1600, a: 0.7, q: 0.8, vol: k === 1 ? 0.09 : 0.05 }, sfxBus); if (k === 1) voice('bell', 75, t + 0.5, 0.8, { bus: sfxBus, prio: 1, vol: 0.7 }); }),
@@ -1720,6 +1866,15 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 
   // ---------- game state ----------
   const emptyRow = () => Array(COLS).fill(null);
+  // ---------- special blocks (juice-design.md 2): a board cell is a string; a second character is a mark ('Tb' = purple Blot) ----------
+  const MK = { b: { name: 'Blot', rank: 1 }, r: { name: 'Rule', rank: 2 }, s: { name: 'Spot', rank: 3 } };
+  const HEART = { I: 1, O: 3, T: 2, S: 3, Z: 2, J: 2, L: 2 };   // index into ROT[t][r]: the same mino in every rotation (ROT maps preserve order)
+  const ink = v => v ? v[0] : null;                            // 'Tb' -> 'T'
+  const mkOf = v => v && v.length > 1 ? v[1] : null;           // 'Tb' -> 'b'
+  const BLAST_T = 0.22, FALL_T = 0.16, CHAIN_CAP = 6, SPOT_T = 0.32, REG_T = 0.25;   // SPOT_T, REG_T: the Spot's ring and per-cell rings (visual only)
+  const CHAIN_WORDS = ['', 'Inked!', 'Crisp!', 'Clean!', 'Full bleed!', 'Hot press!', 'Masterprint!'];
+  const CHAIN_SHOW = ['', 'Inked!', 'Crisp!', 'Clean!', 'Full\nbleed!', 'Hot\npress!', 'Master\nprint!'];   // the callout's display form: the long words stack
+  const specialsOn = () => S.mode !== 'sprint' && S.status !== 'ready';
   function fresh(demo, mode) {
     const board = Array.from({length: ROWS}, emptyRow);
     if (demo) DEMO.forEach((row, i) => {
@@ -1732,7 +1887,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       resets: 0, lowest: 0, lastRotate: false, lastKick: 0,
       tier: 0, heat: 0, streak: 0, fuse: 0, fuseMax: FUSE[0], bestStreak: 0, peakTier: 0, chainPeak: 0, pieceT: 0, warnT: 0,
       target: 0, piecesLeft: 0, roundScore: 0, roundClears: 0, usedHold: false, earn: null, winT: 0,
-      bx: null, bossPhase: 0, lastClear: false, danger: false };   // bx: per-round boss state (makeBx); bossPhase mirrors bx.phase (0 = no boss)
+      bx: null, bossPhase: 0, lastClear: false, danger: false,   // bx: per-round boss state (makeBx); bossPhase mirrors bx.phase (0 = no boss)
+      // juice pass: specials (nextMark / holdMk / cur.mk), cascade (casc), Overs payout (fin), near miss + instant retry
+      casc: null, nextMark: null, holdMk: null, b2bN: 0, handMult: 0, bestChain: 0,
+      fin: null, winLeft: 0, finPts: 0, near: '', overAt: 0 };
   }
   let S = fresh(true);
   let particles = [];
@@ -1743,7 +1901,21 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const RUN_LV   = { single: [10, 1], double: [15, 1], triple: [20, 2], quad: [25, 2], tspin: [25, 2] };
   const CLEAR_NAMES = { single: 'Single', double: 'Double', triple: 'Triple', quad: 'Quad', tspin: 'T-spin' };
   // Balance (game-design.md 1.5-1.6): ante 1 is learnable, antes 3-5 need a build, antes 7-8 need a real synergy.
-  const ANTE_T = [500, 1500, 3600, 6800, 11000, 17000, 25000, 36000];
+  // juice-design.md 5: antes 3-8 retuned +9..17% to absorb cascades, Overs and tickets
+  const ANTE_T = [500, 1500, 4200, 7500, 12000, 18500, 27500, 42000];
+  const FOIL_P = 0.05;                                   // each shop charm card rolls foil once, when dealt
+  const PAYOUT_SHOW = 20, PAY_X = [3, 6, 0, 4, 7, 1, 5, 2];   // Overs: at most 20 animated pieces; drop columns
+  // scratch ticket prizes (juice-design.md 8): weight, ticket text, tier (0 blank .. 3 top)
+  const TICKET = {
+    cash1:    { w: 34, text: '$1', tier: 1 },
+    cash2:    { w: 12, text: '$2', tier: 2 },
+    cash3:    { w: 4,  text: '$3\nTOP PRIZE', tier: 3 },          // headline \n small note (renderTicket)
+    reroll:   { w: 14, text: 'FREE REROLL', tier: 2, shop: true },
+    pieces:   { w: 10, text: '+2 PIECES\nNEXT ROUND', tier: 1 },
+    discount: { w: 8,  text: '$2 OFF\nAN UPGRADE', tier: 2, shop: true },
+    foil:     { w: 3,  text: 'FOIL PROOF', tier: 3, shop: true },
+    blank:    { w: 15, text: 'MISPRINT', tier: 0 },
+  };
   const ROUND_F = [1, 1.5, 2], ROUND_NAME = ['Small round', 'Big round', 'Boss round'], ROUND_PAY = [3, 4, 5];
   const BASE_PIECES = 40, BASE_MAX_CHARMS = 5;          // R.maxCharms can reach 6 via the Suture spoil
   const upCost = lv => 2 + lv;                          // upgrade price: Lv1->2 costs $3, Lv4->5 costs $6
@@ -1767,7 +1939,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
                notes: { pair: 'Your Pair Up goes quiet at half.', hattrick: 'Your Hat Trick loves this fight.', tetrad: 'Your Tetrad loves this fight.', pivot: 'Your Pivot always passes the bar.' } },
     tide:    { name: 'Tide', title: 'The rising water', minAnte: 2, phases: [0.5], spoil: 'driftwood',
                rules: ['Garbage rises every 8 pieces.', 'At half: every 5, with the gaps in one column.'],
-               notes: { tetrad: 'Your Tetrad loves the channel. Garbage rows give +2 mult.', hattrick: 'Your Hat Trick likes salvage.', lowprofile: 'Your Low Profile suffers as the water rises.', sweep: 'Your Clean Sweep will struggle here.' } },
+               notes: { tetrad: 'Your Tetrad loves the channel. Garbage rows give +2 mult.', hattrick: 'Your Hat Trick likes salvage.', lowprofile: 'Your Low Profile suffers as the water rises.', sweep: 'Your Clean Sweep will struggle here.', inkwell: 'Your Ink Well Blots eat garbage.' } },
     surge:   { name: 'Surge', title: 'The quickening', minAnte: 2, phases: [0.5], spoil: 'tailwind',
                rules: ['Pieces fall faster.', 'At half: faster again, with a shorter lock delay.'],
                notes: { speed: 'Your Speed Demon loves this fight.', afterburner: 'Your Afterburner loves this fight.', overdrive: 'Your Overdrive loves this fight.', slowfuse: 'Your Slow Fuse helps keep the streak.' } },
@@ -1836,54 +2008,66 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const note = (c, who, what) => { c.notes.push([who, what]); return true; };
   const RARITY = { common: { label: 'Common' }, uncommon: { label: 'Uncommon' }, rare: { label: 'Rare' } };
   const RARITY_W = [[62, 30, 8], [50, 36, 14]];   // [common, uncommon, rare]; antes 1-4, antes 5-8
+  // Every charm has desc (base) and fdesc (foil). Score functions read ch.foil; other effects go through cv() / charmFoil().
   const CHARMS = {
-    pivot:     { name: 'Pivot', rarity: 'common', cost: 5, desc: 'T-spins give +4 mult.',
-                 score: c => c.spin && (c.mult += 4, note(c, 'Pivot', '+4 mult')) },
-    tetrad:    { name: 'Tetrad', rarity: 'uncommon', cost: 7, desc: 'Clearing 4 lines at once gives ×2 mult.',
-                 score: c => c.n === 4 && (c.x *= 2, note(c, 'Tetrad', '×2 mult')) },
-    pair:      { name: 'Pair Up', rarity: 'common', cost: 4, desc: 'Doubles give +20 points and +3 mult.',
-                 score: c => c.n === 2 && !c.spin && (c.pts += 20, c.mult += 3, note(c, 'Pair Up', '+20 points, +3 mult')) },
-    hattrick:  { name: 'Hat Trick', rarity: 'uncommon', cost: 6, desc: 'Triples give ×2 mult.',
-                 score: c => c.n === 3 && !c.spin && (c.x *= 2, note(c, 'Hat Trick', '×2 mult')) },
+    pivot:     { name: 'Pivot', rarity: 'common', cost: 5, desc: 'T-spins give +4 mult.', fdesc: 'T-spins give +6 mult.',
+                 score: (c, ch) => { const k = ch.foil ? 6 : 4; return c.spin && (c.mult += k, note(c, 'Pivot', '+' + k + ' mult')); } },
+    tetrad:    { name: 'Tetrad', rarity: 'uncommon', cost: 7, desc: 'Clearing 4 lines at once gives ×2 mult.', fdesc: 'Clearing 4 lines at once gives ×2.5 mult.',
+                 score: (c, ch) => { const k = ch.foil ? 2.5 : 2; return c.n === 4 && (c.x *= k, note(c, 'Tetrad', '×' + k + ' mult')); } },
+    pair:      { name: 'Pair Up', rarity: 'common', cost: 4, desc: 'Doubles give +20 points and +3 mult.', fdesc: 'Doubles give +30 points and +5 mult.',
+                 score: (c, ch) => { const p = ch.foil ? 30 : 20, m = ch.foil ? 5 : 3; return c.n === 2 && !c.spin && (c.pts += p, c.mult += m, note(c, 'Pair Up', '+' + p + ' points, +' + m + ' mult')); } },
+    hattrick:  { name: 'Hat Trick', rarity: 'uncommon', cost: 6, desc: 'Triples give ×2 mult.', fdesc: 'Triples give ×2.5 mult.',
+                 score: (c, ch) => { const k = ch.foil ? 2.5 : 2; return c.n === 3 && !c.spin && (c.x *= k, note(c, 'Hat Trick', '×' + k + ' mult')); } },
     longgame:  { name: 'Long Game', rarity: 'uncommon', cost: 6, desc: 'Every I piece you place adds +3 points to all later clears this run.',
+                 fdesc: 'Every I piece you place adds +5 points to all later clears this run.',
                  live: ch => '+' + ch.val + ' points',
                  score: (c, ch) => ch.val > 0 && (c.pts += ch.val, note(c, 'Long Game', '+' + ch.val + ' points')) },
-    palette:   { name: 'Palette', rarity: 'common', cost: 5, desc: '+4 mult for each cleared row with 3 colours or fewer.',
-                 score: c => { const k = c.rows.filter(y => new Set(S.board[y]).size <= 3).length; return k > 0 && (c.mult += 4 * k, note(c, 'Palette', '+' + 4 * k + ' mult')); } },
-    lowprofile:{ name: 'Low Profile', rarity: 'common', cost: 5, desc: '+1 mult for every 3 empty rows left in the well after a clear.',
-                 score: c => { const m = Math.floor(emptyRowsAfter(c.rows) / 3); return m > 0 && (c.mult += m, note(c, 'Low Profile', '+' + m + ' mult')); } },
-    chain:     { name: 'Chain', rarity: 'common', cost: 5, desc: 'Each combo step gives +2 extra mult.',
-                 score: c => S.combo > 0 && (c.mult += 2 * S.combo, note(c, 'Chain', '+' + 2 * S.combo + ' mult')) },
+    palette:   { name: 'Palette', rarity: 'common', cost: 5, desc: '+4 mult for each cleared row with 3 colours or fewer.', fdesc: '+6 mult for each cleared row with 3 colours or fewer.',
+                 score: (c, ch) => { const k = c.rows.filter(y => new Set(S.board[y].map(ink)).size <= 3).length, m = (ch.foil ? 6 : 4) * k; return k > 0 && (c.mult += m, note(c, 'Palette', '+' + m + ' mult')); } },
+    lowprofile:{ name: 'Low Profile', rarity: 'common', cost: 5, desc: '+1 mult for every 3 empty rows left in the well after a clear.', fdesc: '+1 mult for every 2 empty rows left in the well after a clear.',
+                 score: (c, ch) => { const m = Math.floor(emptyRowsAfter(c.rows) / (ch.foil ? 2 : 3)); return m > 0 && (c.mult += m, note(c, 'Low Profile', '+' + m + ' mult')); } },
+    chain:     { name: 'Chain', rarity: 'common', cost: 5, desc: 'Each combo step gives +2 extra mult.', fdesc: 'Each combo step gives +3 extra mult.',
+                 score: (c, ch) => { const m = (ch.foil ? 3 : 2) * S.combo; return S.combo > 0 && (c.mult += m, note(c, 'Chain', '+' + m + ' mult')); } },
     speed:     { name: 'Speed Demon', rarity: 'uncommon', cost: 6, desc: '+1 mult for each piece placed within 1 second since your last clear.',
+                 fdesc: '+2 mult for each piece placed within 1 second since your last clear.',
                  live: ch => '+' + ch.val + ' mult ready',
                  score: (c, ch) => { const v = ch.val; ch.val = 0; return v > 0 && (c.mult += v, note(c, 'Speed Demon', '+' + v + ' mult')); } },
-    hoarder:   { name: 'Hoarder', rarity: 'uncommon', cost: 6, desc: '+1 mult for every $5 you hold.',
-                 live: () => '+' + Math.floor(R.money / 5) + ' mult now',
-                 score: c => { const m = Math.floor(R.money / 5); return m > 0 && (c.mult += m, note(c, 'Hoarder', '+' + m + ' mult')); } },
-    nohands:   { name: 'No Hands', rarity: 'common', cost: 4, desc: '+4 mult until you use hold this round. +8 against the Warden.',
-                 score: c => { if (S.usedHold) return false; const k = bossIs('warden') ? 8 : 4; c.mult += k; return note(c, 'No Hands', '+' + k + ' mult'); } },
-    headstart: { name: 'Head Start', rarity: 'common', cost: 5, desc: 'The first clear of each round gets ×3 mult.',
-                 score: c => S.roundClears === 0 && (c.x *= 3, note(c, 'Head Start', '×3 mult')) },
-    goldrush:  { name: 'Gold Rush', rarity: 'common', cost: 5, desc: 'Earn $1 each time you clear 4 lines at once.',
-                 score: c => c.n === 4 && (R.money += 1, note(c, 'Gold Rush', '+$1')) },
-    glass:     { name: 'Glass Cannon', rarity: 'rare', cost: 8, desc: '×2 mult on every clear, but 12 fewer pieces each round.',
-                 score: c => (c.x *= 2, note(c, 'Glass Cannon', '×2 mult')) },
-    slowfuse:  { name: 'Slow Fuse', rarity: 'common', cost: 4, desc: 'Your streak timer lasts 2 seconds longer.' },
-    heatsink:  { name: 'Heat Sink', rarity: 'uncommon', cost: 6, desc: 'Your streak multiplier builds twice as fast.' },
-    spare:     { name: 'Spare Parts', rarity: 'common', cost: 5, desc: '+8 pieces each round.' },
-    piggy:     { name: 'Piggy Bank', rarity: 'common', cost: 4, desc: 'Earn $2 extra at the end of each round.' },
-    sweep:     { name: 'Clean Sweep', rarity: 'common', cost: 4, desc: 'Clearing the whole board gives ×6 instead of ×3, plus $5.' },
-    afterburner:{ name: 'Afterburner', rarity: 'common', cost: 5, desc: 'While a streak is running, quick placements add heat and refill twice as much fuse.' },
-    trophy:    { name: 'Trophy Shelf', rarity: 'uncommon', cost: 6, desc: '+3 mult for every boss you have defeated this run.',
-                 live: () => '+' + 3 * R.bossesBeaten + ' mult',
-                 score: c => R.bossesBeaten > 0 && (c.mult += 3 * R.bossesBeaten, note(c, 'Trophy Shelf', '+' + 3 * R.bossesBeaten + ' mult')) },
-    overdrive: { name: 'Overdrive', rarity: 'rare', cost: 8, desc: '×2 mult while your streak multiplier is ×3 or higher.',
-                 score: c => TIERS[S.tier] >= 3 && (c.x *= 2, note(c, 'Overdrive', '×2 mult')) },
-    slayer:    { name: 'Giant Slayer', rarity: 'rare', cost: 9, desc: 'In boss rounds, ×2 mult. ×3 once the boss is in its final phase.',
-                 score: c => { if (!R.boss || !S.bx) return false; const k = bossFinalPhase() ? 3 : 2; c.x *= k; return note(c, 'Giant Slayer', '×' + k + ' mult'); } },
+    hoarder:   { name: 'Hoarder', rarity: 'uncommon', cost: 6, desc: '+1 mult for every $5 you hold.', fdesc: '+1 mult for every $4 you hold.',
+                 live: ch => '+' + Math.floor(R.money / (ch.foil ? 4 : 5)) + ' mult now',
+                 score: (c, ch) => { const m = Math.floor(R.money / (ch.foil ? 4 : 5)); return m > 0 && (c.mult += m, note(c, 'Hoarder', '+' + m + ' mult')); } },
+    nohands:   { name: 'No Hands', rarity: 'common', cost: 4, desc: '+4 mult until you use hold this round. +8 against the Warden.', fdesc: '+6 mult until you use hold this round. +12 against the Warden.',
+                 score: (c, ch) => { if (S.usedHold) return false; const k = (ch.foil ? 6 : 4) * (bossIs('warden') ? 2 : 1); c.mult += k; return note(c, 'No Hands', '+' + k + ' mult'); } },
+    headstart: { name: 'Head Start', rarity: 'common', cost: 5, desc: 'The first clear of each round gets ×3 mult.', fdesc: 'The first clear of each round gets ×4 mult.',
+                 score: (c, ch) => { const k = ch.foil ? 4 : 3; return S.roundClears === 0 && (c.x *= k, note(c, 'Head Start', '×' + k + ' mult')); } },
+    goldrush:  { name: 'Gold Rush', rarity: 'common', cost: 5, desc: 'Earn $1 each time you clear 4 lines at once.', fdesc: 'Earn $2 each time you clear 4 lines at once.',
+                 score: (c, ch) => { const k = ch.foil ? 2 : 1; return c.n === 4 && (R.money += k, note(c, 'Gold Rush', '+$' + k)); } },
+    glass:     { name: 'Glass Cannon', rarity: 'rare', cost: 8, desc: '×2 mult on every clear, but 12 fewer pieces each round.', fdesc: '×2.5 mult on every clear, but 12 fewer pieces each round.',
+                 score: (c, ch) => { const k = ch.foil ? 2.5 : 2; c.x *= k; return note(c, 'Glass Cannon', '×' + k + ' mult'); } },
+    slowfuse:  { name: 'Slow Fuse', rarity: 'common', cost: 4, desc: 'Your streak timer lasts 2 seconds longer.', fdesc: 'Your streak timer lasts 3 seconds longer.' },
+    heatsink:  { name: 'Heat Sink', rarity: 'uncommon', cost: 6, desc: 'Your streak multiplier builds twice as fast.', fdesc: 'Your streak multiplier builds 2.5 times as fast.' },
+    spare:     { name: 'Spare Parts', rarity: 'common', cost: 5, desc: '+8 pieces each round.', fdesc: '+12 pieces each round.' },
+    piggy:     { name: 'Piggy Bank', rarity: 'common', cost: 4, desc: 'Earn $2 extra at the end of each round.', fdesc: 'Earn $3 extra at the end of each round.' },
+    sweep:     { name: 'Clean Sweep', rarity: 'common', cost: 4, desc: 'Clearing the whole board gives ×6 instead of ×3, plus $5.', fdesc: 'Clearing the whole board gives ×8 instead of ×3, plus $8.' },
+    afterburner:{ name: 'Afterburner', rarity: 'common', cost: 5, desc: 'While a streak is running, quick placements add heat and refill twice as much fuse.',
+                 fdesc: 'While a streak is running, quick placements add 2 heat and refill twice as much fuse.' },
+    trophy:    { name: 'Trophy Shelf', rarity: 'uncommon', cost: 6, desc: '+3 mult for every boss you have defeated this run.', fdesc: '+5 mult for every boss you have defeated this run.',
+                 live: ch => '+' + (ch.foil ? 5 : 3) * R.bossesBeaten + ' mult',
+                 score: (c, ch) => { const m = (ch.foil ? 5 : 3) * R.bossesBeaten; return R.bossesBeaten > 0 && (c.mult += m, note(c, 'Trophy Shelf', '+' + m + ' mult')); } },
+    overdrive: { name: 'Overdrive', rarity: 'rare', cost: 8, desc: '×2 mult while your streak multiplier is ×3 or higher.', fdesc: '×2.5 mult while your streak multiplier is ×3 or higher.',
+                 score: (c, ch) => { const k = ch.foil ? 2.5 : 2; return TIERS[S.tier] >= 3 && (c.x *= k, note(c, 'Overdrive', '×' + k + ' mult')); } },
+    slayer:    { name: 'Giant Slayer', rarity: 'rare', cost: 9, desc: 'In boss rounds, ×2 mult. ×3 once the boss is in its final phase.', fdesc: 'In boss rounds, ×2.5 mult. ×3.5 once the boss is in its final phase.',
+                 score: (c, ch) => { if (!R.boss || !S.bx) return false; const k = (bossFinalPhase() ? 3 : 2) + (ch.foil ? 0.5 : 0); c.x *= k; return note(c, 'Giant Slayer', '×' + k + ' mult'); } },
+    // juice pass: chain hands (cascade) and special-block makers
+    overprint: { name: 'Overprint', rarity: 'uncommon', cost: 6, desc: 'Chain hands set off by special blocks get ×2 mult.', fdesc: 'Chain hands set off by special blocks get ×2.5 mult.',
+                 cascade: (c, ch) => { const k = ch.foil ? 2.5 : 2; c.x *= k; return note(c, 'Overprint', '×' + k + ' mult'); } },
+    inkwell:   { name: 'Ink Well', rarity: 'common', cost: 5, desc: 'Doubles also leave a Blot on your next piece.', fdesc: 'Doubles leave a Blot and Triples leave a Rule.' },
   };
   function has(id) { return S.mode === 'run' && !!R && R.charms.some(c => c.id === id); }
-  const fuseMaxNow = () => FUSE[S.tier] + (has('slowfuse') ? 2 : 0) + (S.mode === 'run' && R ? R.fuseBonus || 0 : 0);
+  const ownC = id => S.mode === 'run' && R ? R.charms.find(c => c.id === id) || null : null;
+  const charmFoil = id => !!(ownC(id) || {}).foil;
+  const cv = (id, base, foil) => { const o = ownC(id); return o ? (o.foil ? foil : base) : 0; };   // e.g. roundPieces: + cv('spare', 8, 12)
+  const charmDesc = ch => { const d = CHARMS[ch.id]; return ch.foil ? d.fdesc || d.desc : d.desc; };
+  const fuseMaxNow = () => FUSE[S.tier] + cv('slowfuse', 2, 3) + (S.mode === 'run' && R ? R.fuseBonus || 0 : 0);
   function emptyRowsAfter(rows) {
     let e = rows.length;
     for (let y = HIDDEN; y < ROWS; y++) if (!rows.includes(y) && S.board[y].every(v => !v)) e++;
@@ -1900,11 +2084,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function newRun() {
     R = { ante: 1, round: 0, money: 4, charms: [], levels: { single: 1, double: 1, triple: 1, quad: 1, tspin: 1 },
       totalScore: 0, bestHand: 0, boss: null, anteBoss: null, usedBosses: [], shop: null, rerollCost: 3,
-      maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {} };
+      maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {},
+      ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0 };   // juice pass: scratch ticket, chain records, ticket +pieces
     R.anteBoss = anteBossFor();
   }
   const targetFor = (ante, round) => Math.round(ANTE_T[ante - 1] * ROUND_F[round]);
-  const roundPieces = () => BASE_PIECES + (R.bonusPieces || 0) + (has('spare') ? 8 : 0) - (has('glass') ? 12 : 0);
+  const roundPieces = () => BASE_PIECES + (R.bonusPieces || 0) + cv('spare', 8, 12) - (has('glass') ? 12 : 0);
   function makeBx() {
     return { phase: 1, pending: 0, grace: 0, since: 0, idle: 0,
       rivetIn: 0, col: -1,            // warden: pieces to next rivet, telegraphed column
@@ -1918,7 +2103,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     S = fresh(false, 'run');
     S.level = S.startLevel = R.ante;      // boss speed-ups go through effLevel(), never S.level
     S.target = targetFor(R.ante, R.round);
-    S.piecesLeft = roundPieces();
+    S.piecesLeft = roundPieces() + (R.bonusNext || 0); R.bonusNext = 0;   // a ticket's +2 PIECES lands on this round
     S.status = 'intro';
     S.bx = R.boss ? makeBx() : null; S.bossPhase = R.boss ? 1 : 0;
     particles = []; shownRound = 0; resetBossFx();
@@ -1930,6 +2115,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
   function startRun() { newRun(); Audio.musicReset(); Audio.start(); setupRound(); }
   function beginRound() {
+    if (R) R.ticketNote = '';
     if (R && R.boss && S.bx) { S.status = 'countdown'; S.bx.cdT = 2.4; S.bx.cdN = 4; showOverlay(); return; }
     S.status = 'playing'; Audio.start(); nextPiece(); showOverlay(); Audio.musicSync();
   }
@@ -2041,8 +2227,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   };
   function runOnPlace(t, quick) {
     for (const ch of R.charms) {
-      if (ch.id === 'longgame' && t === 'I') ch.val += 3;
-      if (ch.id === 'speed' && quick) ch.val += 1;
+      if (ch.id === 'longgame' && t === 'I') ch.val += ch.foil ? 5 : 3;
+      if (ch.id === 'speed' && quick) ch.val += ch.foil ? 2 : 1;
     }
     renderCharms();
   }
@@ -2056,31 +2242,36 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   // returns true when the round ended and no next piece should spawn
   function runAfterPiece() {
     if (S.mode !== 'run' || S.status !== 'playing') return false;
-    if (S.roundScore >= S.target) { S.cur = null; R.boss && S.bx ? bossDefeat() : (S.winT = 1.3, Audio.roundClear(), Audio.musicSync()); return true; }
+    if (S.roundScore >= S.target) { S.cur = null; S.winLeft = S.piecesLeft; R.boss && S.bx ? bossDefeat() : (S.winT = S.winLeft > 0 ? 1.0 : 1.3, Audio.roundClear(), Audio.musicSync()); return true; }
     if (S.piecesLeft <= 0) { endRun(false, 'pieces'); return true; }
     if (S.bx) bossTick();
+    if (S.status === 'playing' && S.piecesLeft === 3 && S.roundScore < S.target) callout('', '3 PIECES · ' + fmt(S.target - S.roundScore) + ' TO GO');   // goal gradient
     return S.status !== 'playing';   // a rivet or garbage row can top the player out
   }
-  function roundWon() {
-    const e = { pay: ROUND_PAY[R.round], left: S.piecesLeft,
-      leftover: Math.min(LEFTOVER_CAP, Math.floor(S.piecesLeft / 5)),
-      interest: Math.min(5, Math.floor(R.money / 5)), piggy: has('piggy') ? 2 : 0,
+  function roundWon(quiet) {   // quiet: hot-reload boot finishing an Overs tail (no sound before a gesture)
+    const left = Math.max(S.winLeft || 0, S.piecesLeft);       // Overs spends S.piecesLeft; S.winLeft keeps the count at the win
+    const e = { pay: ROUND_PAY[R.round], left, finale: S.finPts || 0,
+      leftover: Math.min(LEFTOVER_CAP, Math.floor(left / 5)),
+      interest: Math.min(5, Math.floor(R.money / 5)), piggy: cv('piggy', 2, 3),
       bonus: R.boss && R.boss !== 'keystone' ? BOSS_BONUS(R.ante) : 0, spoil: null, boss: R.boss };
     if (R.boss) { R.bossesBeaten++; const sp = BOSSES[R.boss].spoil; if (sp) { SPOILS[sp].apply(); e.spoil = sp; } }
     e.total = e.pay + e.leftover + e.interest + e.piggy + e.bonus;
     R.money += e.total; S.earn = e;
-    S.cur = null; resetInput(); fx.defeat = null;
+    S.cur = null; S.fin = null; resetInput(); fx.defeat = null;
     if (R.round === 2 && R.ante === ANTE_T.length) { endRun(true, 'won'); return; }
+    R.tickets = (R.tickets || 0) + 1;
+    R.ticket = { prize: rollTicket(), done: false, no: R.tickets };   // rolled and stored now, so a reload never rerolls it
     S.status = 'cleared';
-    Audio.cash(e.total);   // till receipt; after a boss it waits for the fanfare
+    if (!quiet) Audio.cash(e.total);   // till receipt; after a boss it waits for the fanfare
     showOverlay(); Audio.musicSync(); renderCharms();
   }
   function recordRun(won) {
     const date = new Date().toISOString().slice(0, 10);
-    return addRecord('run', { won: won ? 1 : 0, ante: R.ante, round: R.round, score: R.totalScore, best: R.bestHand, bosses: R.bossesBeaten || 0, date });
+    return addRecord('run', { won: won ? 1 : 0, ante: R.ante, round: R.round, score: R.totalScore, best: R.bestHand, bosses: R.bossesBeaten || 0, chain: R.bestChain || 0, date });
   }
   function endRun(won, reason) {
-    S.status = 'over'; S.cur = null; S.result = reason;
+    S.status = 'over'; S.cur = null; S.result = reason; S.casc = null; S.fin = null;
+    S.near = won ? '' : nearMiss(reason); S.overAt = performance.now();
     goalEl.classList.remove('notch-hot');
     S.rank = recordRun(won);
     if (won) Audio.runComplete(); else Audio.runOver();
@@ -2118,7 +2309,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     // Salvage (Tide, Keystone): each cleared row holding garbage gives +2 mult
     if (bossIs('tide') || bossIs('keystone')) { const k = rows.filter(y => S.board[y].includes('G')).length;
       if (k) { c.mult += 2 * k; note(c, 'Salvage', '+' + 2 * k + ' mult'); } }
-    if (pc) { const px = has('sweep') ? 6 : 3; c.x *= px; note(c, 'Perfect clear', '×' + px); if (has('sweep')) { R.money += 5; flashCharm('sweep'); } }
+    if (pc) { const px = cv('sweep', 6, 8) || 3; c.x *= px; note(c, 'Perfect clear', '×' + px); if (has('sweep')) { R.money += cv('sweep', 5, 8); flashCharm('sweep'); } }
+    S.handMult = c.mult;   // the additive engine of this hand carries into any cascade it sets off (juice-design 4.2)
     const sx = TIERS[S.tier];
     if (sx > 1) note(c, 'Streak', fmtMult(sx));
     const shown = Math.round(c.pts * c.mult * c.x * sx);
@@ -2158,7 +2350,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
   function stepTally(now) {
     if (!tallyAnim) return;
-    const p = Math.min(1, (now - tallyAnim.t0) / 550);
+    const p = Math.max(0, Math.min(1, (now - tallyAnim.t0) / 550));
     tA.textContent = tB.textContent = fmt(Math.round(tallyAnim.total * (1 - Math.pow(1 - p, 3))));
     if (p >= 1) tallyAnim = null;
   }
@@ -2177,13 +2369,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     for (const ch of owned) {
       const d = CHARMS[ch.id];
-      const li = document.createElement('li'); li.dataset.charm = ch.id;
+      const li = document.createElement('li'); li.dataset.charm = ch.id; if (ch.foil) li.className = 'foil';
       const b = document.createElement('b'); b.textContent = d.name; b.append(rarityDots(d.rarity));
-      const sp = document.createElement('span'); sp.textContent = d.desc;
+      const sp = document.createElement('span'); sp.textContent = charmDesc(ch);
       li.append(b, sp);
-      if (d.live) { const em = document.createElement('em'); em.textContent = d.live(ch); li.append(em); }
+      if (d.live || ch.foil) { const em = document.createElement('em'); em.textContent = (ch.foil ? 'FOIL · ' : '') + (d.live ? d.live(ch) : 'boosted'); li.append(em); }
       list.append(li);
-      const s = document.createElement('span'); s.dataset.charm = ch.id; s.textContent = d.name + (d.live ? ' · ' + d.live(ch) : ''); s.title = d.desc;
+      const s = document.createElement('span'); s.dataset.charm = ch.id; if (ch.foil) s.className = 'foil';
+      s.textContent = d.name + (d.live ? ' · ' + d.live(ch) : ''); s.title = (ch.foil ? 'Foil: ' : '') + charmDesc(ch);
       strip.append(s);
     }
     requestAnimationFrame(stripFade);
@@ -2204,7 +2397,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 
   // shop
   const shopEl = $('shop');
-  const sellValue = id => Math.max(1, Math.floor(CHARMS[id].cost / 2));
+  const sellValue = ch => Math.max(1, Math.floor((CHARMS[ch.id].cost + (ch.foil ? 3 : 0)) / 2));
+  // a charm card's price: free (Mirror shard), base (ticket FOIL PROOF gift), or cost + $3 for a foil
+  const charmPrice = o => o.free ? 0 : CHARMS[o.id].cost + (o.foil && !o.foilGift ? 3 : 0);
   function shuffled(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   function rollRarity() {
     const w = RARITY_W[R.ante >= 5 ? 1 : 0]; let r = Math.random() * (w[0] + w[1] + w[2]);
@@ -2220,31 +2415,158 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (!pool.length) break;
       picked.push(pool[Math.floor(Math.random() * pool.length)]);
     }
-    R.shop.charms = picked.map((id, i) => ({ id, sold: false, free: i === 0 && !!R.shop.freeCharm }));
+    // foil rolls once per card, when dealt, and is stored on the card (a reload never rerolls it)
+    R.shop.charms = picked.map((id, i) => ({ id, sold: false, free: i === 0 && !!R.shop.freeCharm, foil: Math.random() < FOIL_P }));
     R.shop.freeCharm = false;   // Mirror shard: only the first roll gets the free card; rerolling forfeits it
   }
   function openShop() {
     S.status = 'shop';
     const nx = R.next || {};
     R.shop = { charms: [], boosts: shuffled(Object.keys(CLEAR_NAMES)).slice(0, 2).map(t => ({ t, sold: false })),
-      extra: nx.extra || 0, freeCharm: !!nx.freeCharm, freeUpgrades: !!nx.freeUpgrades };
+      extra: nx.extra || 0, freeCharm: !!nx.freeCharm, freeUpgrades: !!nx.freeUpgrades, freeRerolls: 0, upDiscount: 0 };
     R.rerollCost = nx.freeReroll ? 0 : 3; R.next = {};
     rollCharms();
-    showOverlay(); dealNext = true; renderShop();
-    shopEl.hidden = false;
+    showOverlay(); dealNext = true;
+    shopEl.hidden = false; renderShop();   // visible first, so the ticket coat can size itself
     Audio.shopOpen(); Audio.musicSync();
     $('next-round').focus();
   }
   function nextRound() {
+    revealTicket(true);   // leaving never loses the prize
     shopEl.hidden = true;
     R.round++;
     if (R.round > 2) { R.round = 0; R.ante++; R.anteBoss = anteBossFor(); }
     setupRound();
+    if (R.ticketNote) callout('', R.ticketNote);   // R.ticketNote: 'TICKET: $1' when a shop-only prize was cashed on leaving
   }
+
+  // ---------- scratch ticket (juice-design.md 8) ----------
+  function rollTicket() {
+    const ids = Object.keys(TICKET); let r = Math.random() * ids.reduce((a, k) => a + TICKET[k].w, 0);
+    for (const k of ids) if ((r -= TICKET[k].w) < 0) return k;
+    return 'blank';
+  }
+  // applies a revealed prize; returns the text the ticket shows. Shop-only prizes revealed on leaving pay $1 instead.
+  function applyPrize(id, leaving) {
+    const P = TICKET[id] || TICKET.blank;
+    if (leaving && P.shop) { R.money += 1; R.ticketNote = 'TICKET: $1'; return '$1'; }
+    if (id === 'cash1' || id === 'cash2' || id === 'cash3') R.money += +id[4];
+    else if (id === 'reroll') R.shop.freeRerolls = 1;
+    else if (id === 'pieces') R.bonusNext = (R.bonusNext || 0) + 2;
+    else if (id === 'discount') R.shop.upDiscount = 2;
+    else if (id === 'foil') {
+      const pool = R.shop.charms.filter(o => !o.sold && !o.foil);
+      if (!pool.length) { R.money += 2; return 'FOIL PROOF\n$2'; }
+      const o = pool[Math.floor(Math.random() * pool.length)]; o.foil = true; o.foilGift = true; o.fresh = true;
+      return 'FOIL PROOF\n' + CHARMS[o.id].name.toUpperCase();
+    }
+    return P.text;
+  }
+  function revealTicket(leaving) {
+    const tk = R && R.ticket; if (!tk || tk.done) return;
+    tk.done = true; tk.shown = applyPrize(tk.prize, !!leaving);
+    if (leaving) return;
+    const tier = (TICKET[tk.prize] || TICKET.blank).tier;
+    tk.lift = true;                       // renderTicket plays the coat lift + prize stamp once
+    Audio.reveal(tier); onTicketReveal(tier);
+    renderShop(); renderCharms();
+  }
+  // feel hook: tier 0 blank .. 3 top prize (the ticket element thumps on tier 2+)
+  function onTicketReveal(tier) {
+    const el = $('shop-ticket');
+    if (tier >= 2 && !reducedMotion) { el.classList.remove('thump'); void el.offsetWidth; el.classList.add('thump'); }
+    const r = $('tk-coat').getBoundingClientRect(), n = [0, 10, 18, 30][tier] || 0;   // a prize throws paper confetti off the ticket
+    for (let i = 0; i < n; i++) flake(r.left + r.width * (0.2 + Math.random() * 0.6), r.top + r.height / 2, [C.sun, C.pink, C.blue, C.ink][i % 4],
+      (Math.random() - 0.5) * 220, -40 - Math.random() * 90, 700 + Math.random() * 400, 5 + Math.random() * 5);
+  }
+  // paper flakes in page space (position:fixed, so they never add scroll); skipped with particles off or reduced motion
+  function flake(x, y, color, vx, vy, life, size) {
+    if (!prefs.particles || reducedMotion || !document.body.animate || document.querySelectorAll('.flake').length > 60) return;
+    const el = document.createElement('i'); el.className = 'flake';
+    el.style.cssText = 'width:' + size.toFixed(1) + 'px;height:' + (size * 0.6).toFixed(1) + 'px;background:' + color;
+    document.body.append(el);
+    const rot = (Math.random() - 0.5) * 900, T = (dx, dy, r) => 'translate(' + (x + dx).toFixed(1) + 'px,' + (y + dy).toFixed(1) + 'px) rotate(' + r.toFixed(0) + 'deg)';
+    const a = el.animate([{ transform: T(0, 0, 0), opacity: 1 }, { transform: T(vx * 0.55, vy * 0.55, rot * 0.5), opacity: 1, offset: 0.45 }, { transform: T(vx, vy + 80, rot), opacity: 0 }],
+      { duration: life, easing: 'cubic-bezier(.25,.6,.55,1)' });
+    a.onfinish = a.oncancel = () => el.remove();
+  }
+  let coatNo = 0, scratchT = 0;
+  function printPrize(el, text) {   // a headline and a small note: the bigger the prize, the bigger the type (older saves used ' · ')
+    const [head, ...rest] = String(text).split(/\n| · /), note = rest.join(' · ');
+    el.textContent = ''; const b = document.createElement('b'); b.textContent = head; el.append(b);
+    if (note) { const sm = document.createElement('small'); sm.textContent = note; el.append(sm); }
+    el.classList.toggle('long', head.length > 12);
+  }
+  function renderTicket() {
+    const tk = R.ticket, el = $('shop-ticket');
+    el.hidden = !tk; if (!tk) return;
+    const P = TICKET[tk.prize] || TICKET.blank, prize = $('tk-prize'), coat = $('tk-coat');
+    $('tk-no').textContent = 'No. ' + String(tk.no).padStart(3, '0');
+    prize.className = 'tk-prize t' + P.tier;
+    $('tk-reveal').hidden = tk.done;
+    el.classList.toggle('done', !!tk.done);
+    if (tk.done) {
+      prize.removeAttribute('aria-hidden');
+      printPrize(prize, tk.shown || P.text);
+      if (tk.lift) { tk.lift = false; prize.classList.add('stamp'); if (!reducedMotion && !coat.hidden) { coat.classList.add('lift'); setTimeout(() => { coat.hidden = true; coat.classList.remove('lift'); }, 170); } else coat.hidden = true; }
+      else coat.hidden = true;
+      coatNo = 0; return;
+    }
+    prize.setAttribute('aria-hidden', 'true'); printPrize(prize, P.text);   // printed under the coat; announced once revealed
+    coat.hidden = false; coat.classList.remove('lift');
+    if (coatNo !== tk.no) { coatNo = tk.no; requestAnimationFrame(drawCoat); }
+  }
+  function drawCoat() {   // sunflower coat, ink halftone, SCRATCH stamped in Big Shoulders
+    const cc = $('tk-coat'); if (!R || !R.ticket || R.ticket.done || cc.hidden) return;
+    const r = cc.getBoundingClientRect(); if (!r.width || !r.height) { coatNo = 0; return; }
+    const d = dprNow(), w = cc.width = Math.round(r.width * d), h = cc.height = Math.round(r.height * d), x = cc.getContext('2d');
+    x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+    x.fillStyle = C.sun; x.fillRect(0, 0, w, h);
+    x.globalAlpha = 0.25; x.fillStyle = dotPattern(x, C.ink, Math.max(3, Math.round(5 * d))); x.fillRect(0, 0, w, h); x.globalAlpha = 1;
+    x.font = '900 ' + Math.round(h * 0.6) + 'px ' + DISPLAY; if ('fontStretch' in x) x.fontStretch = 'condensed';
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    const o = Math.max(1, Math.round(2 * d));   // SCRATCH printed in two plates, the pink one off register
+    x.globalCompositeOperation = 'multiply'; x.fillStyle = C.pink; x.fillText('SCRATCH', w / 2 + o, h / 2 + h * 0.03 + o); x.globalCompositeOperation = 'source-over';
+    x.fillStyle = C.ink; x.fillText('SCRATCH', w / 2, h / 2 + h * 0.03);
+    x.fillStyle = C.ink; const cw = Math.round(6 * d), lw = Math.max(1, Math.round(d));   // crop ticks in the corners
+    const m3 = Math.round(3 * d);
+    for (const [cx, cy, sx, sy] of [[m3, m3, 1, 1], [w - m3, m3, -1, 1], [m3, h - m3, 1, -1], [w - m3, h - m3, -1, -1]]) {
+      x.fillRect(sx > 0 ? cx : cx - cw, sy > 0 ? cy : cy - lw, cw, lw); x.fillRect(sx > 0 ? cx : cx - lw, sy > 0 ? cy : cy - cw, lw, cw); }
+  }
+  function coatCleared(x, w, h) {   // share of the coat scratched off, sampled on a stride-8 grid
+    let n = 0, k = 0; const data = x.getImageData(0, 0, w, h).data;
+    for (let yy = 4; yy < h; yy += 8) for (let xx = 4; xx < w; xx += 8) { k++; if (data[(yy * w + xx) * 4 + 3] < 128) n++; }
+    return k ? n / k : 1;
+  }
+  (() => {
+    const cc = $('tk-coat'); let last = null, frac = 0, flakeT = 0;
+    const check = force => { const now = performance.now(); if (!force && now - scratchT < 150) return; scratchT = now;
+      if (!R || !R.ticket || R.ticket.done) return;
+      frac = coatCleared(cc.getContext('2d'), cc.width, cc.height); if (frac >= 0.5) revealTicket(); };
+    const scratch = e => {
+      if (!R || !R.ticket || R.ticket.done) return;
+      const r = cc.getBoundingClientRect(); if (!r.width) return;
+      const k = cc.width / r.width, p = [(e.clientX - r.left) * k, (e.clientY - r.top) * k], a = last || p, x = cc.getContext('2d');
+      x.globalCompositeOperation = 'destination-out'; x.lineCap = x.lineJoin = 'round'; x.lineWidth = 24 * dprNow();
+      x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(p[0] + 0.01, p[1]); x.stroke(); x.globalCompositeOperation = 'source-over';
+      const moved = last ? Math.hypot(p[0] - a[0], p[1] - a[1]) : 0;
+      last = p; Audio.scratch(frac);   // the scrape climbs in pitch as more of the coat comes off
+      const now = performance.now();
+      if (now - flakeT > 28 && (moved > 2 || !flakeT)) { flakeT = now;   // sunflower shavings flick off the pointer
+        for (let i = 0; i < 2; i++) flake(e.clientX, e.clientY, i ? C.sun : C.ink, (Math.random() - 0.5) * 60, -10 - Math.random() * 30, 380 + Math.random() * 200, 3 + Math.random() * 3); }
+      check(false);
+    };
+    cc.addEventListener('pointerdown', e => { e.preventDefault(); try { cc.setPointerCapture(e.pointerId); } catch (_) {} last = null; flakeT = 0; scratch(e); });
+    cc.addEventListener('pointermove', e => { if (e.buttons) scratch(e); });
+    const up = () => { if (last) check(true); last = null; };
+    cc.addEventListener('pointerup', up); cc.addEventListener('pointercancel', up);
+    $('tk-reveal').addEventListener('click', () => revealTicket());
+  })();
+
   // die-cut ticket: rarity stub (perforated), name, description, hanging price tag, BUY stamp bar
   function card(o) {
-    const el = document.createElement('div'); el.className = 'card ' + o.cls + (o.sold ? ' sold' : '');
-    const k = document.createElement('span'); k.className = 'k'; k.textContent = o.kind;
+    const el = document.createElement('div'); el.className = 'card ' + o.cls + (o.sold ? ' sold' : '') + (o.foil ? ' foil' : '');
+    const k = document.createElement('span'); k.className = 'k'; k.textContent = (o.foil ? 'FOIL · ' : '') + o.kind;
     if (o.rarity) k.append(rarityDots(o.rarity));
     const b = document.createElement('b'); b.textContent = o.name; if (o.name.length > 9) b.className = 'long';
     el.append(k, b);
@@ -2252,7 +2574,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const p = document.createElement('p'); p.textContent = o.desc;
     const tag = document.createElement('span'); tag.className = 'ptag'; tag.textContent = o.price ? '$' + o.price : 'FREE';
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'buy'; btn.textContent = o.label; btn.disabled = !o.enabled;
-    btn.setAttribute('aria-label', o.label + ' ' + o.name + (o.price ? ' for $' + o.price : ''));
+    btn.setAttribute('aria-label', o.label + ' ' + (o.foil ? 'foil ' : '') + o.name + (o.price ? ' for $' + o.price : ''));
     btn.addEventListener('click', o.onBuy);
     el.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch' && !btn.disabled) Audio.hover(o.hi); });
     btn.addEventListener('focus', () => { if (btn.matches(':focus-visible')) Audio.hover(o.hi); });
@@ -2266,7 +2588,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const bossId = nr === 2 ? R.anteBoss : null, boss = bossId ? BOSSES[bossId] : null;
     const nx = $('shop-next'); nx.innerHTML = '';
     const b = document.createElement('b'); b.textContent = 'Next: ante ' + na + ' · ' + ROUND_NAME[nr].toLowerCase();
-    nx.append(b, document.createTextNode(' · target ' + fmt(targetFor(na, nr)) + ' · ' + roundPieces() + ' pieces.'));
+    const bn = R.bonusNext || 0;
+    nx.append(b, document.createTextNode(' · target ' + fmt(targetFor(na, nr)) + ' · ' + (roundPieces() + bn) + ' pieces' + (bn ? ' (ticket +' + bn + ')' : '') + '.'));
     $('shop').style.setProperty('--boss', bossId ? 'var(--boss-' + bossId + ')' : 'var(--ink)');
     $('shop').style.setProperty('--boss-on', ['arbiter', 'surge', 'keystone'].includes(bossId) ? 'var(--ink)' : 'var(--paper)');
     if (boss) {   // boss preview: chip in the boss ink, then rules, spoils and owned-charm notes so the player can buy counters
@@ -2275,29 +2598,39 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       nx.append(document.createElement('br'), chip, document.createTextNode(boss.rules.join(' ') + ' Spoils $' + (bossId === 'keystone' ? 0 : BOSS_BONUS(na))
         + (sp ? ' + ' + sp.name + ': ' + sp.desc : '') + (bossNotes(bossId).length ? ' ' + bossNotes(bossId).join(' ') : '')));
     }
+    renderTicket();
 
     const sc = $('shop-charms'), sb = $('shop-boosts'); sc.innerHTML = ''; let hi = 0;   // hi: hover-tick pitch index
+    const dealing = dealNext;
     sc.classList.toggle('deal', dealNext && !reducedMotion); sb.classList.toggle('deal', dealNext && !reducedMotion); dealNext = false;
     const full = R.charms.length >= maxCharms();
-    for (const o of R.shop.charms) {
-      const d = CHARMS[o.id], price = o.free ? 0 : d.cost;
+    R.shop.charms.forEach((o, i) => {
+      const d = CHARMS[o.id], price = charmPrice(o);
+      if (o.foil && !o.sold && (dealing || o.fresh)) { o.fresh = false; setTimeout(() => Audio.foil(i), 220 + i * 50); }   // a foil card lands
       const label = o.sold ? 'Sold' : full ? 'Slots full' : R.money < price ? 'Need $' + (price - R.money) : o.free ? 'Take free' : 'Buy';
-      sc.append(card({ kind: RARITY[d.rarity].label, cls: 'r' + ({ common: 1, uncommon: 2, rare: 3 })[d.rarity], rarity: d.rarity, name: d.name, price,
-        desc: d.desc + (o.free && !o.sold ? ' Free · lost if you reroll.' : ''), label, enabled: !o.sold && !full && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
+      sc.append(card({ kind: RARITY[d.rarity].label, cls: 'r' + ({ common: 1, uncommon: 2, rare: 3 })[d.rarity], rarity: d.rarity, name: d.name, price, foil: !!o.foil,
+        desc: (o.foil ? d.fdesc || d.desc : d.desc) + (o.free && !o.sold ? ' Free · lost if you reroll.' : '') + (o.foilGift && !o.sold ? ' Ticket foil · base price.' : ''),
+        label, enabled: !o.sold && !full && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
         if (o.sold || full || R.money < price) return;
-        R.money -= price; R.charms.push({ id: o.id, val: 0 }); o.sold = true; o.free = false;
-        Audio.buy('charm'); renderShop(); renderCharms();
+        R.money -= price; R.charms.push({ id: o.id, val: 0, foil: !!o.foil }); o.sold = true; o.free = false;
+        Audio.buy('charm'); if (o.foil) setTimeout(() => Audio.foil(-1), 160);   // a shorter foil shimmer after the till
+        renderShop(); renderCharms();
+        if (o.foil && !reducedMotion) for (const el of document.querySelectorAll('.charm-list li.foil, .row-o.foil')) if (el.textContent.includes(d.name)) { el.classList.remove('bought'); void el.offsetWidth; el.classList.add('bought'); }
       } }));
-    }
+    });
     sb.innerHTML = '';
+    const disc = R.shop.upDiscount || 0;
     for (const o of R.shop.boosts) {   // a sold card keeps showing the level and price that were bought
-      const lv = o.sold && o.lv ? o.lv : R.levels[o.t], [pp, mm] = RUN_LV[o.t], price = o.sold && o.price != null ? o.price : R.shop.freeUpgrades ? 0 : upCost(lv);
+      const lv = o.sold && o.lv ? o.lv : R.levels[o.t], [pp, mm] = RUN_LV[o.t];
+      const price = o.sold && o.price != null ? o.price : R.shop.freeUpgrades ? 0 : Math.max(0, upCost(lv) - disc);
       sb.append(card({ kind: 'Upgrade · plate', cls: 'up', name: CLEAR_NAMES[o.t], lv: 'LV ' + lv + ' → ' + (lv + 1), price,
-        desc: '+' + pp + ' points and +' + mm + ' mult on every ' + CLEAR_NAMES[o.t] + (o.t === 'tspin' ? ' clear' : '') + '.',
+        desc: '+' + pp + ' points and +' + mm + ' mult on every ' + CLEAR_NAMES[o.t] + (o.t === 'tspin' ? ' clear' : '') + '.'
+          + (disc && !o.sold && !R.shop.freeUpgrades ? ' Ticket: $' + disc + ' off one upgrade.' : ''),
         label: o.sold ? 'Sold' : R.money < price ? 'Need $' + (price - R.money) : price ? 'Buy' : 'Take free',
         enabled: !o.sold && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
           if (o.sold || R.money < price) return;
           R.money -= price; o.lv = R.levels[o.t]; o.price = price; R.levels[o.t]++; o.sold = true;
+          if (!R.shop.freeUpgrades) R.shop.upDiscount = 0;   // the ticket discount covers one upgrade
           Audio.buy('plate'); renderShop();
         } }));
     }
@@ -2306,25 +2639,29 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (!R.charms.length) { const p = document.createElement('p'); p.className = 'note'; p.textContent = 'You have no charms yet.'; ow.append(p); }
     R.charms.forEach((ch, i) => {
       const d = CHARMS[ch.id];
-      const row = document.createElement('div'); row.className = 'row-o ticket' + (d.live ? ' live' : '');
+      const row = document.createElement('div'); row.className = 'row-o ticket' + (d.live || ch.foil ? ' live' : '') + (ch.foil ? ' foil' : '');
       const nb = document.createElement('b'); nb.textContent = d.name;
-      const ds = document.createElement('span'); ds.textContent = d.desc;
-      const sell = document.createElement('button'); sell.type = 'button'; sell.className = 'small'; sell.textContent = 'Sell $' + sellValue(ch.id);
-      sell.setAttribute('aria-label', 'Sell ' + d.name + ' for $' + sellValue(ch.id));
-      sell.addEventListener('click', () => { R.money += sellValue(ch.id); R.charms.splice(i, 1); Audio.sell(); renderShop(); renderCharms(); });
+      const ds = document.createElement('span'); ds.textContent = charmDesc(ch);
+      const sell = document.createElement('button'); sell.type = 'button'; sell.className = 'small'; sell.textContent = 'Sell $' + sellValue(ch);
+      sell.setAttribute('aria-label', 'Sell ' + (ch.foil ? 'foil ' : '') + d.name + ' for $' + sellValue(ch));
+      sell.addEventListener('click', () => { R.money += sellValue(ch); R.charms.splice(i, 1); Audio.sell(); renderShop(); renderCharms(); });
       row.append(nb, sell);
-      if (d.live) { const em = document.createElement('em'); em.textContent = d.live(ch); row.append(em); }
+      if (d.live || ch.foil) { const em = document.createElement('em'); em.textContent = (ch.foil ? 'FOIL · ' : '') + (d.live ? d.live(ch) : 'boosted'); row.append(em); }
       row.append(ds); ow.append(row);
     });
-    const rr = $('reroll'); rr.textContent = R.rerollCost ? 'Reroll charms $' + R.rerollCost : 'Reroll charms free'; rr.disabled = R.money < R.rerollCost;
+    const rr = $('reroll'), freeR = (R.shop.freeRerolls || 0) > 0 || !R.rerollCost;
+    rr.textContent = freeR ? 'Reroll charms free' : 'Reroll charms $' + R.rerollCost; rr.disabled = !freeR && R.money < R.rerollCost;
   }
   $('reroll').addEventListener('click', () => {
-    if (R.money < R.rerollCost) return;
-    R.money -= R.rerollCost; R.rerollCost = R.rerollCost === 0 ? 3 : R.rerollCost + 1;
+    const tk = (R.shop.freeRerolls || 0) > 0;   // a ticket reroll is free and leaves the reroll price alone
+    if (!tk && R.money < R.rerollCost) return;
+    if (tk) R.shop.freeRerolls--;
+    else { R.money -= R.rerollCost; R.rerollCost = R.rerollCost === 0 ? 3 : R.rerollCost + 1; }
     rollCharms(); Audio.reroll(); dealNext = true; renderShop();
   });
   $('next-round').addEventListener('click', () => { Audio.ensure(); Audio.pageTurn(); nextRound(); });
   $('abandon').addEventListener('click', e => confirmTwice(e.currentTarget, 'Abandon run', 'abandon', () => {
+    revealTicket(true);
     shopEl.hidden = true;
     // the round that just ended was won (a boss may have just fallen): clear its boss state and record the run as reaching the next round
     S.bx = null; R.boss = null; resetBossFx();
@@ -2348,11 +2685,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
   }
   function spawn(t) {
-    S.cur = { t, r: 0, x: t === 'O' ? 4 : 3, y: 1 };
+    S.cur = { t, r: 0, x: t === 'O' ? 4 : 3, y: 1, mk: null };
     S.lowest = 1; S.resets = 0; S.lockT = 0; S.fallAcc = 0; S.lastRotate = false; S.pieceT = 0;
     if (collide(t, 0, S.cur.x, S.cur.y)) topOut();
   }
-  function nextPiece() { refill(); spawn(S.queue.shift()); refill(); }
+  function nextPiece() {
+    refill(); spawn(S.queue.shift()); refill();
+    if (S.cur && S.nextMark) { S.cur.mk = S.nextMark; S.nextMark = null; onMarkSpawn(S.cur.mk); }   // the special is printed on this piece
+  }
 
   function afterMove() {
     const c = S.cur;
@@ -2398,9 +2738,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (bossIs('warden')) { callout('', 'HOLD IS SEALED'); Audio.lockDenied(); fx.sealT = 0.4; return; }
     S.usedHold = true;
     Audio.hold();
-    const t = S.cur.t, h = S.hold;
-    S.hold = t;
-    if (h) spawn(h); else nextPiece();
+    const t = S.cur.t, mk = S.cur.mk || null, h = S.hold, hm = S.holdMk || null;   // a mark travels with its piece
+    S.hold = t; S.holdMk = mk;
+    if (h) { spawn(h); if (S.cur) S.cur.mk = hm; } else nextPiece();
     S.holdUsed = true;
   }
   function filled(x, y) { return x < 0 || x >= COLS || y >= ROWS || (y >= 0 && !!S.board[y][x]); }
@@ -2417,15 +2757,23 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     return 'mini';
   }
 
+  // which special (if any) this clear prints on the next piece; one per lock, the highest rank wins (juice-design 2.2)
+  function markFor(n, spin, pc, combo) {
+    if (!specialsOn() || !n) return null;
+    if (pc || (combo >= 4 && combo % 4 === 0) || (S.b2bN >= 3 && S.b2bN % 3 === 0)) return 's';
+    if (n === 4 || (n === 3 && charmFoil('inkwell'))) return 'r';
+    if (n === 3 || spin === 'full' || (n === 2 && has('inkwell'))) return 'b';
+    return null;
+  }
   function lock(hard) {
     const c = S.cur;
     const spin = tSpinKind();
     let allHidden = true;
-    for (const [cx, cy] of ROT[c.t][c.r]) {
+    ROT[c.t][c.r].forEach(([cx, cy], i) => {
       const X = c.x + cx, Y = c.y + cy;
-      if (Y >= 0) S.board[Y][X] = c.t;
+      if (Y >= 0) S.board[Y][X] = c.t + (c.mk && i === HEART[c.t] ? c.mk : '');   // the marked mino keeps its special
       if (Y >= HIDDEN) allHidden = false;
-    }
+    });
     S.cur = null;
     S.holdUsed = false;
     S.pieces++;
@@ -2436,7 +2784,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (S.streak > 0) {
         const ab = has('afterburner'), surge = bossIs('surge');
         S.fuse = Math.min(S.fuseMax, S.fuse + QUICK_ADD * (ab ? 2 : 1) * (surge ? 2 : 1)); fuseBump();
-        if (ab) { S.heat += 1; const t = []; if (raiseTier(t)) { S.fuseMax = fuseMaxNow(); S.fuse = Math.min(S.fuse, S.fuseMax); } if (t.length) callout('', t.join('\n')); flashCharm('afterburner'); }
+        if (ab) { S.heat += cv('afterburner', 1, 2); const t = []; if (raiseTier(t)) { S.fuseMax = fuseMaxNow(); S.fuse = Math.min(S.fuse, S.fuseMax); } if (t.length) callout('', t.join('\n')); flashCharm('afterburner'); }
       }
     }
     if (allHidden) { topOut(); return; }
@@ -2445,7 +2793,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     for (let y = 0; y < ROWS; y++) if (S.board[y].every(Boolean)) rows.push(y);
     S.lastClear = rows.length > 0;
     const pc = rows.length > 0 && S.board.every((row, y) => rows.includes(y) || row.every(v => !v));
-    score(rows.length, spin, pc, rows);
+    if (rows.length) S.b2bN = (rows.length === 4 || spin) ? S.b2bN + 1 : 0;   // hard clears in a row (b2b rule); non-clearing pieces don't break it
+    const mk = markFor(rows.length, spin, pc, rows.length ? S.combo + 1 : -1);  // score() is about to move S.combo to this value
+    score(rows.length, spin, pc, rows, mk);
+    if (mk) {
+      if (!S.nextMark || MK[mk].rank > MK[S.nextMark].rank) S.nextMark = mk;
+      if (S.mode === 'run') callout('', 'NEXT PIECE · ' + MK[mk].name.toUpperCase());
+      onMarkMade(mk);
+    }
 
     if (rows.length) {
       Audio.clear(rows.length, spin, pc);
@@ -2461,7 +2816,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   function addHeat(n, spin, pc, tags) {
-    S.heat += (n + (n === 4 ? 2 : 0) + (spin ? 2 : 0) + (pc ? 4 : 0)) * (has('heatsink') ? 2 : 1);
+    S.heat += (n + (n === 4 ? 2 : 0) + (spin ? 2 : 0) + (pc ? 4 : 0)) * (cv('heatsink', 2, 2.5) || 1);
     const before = S.streak;
     S.streak += n;
     S.bestStreak = Math.max(S.bestStreak, S.streak);
@@ -2480,7 +2835,13 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     return true;
   }
 
-  function score(n, spin, pc, rows) {
+  // Marathon / Ultra: a level every 10 lines (shared by the player's clears and cascade chain rows)
+  function levelCheck(tags) {
+    if (S.mode !== 'marathon' && S.mode !== 'ultra') return;
+    const lv = S.startLevel + Math.floor(S.lines / 10);
+    if (lv > S.level) { S.level = lv; Audio.level(); fx.levelT = 0.6; tags.push('LEVEL ' + lv); }
+  }
+  function score(n, spin, pc, rows, mk) {
     if (S.mode === 'run') return runScore(n, spin, pc, rows);
     const L = S.level;
     const mult = TIERS[S.tier];
@@ -2499,11 +2860,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (S.combo > 0) { pts += 50 * S.combo * L; tags.push('COMBO ×' + S.combo); }
       if (pc) { pts += [0, 800, 1200, 1800, 2000][n] * L; name = 'Perfect clear'; tags.unshift(['', 'SINGLE', 'DOUBLE', 'TRIPLE', 'QUAD'][n]); }
       S.lines += n;
-      if (S.mode === 'marathon' || S.mode === 'ultra') {
-        const lv = S.startLevel + Math.floor(S.lines / 10);
-        if (lv > S.level) { S.level = lv; Audio.level(); fx.levelT = 0.6; tags.push('LEVEL ' + lv); }
-      }
+      levelCheck(tags);
       addHeat(n, spin, pc, tags);
+      if (mk) tags.push(MK[mk].name.toUpperCase() + ' ON NEXT PIECE');
       if (mult > 1) pts = Math.round(pts * mult);
       floater('+' + fmt(pts), mult > 1 ? fmtMult(mult) : '', rows);
     } else {
@@ -2511,6 +2870,222 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     S.score += pts;
     if (n >= 2 || spin || pc || tags.length) callout(n === 1 && !spin && !pc ? '' : name, tags.join('\n'));
+  }
+
+  // ---------- cascades (juice-design.md 3-4) ----------
+  // S.casc = { wave, ph: 'blast' | 'fall' | 'cut', t, rows, cells, hits, trig, sum, falls } is plain data (hot reload, pause).
+  // blast: specials in the cut rows detonate; fall: blast cells are gone, touched columns settle; cut: rows the settle
+  // completed play the knife cut, then their specials start the next wave. Never more than CHAIN_CAP waves.
+  const marksIn = rows => { const o = []; for (const y of rows) for (let x = 0; x < COLS; x++) { const v = S.board[y][x], k = mkOf(v); if (k) o.push([x, y, k, ink(v)]); } return o; };
+  const fullRows = () => { const o = []; for (let y = 0; y < ROWS; y++) if (S.board[y].every(Boolean)) o.push(y); return o; };
+  function blastWave(seeds, rows) {             // -> { cells: [[x,y]], hits: [[x,y,k,ink]] }
+    const done = new Set(), cells = new Map(), q = seeds.slice(), hits = [];
+    const add = (x, y) => {
+      if (x < 0 || x >= COLS || y < 0 || y >= ROWS || rows.includes(y) || !S.board[y][x]) return;   // cells in the cut rows go with the rows
+      const key = y * COLS + x; if (cells.has(key)) return; cells.set(key, [x, y]);
+      const k = mkOf(S.board[y][x]); if (k) q.push([x, y, k, ink(S.board[y][x])]);                  // sympathetic hit: same wave
+    };
+    while (q.length) {
+      const h = q.shift(), [x, y, k, c] = h, key = y * COLS + x; if (done.has(key)) continue; done.add(key); hits.push(h);
+      if (k === 'b') { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) add(x + dx, y + dy); }
+      else if (k === 'r') { for (let yy = 0; yy < ROWS; yy++) add(x, yy); }
+      else for (let yy = 0; yy < ROWS; yy++) for (let xx = 0; xx < COLS; xx++) if (ink(S.board[yy][xx]) === c) add(xx, yy);   // Spot: its ink (never garbage)
+    }
+    return { cells: [...cells.values()], hits };
+  }
+  function applyWave(rows, cells) {             // null blasts, drop cut rows, settle touched columns; returns falls [[x, fromY, toY]]
+    const cols = new Set();
+    for (const [x, y] of cells) { S.board[y][x] = null; cols.add(x); }
+    if (rows.length) { S.board = S.board.filter((_, i) => !rows.includes(i)); while (S.board.length < ROWS) S.board.unshift(emptyRow()); }
+    const falls = [];
+    for (const x of cols) for (let y = ROWS - 1, w = ROWS - 1; y >= 0; y--) {
+      const v = S.board[y][x]; if (!v) continue;
+      if (y !== w) { S.board[w][x] = v; S.board[y][x] = null; falls.push([x, y, w]); }
+      w--;
+    }
+    return falls;
+  }
+  function startCascade(rows) {
+    const w = blastWave(marksIn(rows), rows);
+    S.casc = { wave: 1, ph: 'blast', t: BLAST_T, rows, cells: w.cells, hits: w.hits, trig: S.handMult || 0, sum: 0, falls: [] };
+    blastFx(w, 1);
+  }
+  function stepCascade(dt) {
+    const k = S.casc; k.t -= dt; if (k.t > 0) return;
+    if (k.ph === 'blast') { k.falls = applyWave(k.rows, k.cells); k.rows = []; k.ph = 'fall'; k.t = reducedMotion ? 0.05 : FALL_T; return; }
+    if (k.ph === 'fall') {
+      if (k.falls.length) landFx(k.falls);
+      const full = fullRows();
+      scoreWave(k, full); k.cells = []; k.hits = []; k.falls = [];
+      if (S.status !== 'playing' || !S.casc) return;
+      if (!full.length) return endCascade();
+      k.rows = full; k.ph = 'cut'; k.t = CLEAR_T; burst(full, false); Audio.clear(Math.min(4, full.length), null, false); return;
+    }
+    // 'cut' finished
+    const seeds = marksIn(k.rows);
+    if (!seeds.length || k.wave >= CHAIN_CAP) {
+      if (seeds.length) callout(CHAIN_SHOW[CHAIN_CAP], (k.lastExtra ? k.lastExtra + '\n' : '') + 'PLATE DRY', 'c' + CHAIN_CAP);   // the cap keeps the wave-6 line; marks leave with their rows, unfired
+      applyWave(k.rows, []); return endCascade();
+    }
+    k.wave++; const w = blastWave(seeds, k.rows); k.cells = w.cells; k.hits = w.hits; k.ph = 'blast'; k.t = BLAST_T; blastFx(w, k.wave);
+  }
+  const CLASSIC_LINE = [0, 100, 300, 500, 800];
+  function scoreWave(k, full) {                 // one score per wave with at least one blast cell or chain row
+    const cells = k.cells.length, n = full.length;
+    if (!cells && !n) {   // a dud wave: it was heard and felt, so the callout still steps up (no score)
+      const w = Math.min(k.wave, CHAIN_CAP); k.lastExtra = 'CHAIN ' + k.wave + (S.mode === 'run' ? ' · +' + fmt(k.sum) : '');
+      callout(CHAIN_SHOW[w], k.lastExtra, 'c' + w); onChainWave(k.wave, 0, 0, 0); return;
+    }
+    const extra = Math.max(0, k.hits.length - 1);   // sympathetic (and extra seed) specials in this wave
+    const ys = n ? full : k.cells.map(c => c[1]);
+    const w = Math.min(k.wave, CHAIN_CAP);
+    let total;
+    if (S.mode === 'run' && R) {
+      const c = { cascade: true, n, cells, wave: k.wave, x: 1, notes: [], pts: 10 * cells + 25 * n, mult: k.trig + k.wave + 2 * extra };
+      note(c, 'Hand', '+' + k.trig + ' mult'); note(c, 'Chain ' + k.wave, '+' + k.wave + ' mult');
+      if (extra) note(c, 'Sympathetic', '+' + 2 * extra + ' mult');
+      for (const ch of R.charms) { const d = CHARMS[ch.id]; if (d.cascade && d.cascade(c, ch)) flashCharm(ch.id); }   // Overprint only: × charms stay out
+      const sx = TIERS[S.tier]; if (sx > 1) note(c, 'Streak', fmtMult(sx));
+      total = Math.round(c.pts * c.mult * c.x * sx);
+      S.roundScore += total; R.totalScore += total; R.cascTotal = (R.cascTotal || 0) + total; k.sum += total;
+      if (n) { S.lines += n; const tags = []; addHeat(n, false, false, tags); tags.forEach(t => note(c, t, '')); }
+      showTally('Chain ' + k.wave + ' · ' + CHAIN_WORDS[w].replace('!', ''), c.pts, c.mult, c.x * sx, total, c.notes, false);
+      Audio.tally(c.notes, total, S.roundScore >= S.target ? 1 : total / S.target, Math.min(4, k.wave + 1), true);   // the tick ladder starts higher each wave; chain() carries the bells
+      k.lastExtra = 'CHAIN ' + k.wave + ' · +' + fmt(k.sum);   // the running chain total rides the callout (the tally shows this wave)
+      callout(CHAIN_SHOW[w], k.lastExtra, 'c' + w);
+      renderCharms();
+    } else {
+      total = Math.round((20 * cells + CLASSIC_LINE[Math.min(n, 4)]) * S.level * (k.wave + 1 + extra) * TIERS[S.tier]);
+      S.score += total; k.sum += total;
+      const tags = [];
+      if (n) { S.lines += n; levelCheck(tags); addHeat(n, false, false, tags); }
+      k.lastExtra = 'CHAIN ' + k.wave + ' · +' + fmt(total);
+      callout(CHAIN_SHOW[w], [k.lastExtra].concat(tags).join('\n'), 'c' + w);
+    }
+    if (ys.length) floater('+' + fmt(total), '', ys, w);
+    onChainWave(k.wave, total, n, cells);
+    if (S.mode === 'run') bossCheckPhase();
+  }
+  function endCascade() {
+    const k = S.casc; S.casc = null;
+    S.bestChain = Math.max(S.bestChain || 0, k.wave);
+    if (S.mode === 'run' && R) R.bestChain = Math.max(R.bestChain || 0, k.wave);   // the chain total is on the last wave's callout
+    onChainEnd(k.wave, k.sum);
+    if (S.status !== 'playing') return;
+    if (runAfterPiece()) return;
+    nextPiece();
+  }
+
+  // ---------- juice hooks (feel engineer: sounds + visuals hang off these; gameplay never depends on them) ----------
+  // Every event also fires window 'stackfall:juice' with detail { type, ... }.
+  function juice(type, detail) { try { window.dispatchEvent(new CustomEvent('stackfall:juice', { detail: Object.assign({}, detail, { type }) })); } catch (e) {} }
+  const CHAIN_SHAKE = [0, 3, 5, 7, 9, 11, 12], CHAIN_SLIP = [0, 0.1, 0.14, 0.18, 0.22, 0.24, 0.24];
+  function onMarkMade(mk) { juice('markMade', { mk }); }                                     // a clear earned a special (shown on the next piece)
+  function onMarkSpawn(mk) { Audio.mark(mk); fx.markT = 0.16; plateSlip(0.06); juice('markSpawn', { mk }); }   // the marked piece enters
+  function blastFx(w, wave) {                                                                 // a wave detonates: w.hits are the specials, w.cells the blast area
+    const kind = w.hits.reduce((a, h) => !a || MK[h[2]].rank > MK[a].rank ? h[2] : a, null) || 'b';
+    const i = Math.min(wave, CHAIN_CAP);
+    Audio.blast(kind, wave); Audio.chain(wave);
+    shake(CHAIN_SHAKE[i], i >= 3 ? CHAIN_SHAKE[i] * 0.5 * (i % 2 ? 1 : -1) : 0); plateSlip(CHAIN_SLIP[i]);
+    if (i >= 3) fx.stopT = Math.min(0.12, 0.05 + 0.02 * (i - 3));   // hit-stop: the impact frame holds on big chains
+    for (const h of w.hits.slice(0, 10)) fx.blasts.push({ k: h[2], x: h[0], y: h[1], c: h[3], w: i, t: 0, seed: (Math.random() * 1e9) | 0 });
+    if (fx.blasts.length > 14) fx.blasts.splice(0, fx.blasts.length - 14);
+    const spotInks = new Set(w.hits.filter(h => h[2] === 's').map(h => h[3]));   // every same-ink block a Spot hits gets its own registration ring
+    if (spotInks.size) { fx.regs = w.cells.filter(([x, y]) => spotInks.has(ink(S.board[y][x]))).slice(0, 80).map(([x, y]) => ({ x, y, t: 0 })); }
+    if (prefs.particles && prefs.glow && !reducedMotion) for (const [x, y, k, c] of w.hits.slice(0, 6)) {   // ink splash: toner flecks thrown off each special
+      const n = 6 + 2 * i;
+      for (let j = 0; j < n; j++) { const a = Math.random() * Math.PI * 2, v = 6 + Math.random() * (6 + i);
+        addParticle({ x: x + 0.5, y: y + 0.5, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, g: 24, life: 0.3 + Math.random() * 0.35, size: 0.1 + Math.random() * 0.14, color: j % 4 ? C.ink : C[c] || C.pink, fleck: true }); }
+    }
+    if (prefs.particles && !reducedMotion) for (const [x, y] of w.cells) {
+      const col = C[ink(S.board[y][x])] || C.ink;
+      for (let j = 0; j < 3; j++) addParticle({ x: x + 0.5, y: y + 0.5, vx: (Math.random() - 0.5) * 8, vy: -3 - Math.random() * 7, g: 26, life: 0.45 + Math.random() * 0.4, size: 0.14 + Math.random() * 0.16, color: col });
+    }
+    if (particles.length > 600) particles.splice(0, particles.length - 600);
+    if (prefs.glow && !reducedMotion) { wellWrap.style.setProperty('--chain', 2 * i + 'px'); clearTimeout(blastFx.t); blastFx.t = setTimeout(() => wellWrap.style.removeProperty('--chain'), 400); }
+    juice('blast', { wave, kind, hits: w.hits, cells: w.cells });
+  }
+  function landFx(falls) {                                                                    // the settle: falls = [[x, fromY, toY]]
+    shake(2); Audio.land();
+    if (prefs.glow) fx.lockFlash = { cells: falls.map(f => [f[0], f[2]]), life: 0.14 };
+    if (prefs.particles && !reducedMotion) {   // a puff of paper dust under each column that dropped
+      const low = new Map(); for (const [x, , y1] of falls) low.set(x, Math.max(low.get(x) ?? -1, y1));
+      for (const [x, y] of low) for (const d of [-1, 1]) addParticle({ x: x + 0.5 + d * 0.35, y: y + 0.95, vx: d * (2 + Math.random() * 2), vy: -1 - Math.random() * 1.5, g: 8, life: 0.25 + Math.random() * 0.15, size: 0.1 + Math.random() * 0.08, color: C.ink2 });
+    }
+    juice('land', { falls });
+  }
+  function onChainWave(wave, total, rows, cells) { juice('wave', { wave, total, rows, cells }); }
+  function onChainEnd(wave, sum) { juice('chainEnd', { wave, sum }); }
+
+  // ---------- Overs: the finale payout (juice-design.md 6) ----------
+  // S.fin = { left, i, t, age, unit, pts, cash, drop, tail } is plain data. Timing tuned so 20 pieces + tail fit 3.2 s.
+  const winning = () => S.winT > 0 || !!S.fin;
+  function startPayout() {
+    S.fin = { left: S.winLeft, i: 0, t: 0.2, age: 0, unit: Math.max(5, Math.round(S.target / 500) * 5), pts: 0, cash: 0, drop: null, tail: 0 };
+    callout('Overs!', S.winLeft + (S.winLeft === 1 ? ' PIECE' : ' PIECES') + ' LEFT'); Audio.musicSync();   // the band at the sheet's foot says how to skip
+    $('tally').classList.remove('show'); tallyAnim = null;   // the till slip takes over the top of the sheet
+    juice('oversStart', { left: S.winLeft });
+  }
+  function payPiece(f, quiet) {
+    f.i++; const v = f.i > PAYOUT_SHOW ? 0 : f.unit * Math.min(f.i, 8); f.pts += v; S.roundScore += v; R.totalScore += v; S.piecesLeft = Math.max(0, S.piecesLeft - 1);   // points stop at 20 plates; money still counts every piece
+    const money = f.i % 5 === 0 && f.cash < LEFTOVER_CAP; if (money) f.cash++;   // shows the $1 per 5 pieces roundWon() pays
+    if (!quiet) Audio.payout(f.i, money, f.left);
+    return [v, money];
+  }
+  function stepPayout(dt) {
+    const f = S.fin; f.age += dt;
+    if (f.tail > 0) { if ((f.tail -= dt) <= 0) { S.fin = null; S.finPts = f.pts; roundWon(); } return; }
+    if (f.drop && (f.drop.t -= dt) <= 0) {
+      const [v, money] = payPiece(f), d = f.drop; f.drop = null;
+      burstPiece(d.type, d.x, d.y1);
+      if (f.i <= 8 || money) fx.floaters.push({ text: '+' + fmt(v), sub: money ? '$1' : '', x: Math.min(COLS - 1, d.x + 1.5), y: d.y1 + 0.5, life: 0.6, color: money ? C.sun : C.ink, scale: 0.72 });   // small: the till slip carries the total
+      juice('oversPiece', { i: f.i, value: v, money, piece: d.type, x: d.x, y: d.y1 });
+    }
+    if ((f.t -= dt) > 0 || f.drop) return;
+    if (f.i >= Math.min(f.left, PAYOUT_SHOW)) { while (f.i < f.left) payPiece(f, true); Audio.payoutEnd(f.left, false); f.tail = 0.35; juice('oversEnd', { left: f.left, pts: f.pts, skipped: false }); return; }
+    refill(); const type = S.queue.shift(), w = type === 'I' ? 4 : type === 'O' ? 2 : 3;
+    const x = Math.min(PAY_X[f.i % PAY_X.length], COLS - w); let y = 0; while (y < ROWS && !collide(type, 0, x, y + 1)) y++;
+    f.t = Math.max(0.06, 0.2 * Math.pow(0.85, f.i));                     // accelerates: 0.2, 0.17, 0.14 ... floor 0.06 s (20 plates ~1.7 s + 0.35 s tail)
+    const dur = reducedMotion ? 0.05 : Math.min(0.12, f.t);
+    f.drop = { type, x, y1: y, t: dur, t0: dur };
+  }
+  function skipPayout() {
+    const f = S.fin; if (!f || f.tail > 0 || f.age < 0.25) return;   // the guard keeps the winning hard drop from skipping
+    f.drop = null; let sum = 0; while (f.i < f.left) sum += payPiece(f, true)[0];
+    if (sum) fx.floaters.push({ text: '+' + fmt(sum), sub: f.cash ? '$' + f.cash : '', x: COLS / 2, y: HIDDEN + 8, life: 1, color: C.ink });
+    Audio.payoutEnd(f.left, true); f.tail = 0.3;
+    juice('oversEnd', { left: f.left, pts: f.pts, skipped: true });
+  }
+  function burstPiece(type, x, y) {             // an Overs plate presses and bursts (no board write)
+    const cells = ROT[type][0].map(([cx, cy]) => [x + cx, y + cy]);
+    if (prefs.glow) fx.lockFlash = { cells, life: 0.14 };
+    if (prefs.particles && !reducedMotion) for (const [cx, cy] of cells) for (let i = 0; i < 4; i++)
+      addParticle({ x: cx + 0.5, y: cy + 0.5, vx: (Math.random() - 0.5) * 9, vy: -3 - Math.random() * 7, g: 26, life: 0.5 + Math.random() * 0.4, size: 0.14 + Math.random() * 0.16, color: C[type] });
+    shake(2);
+  }
+
+  // ---------- near miss (juice-design.md 9): real numbers only, computed before the record is added ----------
+  function nearMiss(reason) {   // S.nearG = [have, need]: the gauge under the message (feel pass), always real numbers
+    S.nearG = null;
+    if (S.mode === 'run') {
+      if (reason !== 'pieces' && reason !== 'topout') return '';
+      const short = S.target - S.roundScore;
+      if (short > 0 && short <= 0.15 * S.target) { S.nearG = [S.roundScore, S.target]; return 'Missed by ' + fmt(short) + '!'; }
+      return '';
+    }
+    const list = records[S.mode] || [];
+    if (S.mode === 'marathon' || S.mode === 'ultra') {
+      const sc = S.score; if (!list.length || sc <= 0) return '';
+      const best = list[0].score || 0;
+      if (sc < best && sc >= 0.9 * best) { S.nearG = [sc, best]; return 'Missed your best by ' + fmt(best - sc) + '!'; }
+      if (list.length >= 10) { const tenth = list[9].score || 0; if (sc < tenth && sc >= 0.9 * tenth) { S.nearG = [sc, tenth]; return fmt(tenth - sc) + ' short of your top 10'; } }
+      return '';
+    }
+    if (S.mode === 'sprint') {
+      if (reason === 'clear') { const b = list[0], t = Math.round(S.time * 100) / 100; if (b && t > b.time && t <= 1.05 * b.time) { S.nearG = [b.time, t]; return (t - b.time).toFixed(2) + ' s off your best'; } return ''; }
+      if (S.lines >= 30 && S.lines < SPRINT_LINES) { S.nearG = [S.lines, SPRINT_LINES]; return (SPRINT_LINES - S.lines) + ' lines short'; }
+    }
+    return '';
   }
 
   function loseStreak() {
@@ -2535,10 +3110,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   function endGame(reason) {
-    S.status = 'over'; S.cur = null; S.result = reason; S.rank = 0;
+    S.status = 'over'; S.cur = null; S.result = reason; S.rank = 0; S.casc = null;
+    S.near = nearMiss(reason); S.overAt = performance.now();   // from the records as they were
     const date = new Date().toISOString().slice(0, 10);
-    if (S.mode === 'marathon' && S.score > 0) S.rank = addRecord('marathon', { score: S.score, lines: S.lines, level: S.level, streak: S.bestStreak, date });
-    if (S.mode === 'ultra' && S.score > 0) S.rank = addRecord('ultra', { score: S.score, lines: S.lines, streak: S.bestStreak, date });
+    // v: 7 marks scores set with special blocks; older rows show as "classic" in Records
+    if (S.mode === 'marathon' && S.score > 0) S.rank = addRecord('marathon', { score: S.score, lines: S.lines, level: S.level, streak: S.bestStreak, chain: S.bestChain || 0, v: 7, date });
+    if (S.mode === 'ultra' && S.score > 0) S.rank = addRecord('ultra', { score: S.score, lines: S.lines, streak: S.bestStreak, chain: S.bestChain || 0, v: 7, date });
     if (S.mode === 'sprint' && reason === 'clear') S.rank = addRecord('sprint', { time: Math.round(S.time * 100) / 100, ppm: ppm(), date });
     if (reason === 'clear' || reason === 'time') Audio.win(); else Audio.over();
     resetInput();
@@ -2615,6 +3192,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   function togglePause() { S.status === 'playing' || S.status === 'countdown' ? pause() : (S.status === 'paused' ? resume() : null); }
 
   const RESERVED = ['Enter', 'NumpadEnter', 'KeyM', 'KeyN', 'KeyG'];
+  // the over screen takes the hard-drop key as "go again" after 0.6 s, 0.9 s in Run where it starts a whole new run (a restored overAt of 0 is always allowed)
+  const retryGuard = () => S.mode === 'run' ? 900 : 600;
+  const retryReady = () => S.status === 'over' && sheet.hidden && shopEl.hidden && performance.now() - (S.overAt || 0) > retryGuard();
   let capturing = null;
   const actionFor = code => { for (const a in prefs.keys) if (prefs.keys[a].includes(code)) return a; return null; };
 
@@ -2641,13 +3221,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (code === 'KeyM') { e.preventDefault(); if (!e.repeat) toggleSound(); return; }
     if (code === 'KeyN') { e.preventDefault(); if (!e.repeat) toggleMusic(); return; }
     if (code === 'KeyG') { e.preventDefault(); if (!e.repeat) toggleGhost(); return; }
+    const a = actionFor(code);
+    if (S.fin && S.status === 'playing' && a !== 'pause') { e.preventDefault(); if (!e.repeat) skipPayout(); return; }   // any key skips Overs
     if (code === 'Enter' || code === 'NumpadEnter') { e.preventDefault(); if (!e.repeat) primary(); return; }
 
-    const a = actionFor(code);
     if (!a) return;
     e.preventDefault();
     if (a === 'pause') { if (!e.repeat) togglePause(); return; }
-    if (S.status !== 'playing') { if (a === 'hard' && !e.repeat && S.status === 'ready') primary(); return; }
+    if (S.status !== 'playing') { if (a === 'hard' && !e.repeat && (S.status === 'ready' || retryReady())) primary(); return; }
     if (a === 'left') { if (!e.repeat) pressDir(-1); return; }
     if (a === 'right') { if (!e.repeat) pressDir(1); return; }
     if (a === 'soft') { held.soft = true; return; }
@@ -2662,6 +3243,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   window.addEventListener('blur', () => { pause(); resetInput(); });
   document.addEventListener('visibilitychange', () => { Audio.visibility(document.hidden); if (document.hidden) pause(); });
   document.addEventListener('pointerdown', () => Audio.kick(), { capture: true });   // any tap or click may start the music
+  $('wellWrap').addEventListener('pointerdown', () => { if (S.fin && S.status === 'playing') skipPayout(); });   // a tap on the sheet skips Overs
 
   // touch pad
   $('pad').querySelectorAll('button').forEach(btn => {
@@ -2672,6 +3254,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       btn.classList.add('on');
       try { btn.setPointerCapture(e.pointerId); } catch (_) {}
       if (a === 'pause') { S.status === 'playing' || S.status === 'countdown' ? pause() : primary(); return; }
+      if (S.fin && S.status === 'playing') { skipPayout(); return; }
+      if (a === 'hard' && retryReady()) { primary(); return; }   // instant retry from the over screen
       if (S.status !== 'playing') return;
       if (a === 'left') pressDir(-1);
       else if (a === 'right') pressDir(1);
@@ -2707,6 +3291,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (st.right !== !!prev.right) st.right ? pressDir(1) : releaseDir(1);
       if (st.soft !== !!prev.soft) held.soft = st.soft;
       if (edge('start')) { Audio.ensure(); S.status === 'playing' || S.status === 'countdown' ? pause() : primary(); }
+      if (S.fin && S.status === 'playing' && (edge('hard') || edge('cw') || edge('ccw') || edge('hold'))) skipPayout();
+      if (edge('hard') && retryReady()) primary();
       if (edge('hard')) act('hard');
       if (edge('cw')) act('cw');
       if (edge('ccw')) act('ccw');
@@ -2782,6 +3368,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const poster = !!bossId && st === 'intro';
     if (poster !== ov.classList.contains('poster')) { ov.classList.toggle('poster', poster); ov.style.animation = 'none'; void ov.offsetWidth; ov.style.animation = ''; }
     const ost = $('ov-stamp'); ost.hidden = true; ost.className = 'ostamp';
+    const near = $('ov-near'); near.hidden = true; $('ov-nearg').hidden = true; clearTimeout(showOverlay.go); $('ov-main').classList.remove('go');
     const won = S.mode === 'run' && st === 'over' && S.result === 'won';
     const taped = st === 'over' && (won || (!!bossId && S.result !== 'won'));   // a boss loss keeps the boss tape across the sheet; a won run gets its own
     ov.classList.toggle('taped', taped); ov.classList.toggle('won', won);
@@ -2840,6 +3427,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       spl.title = sp && !boss.finale ? sp.name + ': ' + sp.desc : '';
       const notes = bossNotes(bossId);
       if (notes.length) { cn.hidden = false; cn.innerHTML = ''; notes.forEach(n => { const li = document.createElement('li'); li.textContent = n; cn.append(li); }); }
+      if (R.ticketNote) { rk.hidden = false; rk.textContent = R.ticketNote; }
       m.textContent = 'Face ' + boss.name; menu.hidden = false;
       hint.textContent = coarse ? '' : 'Enter to face it';
     } else if (st === 'intro') {
@@ -2847,7 +3435,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       t.textContent = ROUND_NAME[R.round];
       big.hidden = false; big.textContent = fmt(S.target);
       f.hidden = false; f.textContent = 'Score target · ' + S.piecesLeft + ' pieces';
-      p.textContent = 'Reward $' + ROUND_PAY[R.round] + ', plus $1 for every 5 pieces you have left (up to $' + LEFTOVER_CAP + ').';
+      p.textContent = 'Reward $' + ROUND_PAY[R.round] + ', plus $1 for every 5 pieces left (up to $' + LEFTOVER_CAP + '). Leftover pieces pay out points.';
+      if (R.ticketNote) { rk.hidden = false; rk.textContent = R.ticketNote; }
       m.textContent = 'Play round'; menu.hidden = false;
       hint.textContent = coarse ? '' : 'Enter to play';
     } else if (st === 'cleared') {
@@ -2857,6 +3446,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       big.hidden = false; big.textContent = '+$' + e.total; big.classList.add('tag');
       f.hidden = false; f.textContent = fmt(S.roundScore) + ' / ' + fmt(S.target);
       sk.hidden = false; sk.classList.add('receipt');   // till receipt: one line per payout, dotted leaders, bold total
+      if (e.finale) {   // Overs: points, not money, so a muted line above the till and outside TOTAL
+        const d = document.createElement('div'); d.className = 'overs';
+        const sp = document.createElement('span'); sp.textContent = 'Overs · ' + e.left + (e.left === 1 ? ' piece' : ' pieces');
+        const b = document.createElement('span'); b.textContent = '+' + fmt(e.finale) + ' pts';
+        d.append(sp, document.createElement('i'), b); sk.append(d);
+      }
       [['Reward', e.pay], ['Boss bonus', e.bonus], [e.left + ' pieces left', e.leftover], ['Interest', e.interest], ['Piggy Bank', e.piggy], ['TOTAL', e.total]]
         .forEach(([k, v], i, a) => { if (!v && i < a.length - 1 && i > 0) return;
           const d = document.createElement('div'); if (i === a.length - 1) d.className = 'tot';
@@ -2884,9 +3479,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
           + (!won && R.boss && BOSSES[R.boss] ? ' · ' + BOSSES[R.boss].name : '');
         const nb = R.bossesBeaten || 0;
         sk.hidden = false; sk.textContent = [nb + (nb === 1 ? ' boss' : ' bosses') + ' beaten', R.bestHand ? 'Best clear ' + fmt(R.bestHand) : '',
-          R.charms.length + (R.charms.length === 1 ? ' charm' : ' charms')].filter(Boolean).join(' · ');
-        m.textContent = 'New run';
-        hint.textContent = coarse ? '' : 'Enter for a new run';
+          (R.bestChain || 0) >= 2 ? 'Best chain ×' + R.bestChain : '', R.charms.length + (R.charms.length === 1 ? ' charm' : ' charms')].filter(Boolean).map(x => x.replace(/ /g, '\u00a0')).join(' · ');   // each stat wraps whole
+        m.textContent = S.near ? 'Try again' : 'New run';   // a retry is always a new run: nothing undoes a loss
+        hint.textContent = coarse ? '' : S.near ? 'Space or Enter to try again' : 'Enter for a new run';
       } else if (S.mode === 'sprint' && S.result === 'clear') {
         t.textContent = '40 lines cleared'; p.hidden = true;
         big.hidden = false; big.textContent = fmtTime(S.time, true);
@@ -2906,8 +3501,16 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       }
       if (S.mode !== 'run') { const ok = S.result === 'clear' || S.result === 'time'; ost.hidden = false; ost.classList.toggle('ok', ok);
         ost.textContent = S.result === 'clear' ? 'Finished' : S.result === 'time' ? 'Final score' : 'Game over'; }
-      if (S.bestStreak > 0 && S.mode !== 'sprint' && S.mode !== 'run') { sk.hidden = false; sk.textContent = 'Best streak ' + S.bestStreak + ' lines · peak ' + fmtMult(TIERS[S.peakTier]); }
+      if (S.bestStreak > 0 && S.mode !== 'sprint' && S.mode !== 'run') { sk.hidden = false; sk.textContent = 'Best streak ' + S.bestStreak + ' lines · peak ' + fmtMult(TIERS[S.peakTier]) + ((S.bestChain || 0) >= 2 ? ' · best\u00a0chain\u00a0' + S.bestChain : ''); }
       if (S.rank) { rk.hidden = false; rk.textContent = rankText(S.rank); }
+      if (S.near) {   // near miss: the real gap, stamped on the highlighter; Space or the pad's drop key goes again
+        near.hidden = false; near.textContent = S.near;
+        const gg = $('ov-nearg'), G = S.nearG;
+        if (G && G[1] > 0) { gg.hidden = false; gg.style.setProperty('--f', Math.max(0, Math.min(0.995, G[0] / G[1])).toFixed(3)); }
+        const since = performance.now() - (S.overAt || 0);   // the retry button nudges once, the moment the drop key will take it
+        if (!reducedMotion) showOverlay.go = setTimeout(() => { if (S.status === 'over') $('ov-main').classList.add('go'); }, Math.max(0, retryGuard() + 20 - since));
+        if (S.mode !== 'run') { m.textContent = 'Try again'; hint.textContent = coarse ? '' : 'Space or Enter to try again'; }
+      }
     }
   }
 
@@ -2937,9 +3540,11 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   const co = $('callout');
-  function callout(name, extra) {
+  function callout(name, extra, cls) {   // cls: chain step 'c1'..'c6' sizes and tilts the word (juice-design 10.1)
+    co.classList.remove('c1', 'c2', 'c3', 'c4', 'c5', 'c6'); if (cls) co.classList.add(cls);
     co.innerHTML = '';
-    co.append(document.createTextNode(name || ''));
+    if (cls && name) { const wd = document.createElement('span'); wd.className = 'cw'; wd.textContent = name; co.append(wd); }
+    else co.append(document.createTextNode(name || ''));
     if (extra) { const s = document.createElement('small'); s.textContent = extra; if (name) co.append(document.createElement('br')); co.append(s); }
     co.classList.remove('show'); void co.offsetWidth; co.classList.add('show');
   }
@@ -3054,36 +3659,42 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const thead = document.createElement('tr');
     cols.forEach(c => { const th = document.createElement('th'); th.textContent = c; thead.append(th); });
     tb.append(thead);
+    const marks = recMode === 'marathon' || recMode === 'ultra';   // scores set before special blocks read "classic"
+    let anyClassic = false;
     list.forEach((r, i) => {
       const tr = document.createElement('tr'); if (i === 0) tr.className = 'top';
+      const date = (r.date || '—') + (marks && !r.v ? (anyClassic = true, ' · classic') : '');
       const cells = recMode === 'run'
         ? [[i + 1, 'r'], [(r.won ? 'Won' : 'Ante ' + r.ante + ' · ' + ['small', 'big', 'boss'][r.round]) + (r.bosses ? ' · ' + r.bosses + (r.bosses === 1 ? ' boss' : ' bosses') : ''), ''], [fmt(r.score), 'n'], [fmt(r.best || 0), ''], [r.date || '—', 'dim']]
         : recMode === 'sprint'
         ? [[i + 1, 'r'], [fmtTime(r.time, true), 'n'], [r.ppm ?? '—', ''], [r.date || '—', 'dim']]
         : recMode === 'marathon'
-          ? [[i + 1, 'r'], [fmt(r.score), 'n'], [r.lines ?? '—', ''], [r.level ?? '—', ''], [r.streak ?? '—', ''], [r.date || '—', 'dim']]
-          : [[i + 1, 'r'], [fmt(r.score), 'n'], [r.lines ?? '—', ''], [r.streak ?? '—', ''], [r.date || '—', 'dim']];
+          ? [[i + 1, 'r'], [fmt(r.score), 'n'], [r.lines ?? '—', ''], [r.level ?? '—', ''], [r.streak ?? '—', ''], [date, 'dim']]
+          : [[i + 1, 'r'], [fmt(r.score), 'n'], [r.lines ?? '—', ''], [r.streak ?? '—', ''], [date, 'dim']];
       cells.forEach(([v, cls]) => { const td = document.createElement('td'); td.textContent = v; if (cls) td.className = cls; tr.append(td); });
       tb.append(tr);
     });
     tw.append(tb); wrap.append(tw);
+    if (anyClassic) { const n = document.createElement('p'); n.className = 'note'; n.textContent = 'Classic: set before special blocks. Sprint has none.'; wrap.append(n); }
   }
 
   // ---------- effects ----------
   const wellWrap = $('wellWrap');
-  function shake(px) {
-    if (!prefs.shake || !wellWrap.animate) return;
+  function shake(px, sx = 0) {   // sx: a sideways kick for the bigger chain waves
+    if (!prefs.shake || !wellWrap.animate || reducedMotion) return;
     wellWrap.animate([
-      { transform: 'translate(0,0)' }, { transform: `translate(0,${px}px)` },
-      { transform: `translate(0,${-px * 0.3}px)` }, { transform: 'translate(0,0)' },
-    ], { duration: 190, easing: 'ease-out' });
+      { transform: 'translate(0,0)' }, { transform: `translate(${sx}px,${px}px)` },
+      { transform: `translate(${-sx * 0.6}px,${-px * 0.3}px)` }, { transform: `translate(${sx * 0.25}px,${px * 0.1}px)` }, { transform: 'translate(0,0)' },
+    ], { duration: 190 + (sx ? 90 : 0), easing: 'ease-out' });
   }
   // boss fx fields: goT (GO flash), flipT (Looking Glass shimmer), rivet ({x,y,life}), sealT (Warden hold denied),
   // defeat ({t, row, fireworks[]}: the 2.6 s celebration timeline, driven in stepBossFx)
   // visual fields: slip (plate misregistration spring), voids (Arbiter VOID stamps), streaks (Surge), flick (Looking Glass),
   // rowFlash (garbage row), healT (Mender), tellT (boss telegraph band), veilFrom (Shroud veil lifting), slowT (Surge slow-mo)
   const fx = { trails: [], lockFlash: null, floaters: [], levelT: 0, goT: 0, flipT: 0, rivet: null, sealT: 0, defeat: null,
-    slip: { t: 9, amp: 0 }, voids: [], streaks: [], flick: null, rowFlash: 0, healT: 0, tellT: 0, veilFrom: 0, slowT: 0 };
+    slip: { t: 9, amp: 0 }, voids: [], streaks: [], flick: null, rowFlash: 0, healT: 0, tellT: 0, veilFrom: 0, slowT: 0,
+    markT: 0,     // markT: the marked mino's stamp-in on spawn (feel pass)
+    blasts: [], regs: [], stopT: 0, overs: null };   // blasts: splat / knife / ring per fired special; stopT: chain hit-stop; overs: payout counter slip
   function resetBossFx() { fx.goT = fx.flipT = fx.sealT = fx.rowFlash = fx.healT = fx.tellT = fx.veilFrom = fx.slowT = 0; fx.rivet = null; fx.defeat = null; fx.flick = null;
     fx.voids = []; fx.streaks = []; goalEl.classList.remove('shatter', 'notch-hot', 'heal'); }
   function sparks(x, y, n, color) {
@@ -3130,7 +3741,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         const y = d.row++;
         for (let x = 0; x < COLS; x++) { const c = S.board[y][x]; if (!c) continue;
           if (prefs.particles) for (let i = 0; i < 3; i++) addParticle({ x: x + 0.5, y: y + 0.5, vx: (Math.random() - 0.5) * 8, vy: -3 - Math.random() * 6,
-            g: 24, life: 0.5 + Math.random() * 0.4, size: 0.14 + Math.random() * 0.14, color: i ? C[c] : C.boss });
+            g: 24, life: 0.5 + Math.random() * 0.4, size: 0.14 + Math.random() * 0.14, color: i ? C[ink(c)] : C.boss });
           S.board[y][x] = null; }
       }
     }
@@ -3147,14 +3758,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       for (let i = 0; i < n; i++) addParticle({
         x: x + 0.5 + (Math.random() - 0.5) * 0.6, y: y + 0.5 + (Math.random() - 0.5) * 0.6,
         vx: (Math.random() - 0.5) * 10 * boost + (x - 4.5) * 0.6, vy: -4 - Math.random() * 9 * boost,
-        life: 0.55 + Math.random() * 0.5, size: 0.14 + Math.random() * 0.2, color: C[t], g: 28,
+        life: 0.55 + Math.random() * 0.5, size: 0.14 + Math.random() * 0.2, color: C[ink(t)], g: 28,
       });
     }
     if (particles.length > 600) particles.splice(0, particles.length - 600);
   }
-  function floater(text, sub, rows) {
+  function floater(text, sub, rows, wave) {   // wave: chain step, which grows the stamp (cs * (1 + .12 w))
     const y = rows.reduce((a, b) => a + b, 0) / rows.length + 0.5;
-    fx.floaters.push({ text, sub, x: COLS / 2, y, life: 1.1, color: C.tierT[S.tier] });
+    fx.floaters.push({ text, sub, x: COLS / 2, y, life: 1.1, color: C.tierT[S.tier], scale: wave ? 1 + 0.12 * wave : 1 });
   }
   function voidStamp(rows) { fx.voids.push({ y: rows.reduce((a, b) => a + b, 0) / rows.length + 0.5, life: 0.94 }); }
   const motionOK = () => !reducedMotion;
@@ -3171,6 +3782,16 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   let emberAcc = 0;
   function stepFx(dt) {
     if (S.bx && S.bx.hitT > 0) return;   // hit-stop freezes particles too
+    if (fx.stopT > 0) { fx.stopT -= dt; if (S.casc && S.status === 'playing') return; }   // chain hit-stop: the impact frame holds
+    for (const b of fx.blasts) b.t += dt;
+    if (fx.blasts.length) fx.blasts = fx.blasts.filter(b => b.t < BLAST_T + 0.55);
+    if (fx.regs.length) { for (const g of fx.regs) g.t += dt; fx.regs = fx.regs.filter(g => g.t < REG_T); }
+    const ov = fx.overs; if (ov) {
+      const f = S.fin, goal = f ? f.pts : ov.pts; ov.pts = goal;
+      ov.shown += (goal - ov.shown) * Math.min(1, dt * 14); if (Math.abs(goal - ov.shown) < 1) ov.shown = goal;
+      if (ov.pop > 0) ov.pop -= dt; if (ov.cashPop > 0) ov.cashPop -= dt; if (ov.done > 0) ov.done -= dt;
+      if (!f && S.status !== 'playing' && S.status !== 'paused') fx.overs = null;
+    }
     stepBossFx(dt);
     if (fx.slip.t < 9) fx.slip.t += dt;
     for (const p of particles) { p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; p.rot += p.vr * dt; }
@@ -3181,6 +3802,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     for (const f of fx.floaters) { f.life -= dt; f.y -= dt * 1.6; }
     fx.floaters = fx.floaters.filter(f => f.life > 0);
     if (fx.levelT > 0) fx.levelT -= dt;
+    if (fx.markT > 0) fx.markT -= dt;
     if (S.status === 'playing' && prefs.glow && prefs.particles && S.tier >= 4 && !reducedMotion) {   // toner flecks drift down from the top edge
       emberAcc += dt * [0, 0, 0, 0, 6, 10, 16][S.tier];
       while (emberAcc >= 1) {
@@ -3228,19 +3850,22 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     if (S.status !== 'playing') return;
     if (S.bx && S.bx.hitT > 0) { S.bx.hitT -= dt; return; }   // hit-stop on boss defeat
-    if (S.winT > 0) { S.winT -= dt; if (S.winT <= 0) { S.winT = 0; roundWon(); } return; }
+    if (S.fin) { stepPayout(dt); return; }                      // Overs: leftover pieces pay out before the receipt
+    if (S.winT > 0) { S.winT -= dt; if (S.winT <= 0) { S.winT = 0; S.mode === 'run' && S.winLeft > 0 ? startPayout() : roundWon(); } return; }
     S.time += dt;
-    if (S.mode === 'ultra' && S.time >= ULTRA_SECS) { S.time = ULTRA_SECS; endGame('time'); return; }
+    if (S.mode === 'ultra' && S.time >= ULTRA_SECS && !S.casc && !S.clearRows.length) { S.time = ULTRA_SECS; endGame('time'); return; }   // a buzzer-beater chain finishes first
     checkDanger();
     if ((S.mode === 'ultra' && ULTRA_SECS - S.time <= 20) || (S.mode === 'sprint' && S.lines >= SPRINT_LINES - 5)) Audio.setFinal(true);   // final-stretch music layer
 
+    if (S.casc) { if (fx.stopT > 0) return; stepCascade(dt); return; }   // no piece, no gravity, the streak fuse is frozen; hit-stop on big waves
     if (S.clearRows.length) {
       S.clearT -= dt;
       if (S.clearT <= 0) {
         const rows = S.clearRows;
+        S.clearRows = [];
+        if (specialsOn() && marksIn(rows).length) { startCascade(rows); return; }
         S.board = S.board.filter((_, i) => !rows.includes(i));
         while (S.board.length < ROWS) S.board.unshift(emptyRow());
-        S.clearRows = [];
         if (S.mode === 'sprint' && S.lines >= SPRINT_LINES) { endGame('clear'); return; }
         if (runAfterPiece()) return;
         nextPiece();
@@ -3334,8 +3959,61 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const offscreen = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; };
 
   // colour plate for one cell: ink fill, paper grain specks, halftone shade on two edges, glyph knocked out to paper
-  function sprite(type, cs, v) {
-    const key = type + '|' + cs + '|' + v;
+  // special marks (juice-design 2.4), painted in cell space; ctx is already clipped / translated to the cell's top-left
+  function paintMark(x, mk, cs, g, v, onInk, col) {   // col: paint the mark in one plate ink (the pink misregistered copy)
+    x.save();
+    const INK = col || C.ink, KO = col || C.paper;
+    if (cs < 12) {   // phone mini-next: disc, one bar, ring
+      if (mk === 'b') { x.fillStyle = INK; x.globalAlpha = 0.85; x.beginPath(); x.arc(cs / 2, cs / 2, cs * 0.3, 0, Math.PI * 2); x.fill(); }
+      else if (mk === 'r') { x.fillStyle = INK; x.fillRect(cs / 2 - Math.max(1, cs * 0.09), g, Math.max(2, cs * 0.18), cs - 2 * g); }
+      else { x.strokeStyle = KO; x.lineWidth = Math.max(1, cs * 0.12); x.beginPath(); x.arc(cs / 2, cs / 2, cs * 0.28, 0, Math.PI * 2); x.stroke(); }
+      x.restore(); return;
+    }
+    if (mk === 'b') {        // Blot: a seeded ink splat overprinted on the piece ink
+      const rnd = mulberry32(v * 7919 + 13), seed = rnd() * Math.PI * 2;
+      if (onInk) x.globalCompositeOperation = 'multiply';
+      x.fillStyle = INK; x.globalAlpha = 0.85; x.beginPath();
+      const disc = (dx, dy, r) => { x.moveTo(cs / 2 + dx + r, cs / 2 + dy); x.arc(cs / 2 + dx, cs / 2 + dy, r, 0, Math.PI * 2); };
+      disc(0, 0, cs * 0.26);
+      for (let k = 0; k < 5; k++) { const a = k * Math.PI * 2 / 5 + seed; disc(Math.cos(a) * cs * 0.2, Math.sin(a) * cs * 0.2, cs * 0.11); }
+      for (let k = 0; k < 3; k++) { const a = seed + 0.6 + k * 2.1 + rnd() * 0.5; disc(Math.cos(a) * cs * 0.38, Math.sin(a) * cs * 0.38, cs * 0.04); }
+      x.fill();
+    } else if (mk === 'r') { // Rule: two printer's rules with serif ticks
+      const bw = Math.max(2, cs * 0.09), tw = cs * 0.18, th = Math.max(1.5, cs * 0.06);
+      x.fillStyle = INK;
+      for (const fx_ of [0.36, 0.64]) { const cx = cs * fx_; x.fillRect(cx - bw / 2, g, bw, cs - 2 * g); x.fillRect(cx - tw / 2, g, tw, th); x.fillRect(cx - tw / 2, cs - g - th, tw, th); }
+    } else {                 // Spot: a registration mark knocked out to paper
+      x.strokeStyle = KO; x.globalAlpha = 0.9; x.lineWidth = Math.max(1.5, cs * 0.07);
+      x.beginPath(); x.arc(cs / 2, cs / 2, cs * 0.3, 0, Math.PI * 2);
+      x.moveTo(cs * 0.1, cs / 2); x.lineTo(cs * 0.9, cs / 2); x.moveTo(cs / 2, cs * 0.1); x.lineTo(cs / 2, cs * 0.9); x.stroke();
+    }
+    x.restore();
+  }
+  const markSprites = new Map();   // mark-only plates (ghost piece)
+  function markSprite(mk, cs) {
+    const key = mk + '|' + cs; let c = markSprites.get(key); if (c) return c;
+    c = offscreen(cs, cs); paintMark(c.getContext('2d'), mk, cs, Math.max(1, Math.round(cs * 0.04)), 0, false);
+    if (markSprites.size > 80) markSprites.clear(); markSprites.set(key, c); return c;
+  }
+  // the mark's second plate: the same shape in fluorescent pink, printed a hair off the keyline. It drifts and ticks out of
+  // register on its own, so a special reads as alive without any glow (art-direction rule 3).
+  function markPlate(mk, cs, v) {
+    const key = 'p|' + mk + '|' + cs + '|' + v; let c = markSprites.get(key); if (c) return c;
+    c = offscreen(cs, cs); paintMark(c.getContext('2d'), mk, cs, Math.max(1, Math.round(cs * 0.04)), v, false, C.pink);
+    if (markSprites.size > 80) markSprites.clear(); markSprites.set(key, c); return c;
+  }
+  function plateOff(cs, x, y) {   // [dx, dy] of a special's pink plate: a slow drift plus a quick tick every ~2.2 s; static when still
+    if (reducedMotion || !prefs.glow) return [Math.round(cs * 0.06), Math.round(cs * 0.04)];
+    const t = performance.now() / 1000, ph = (t / 2.2 + x * 0.13 + y * 0.07) % 1, kick = ph < 0.12 ? Math.sin(ph / 0.12 * Math.PI) : 0;
+    const a = cs * (0.05 + 0.1 * kick);
+    return [Math.round(a * (1 + 0.4 * Math.sin(t * 4 + x * 1.3 + y))), Math.round(a * 0.7 * Math.cos(t * 3.3 + x + y * 1.7))];
+  }
+  function drawPlate(ctx, mk, cs, v, px, py, dx, dy, alpha) {
+    ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = alpha;
+    ctx.drawImage(markPlate(mk, cs, v), px + dx, py + dy); ctx.restore();
+  }
+  function sprite(type, cs, v, mk) {
+    const key = type + '|' + cs + '|' + v + '|' + (mk || '');
     let c = sprites.get(key); if (c) return c;
     if (sprites.size > 240) sprites.clear();
     c = offscreen(cs, cs);
@@ -3361,7 +4039,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
         x.globalAlpha = 0.5;
         for (let i = 0, n = 2 + (v % 2); i < n; i++) x.fillRect(g + Math.floor(rnd() * (w - 2)), g + Math.floor(rnd() * w), 2, 1);
       }
-      if (cs >= 12) {
+      if (mk) paintMark(x, mk, cs, g, v, true);   // a special replaces the glyph knockout
+      else if (cs >= 12) {
         const gs = cs * 0.34, h = gs / 2;
         x.globalAlpha = 0.55; x.fillStyle = x.strokeStyle = C.paper; x.lineWidth = Math.max(1.5, cs * 0.075); x.lineCap = 'butt'; x.lineJoin = 'miter';
         x.translate(cs / 2, cs / 2); x.beginPath();
@@ -3495,24 +4174,38 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       bx.globalAlpha = 1;
     }
 
+    drawBlasts(ox, oy, cs, toY, Wd, Hd, dpr, true);   // blast residue sits on the paper, under the blocks that settle onto it
     // 6 settled blocks: sprites, then one keyline stroke (veiled rows get their own faint pass)
     const veil = boss && S.bx.veil ? HIDDEN + S.bx.veil : 0;
     const defeatFade = reducedMotion && fx.defeat ? Math.max(0, 1 - fx.defeat.t / 0.6) : 1;
-    const kp = new Path2D(), kf = new Path2D(); let anyF = false;
+    const kp = new Path2D(), kf = new Path2D(), ks = new Path2D(); let anyF = false, anyS = false;
+    const k = S.casc, falls = new Map();   // cascade settle: cells drawn from their old row, easing in (gravity)
+    let fallK = 0;
+    if (k && k.ph === 'fall' && k.falls.length) {
+      const t0 = reducedMotion ? 0.05 : FALL_T, e = Math.max(0, Math.min(1, 1 - k.t / t0)); fallK = 1 - e * e;
+      for (const [x, y0, y1] of k.falls) falls.set(y1 * COLS + x, y0);
+    }
+    const wob = !reducedMotion && prefs.glow ? performance.now() / 1000 : -1;   // idle register wobble of special cells
+    const specials = [];
     for (let y = HIDDEN; y < ROWS; y++) {
       const a = (ready ? 0.45 : y < veil ? 0.08 : 1) * defeatFade, faint = y < veil;
       if (a <= 0) continue;
       bx.globalAlpha = a;
       for (let x = 0; x < COLS; x++) {
-        const t = S.board[y][x]; if (!t) continue;
-        const px = ox + x * cs, py = toY(y);
-        bx.drawImage(sprite(t, cs, (x * 7 + y * 13) % 3), px + rx, py + ry);
-        (faint ? kf : kp).rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw); if (faint) anyF = true;
+        const v = S.board[y][x]; if (!v) continue;
+        const mk = mkOf(v), y0 = falls.get(y * COLS + x);
+        const px = ox + x * cs, py = y0 === undefined ? toY(y) : Math.round(toY(y) - (y - y0) * cs * fallK);
+        const wx = mk && wob >= 0 ? Math.round(Math.sin(wob * 6 + x + y) * cs * 0.03) : 0;
+        bx.drawImage(sprite(ink(v), cs, (x * 7 + y * 13) % 3, mk), px + rx + wx, py + ry);
+        if (mk && !faint) specials.push([mk, (x * 7 + y * 13) % 3, px + rx + wx, py + ry, x, y, a]);
+        (faint ? kf : mk ? ks : kp).rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw); if (faint) anyF = true; else if (mk) anyS = true;
       }
     }
     bx.strokeStyle = C.ink; bx.lineWidth = kw;
     bx.globalAlpha = (ready ? 0.35 : 1) * defeatFade; bx.stroke(kp);
+    if (anyS) { bx.lineWidth = 2 * kw; bx.stroke(ks); bx.lineWidth = kw; }   // specials get a doubled keyline
     if (anyF) { bx.globalAlpha = 0.1; bx.stroke(kf); }
+    for (const [mk, v, px, py, x, y, a] of specials) { const [dx, dy] = plateOff(cs, x, y); drawPlate(bx, mk, cs, v, px, py, dx, dy, 0.6 * a * defeatFade); }
     bx.globalAlpha = 1;
     if (fx.rowFlash > 0 && boss) {   // a garbage row just rose: it flashes in the boss ink
       bx.globalCompositeOperation = 'multiply'; bx.globalAlpha = 0.8 * fx.rowFlash / 0.2; bx.fillStyle = C.boss;
@@ -3526,15 +4219,18 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       for (const [x, y] of fx.lockFlash.cells) if (y >= HIDDEN) bx.fillRect(ox + x * cs + g, toY(y) + g, cs - 2 * g, cs - 2 * g);
       bx.globalCompositeOperation = 'source-over'; bx.globalAlpha = 1;
     }
-    if (S.clearRows.length) {
-      const p = 1 - Math.max(0, S.clearT / CLEAR_T), big = S.clearRows.length >= 4;
+    const cutRows = S.clearRows.length ? S.clearRows : k && k.ph === 'cut' ? k.rows : null;   // the player's cut, or a chain's
+    if (cutRows) {
+      const p = 1 - Math.max(0, (S.clearRows.length ? S.clearT : k.t) / CLEAR_T), big = cutRows.length >= 4;
       const lw = Math.max(1, Math.round((big ? 3 : 2) * dpr));
-      for (const y of S.clearRows) {
+      for (const y of cutRows) {
         const py = toY(y);
         bx.globalAlpha = Math.min(1, p * 1.4); bx.fillStyle = C.paper; bx.fillRect(ox, py, Wd, cs);
         bx.globalAlpha = 1; bx.fillStyle = big ? C.ink : C.pink; bx.fillRect(ox, py + Math.round(cs / 2 - lw / 2), Math.min(Wd, p * 1.6 * Wd), lw);
       }
     }
+    if (k && k.ph === 'blast') drawCascade(k, ox, cs, toY, Wd, g);
+    drawBlasts(ox, oy, cs, toY, Wd, Hd, dpr, false);
     if (fx.levelT > 0) {   // level up: a sunflower band sweeps down the sheet
       bx.fillStyle = C.sun; bx.fillRect(ox, oy + (1 - fx.levelT / 0.6) * Hd, Wd, Math.max(2, Math.round(3 * dpr)));
     }
@@ -3561,17 +4257,29 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
           gp.rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw);
         }
         bx.globalAlpha = 0.9; bx.strokeStyle = col; bx.lineWidth = kw; bx.setLineDash([cs * 0.16, cs * 0.1]); bx.stroke(gp); bx.setLineDash([]);
+        if (c.mk) { const [hx_, hy_] = ROT[c.t][c.r][HEART[c.t]], Y = gy + hy_;
+          if (Y >= HIDDEN) { bx.globalAlpha = 0.35; bx.drawImage(markSprite(c.mk, cs), ox + (c.x + hx_) * cs, toY(Y)); } }
       }
       const lockFade = S.lockT > 0 ? 1 - 0.35 * Math.min(1, S.lockT / lockDelay()) : 1;
-      const cp = new Path2D();
+      const cp = new Path2D(), cm = new Path2D();
       bx.globalAlpha = lockFade;
+      let mkAt = null;
       ROT[c.t][c.r].forEach(([cx, cy], i) => {
         const Y = c.y + cy; if (Y < HIDDEN) return;
-        const px = ox + (c.x + cx) * cs, py = toY(Y);
-        bx.drawImage(sprite(c.t, cs, i % 3), px + rx, py + ry);
+        const px = ox + (c.x + cx) * cs, py = toY(Y), mk = c.mk && i === HEART[c.t] ? c.mk : null;
+        if (mk) { mkAt = [px, py, i % 3, c.x + cx, Y]; return; }
+        bx.drawImage(sprite(c.t, cs, i % 3, mk), px + rx, py + ry);
         cp.rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw);
       });
       bx.strokeStyle = C.ink; bx.lineWidth = kw; bx.stroke(cp);
+      if (mkAt) {   // the marked mino stamps in on spawn (1.6 -> 1 over 160 ms), then carries its drifting pink plate
+        const [px, py, v, X, Y] = mkAt, e = fx.markT > 0 && !reducedMotion ? fx.markT / 0.16 : 0, sc = 1 + 0.6 * e * e;
+        bx.save(); bx.translate(px + cs / 2, py + cs / 2); bx.scale(sc, sc); bx.translate(-cs / 2, -cs / 2);
+        bx.drawImage(sprite(c.t, cs, v, c.mk), rx, ry);
+        const [dx, dy] = plateOff(cs, X, Y); drawPlate(bx, c.mk, cs, v, rx, ry, dx, dy, 0.6 * lockFade);
+        bx.lineWidth = 2 * kw; bx.strokeStyle = C.ink; bx.strokeRect(g + kw, g + kw, cs - 2 * g - 2 * kw, cs - 2 * g - 2 * kw);
+        bx.restore(); bx.globalAlpha = lockFade;
+      }
       if (fx.flick && fx.flick.t > 0 && boss === 'glass') {   // Looking Glass: a mirrored keyline ghost flicks on each rotation
         const cells = ROT[c.t][c.r], xs = cells.map(q => q[0]), mid = (Math.min(...xs) + Math.max(...xs)) / 2, fp = new Path2D();
         for (const [cx, cy] of cells) { const Y = c.y + cy; if (Y < HIDDEN) continue;
@@ -3580,6 +4288,8 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       }
       bx.globalAlpha = 1;
     }
+
+    if (S.fin) drawOvers(S.fin, ox, oy, cs, toY, Wd, Hd, g, kw, rx, ry, dpr);
 
     // 8 boss overlays on top of the pieces (phase wipe, defeat stamp, countdown)
     if (boss) drawBossTop(boss, ox, oy, cs, Wd, Hd, rx, ry, dpr);
@@ -3602,8 +4312,12 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       if (f.y < HIDDEN) continue;
       const X = ox + f.x * cs, Y = toY(f.y);
       bx.globalAlpha = Math.min(1, f.life / 0.4);
-      stampText(bx, f.text, X, Y, cs, C.pink, C.ink, rx + 2 * dpr);
-      if (f.sub) { bx.font = '800 ' + Math.round(cs * 0.6) + 'px ' + MONO; bx.fillStyle = f.color || C.ink; bx.fillText(f.sub, X, Y + cs * 0.85); }
+      stampText(bx, f.text, X, Y, cs * (f.scale || 1), C.pink, C.ink, rx + 2 * dpr);
+      if (f.sub) { bx.font = '800 ' + Math.round(cs * 0.6) + 'px ' + MONO;
+        if (f.color === C.sun) {   // money: ink on a sunflower tag (sunflower text on paper is unreadable)
+          const sw = bx.measureText(f.sub).width; bx.fillStyle = C.sun; bx.fillRect(X - sw / 2 - 3, Y + cs * 0.55, sw + 6, cs * 0.62); bx.fillStyle = C.ink;
+        } else bx.fillStyle = f.color || C.ink;
+        bx.fillText(f.sub, X, Y + cs * 0.85); }
     }
     for (const v of fx.voids) {   // Arbiter: VOID stamped across a voided clear
       const Y = Math.min(toY(v.y), oy + Hd - cs * 0.85), age = 0.94 - v.life, sc = reducedMotion ? 1 : age < 0.14 ? 1.6 - 0.6 * age / 0.14 : 1;
@@ -3616,6 +4330,176 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     bx.globalAlpha = 1; if ('fontStretch' in bx) bx.fontStretch = 'normal';
   }
+
+  // ---------- cascade + Overs layers (placeholder visuals: the feel pass replaces these) ----------
+  // ---------- cascade art (juice-design 10.2): per-cell cover timing follows the blast that reached it ----------
+  // Blot: covered at once under the splat; Rule: covered as the knife passes down the column; Spot: covered as the ring reaches it.
+  let coverMemo = { cells: null, thr: null };
+  function coverThr(k) {
+    if (coverMemo.cells === k.cells) return coverMemo.thr;
+    const thr = k.cells.map(([x, y]) => {
+      let best = 0.0001, hit = false;
+      for (const [hx, hy, hk, hc] of k.hits) {
+        let t = -1;
+        if (hk === 'b') { if (Math.abs(hx - x) <= 1 && Math.abs(hy - y) <= 1) t = 0; }
+        else if (hk === 'r') { if (hx === x) t = Math.max(0, (y - HIDDEN + 0.5) / (1.6 * (ROWS - HIDDEN))); }
+        else if (ink(S.board[y][x]) === hc) t = Math.min(0.7, Math.hypot(x - hx, y - hy) / 12);
+        if (t >= 0 && (!hit || t < best)) { best = t; hit = true; }
+      }
+      return hit ? best : 0;
+    });
+    coverMemo = { cells: k.cells, thr }; return thr;
+  }
+  function drawCascade(k, ox, cs, toY, Wd, g) {   // blast phase: cut rows stay papered over, blast cells are covered as the wave hits
+    const p = 1 - Math.max(0, k.t / BLAST_T), thr = coverThr(k);
+    bx.fillStyle = C.paper;
+    for (const y of k.rows) if (y >= HIDDEN) bx.fillRect(ox, toY(y), Wd, cs);
+    k.cells.forEach(([x, y], j) => {
+      if (y < HIDDEN) return;
+      const t = reducedMotion ? 0 : thr[j], a = t === 0 ? Math.min(1, p * 1.6) : Math.max(0, Math.min(1, (p - t) * 6));
+      if (a <= 0) return;
+      bx.globalAlpha = a; bx.fillRect(ox + x * cs, toY(y), cs, cs);
+    });
+    bx.globalCompositeOperation = 'multiply'; bx.fillStyle = C.ink; bx.globalAlpha = 0.5 * (1 - p);   // the specials that fired press into the paper
+    for (const [x, y] of k.hits) if (y >= HIDDEN) bx.fillRect(ox + x * cs + g, toY(y) + g, cs - 2 * g, cs - 2 * g);
+    bx.globalCompositeOperation = 'source-over'; bx.globalAlpha = 1;
+  }
+  function splatPath(seed) {   // a seeded ink splat in cell units, centred on 0,0 (radius about 1.5 cells)
+    const r = mulberry32(seed), P = new Path2D(), disc = (x, y, rr) => { P.moveTo(x + rr, y); P.arc(x, y, rr, 0, Math.PI * 2); };
+    disc(0, 0, 0.92);
+    const n = 7 + Math.floor(r() * 3), a0 = r() * Math.PI * 2;
+    for (let i = 0; i < n; i++) { const a = a0 + i * Math.PI * 2 / n + (r() - 0.5) * 0.5, d = 0.7 + r() * 0.35; disc(Math.cos(a) * d, Math.sin(a) * d, 0.3 + r() * 0.18); }
+    for (let i = 0; i < 7; i++) { const a = r() * Math.PI * 2, d = 1.3 + r() * 0.6; disc(Math.cos(a) * d, Math.sin(a) * d, 0.05 + r() * 0.1); }
+    for (let i = 0; i < 3; i++) {   // two-drop streaks flung out of the splat
+      const a = r() * Math.PI * 2; disc(Math.cos(a) * 1.15, Math.sin(a) * 1.15, 0.16); disc(Math.cos(a) * 1.42, Math.sin(a) * 1.42, 0.1); }
+    return P;
+  }
+  // under: the residue (stain, rules, crosshair) printed on the sheet beneath the settled blocks; otherwise the live blast on top
+  function drawBlasts(ox, oy, cs, toY, Wd, Hd, dpr, under) {
+    if (!fx.blasts.length && !fx.regs.length) return;
+    bx.save(); bx.beginPath(); bx.rect(ox, oy, Wd, Hd); bx.clip();
+    if (!under) for (const g of fx.regs) {   // Spot: a paper registration ring stamps on each block it took
+      const q = g.t / REG_T, r = cs * 0.3 * (reducedMotion ? 1 : 0.7 + 0.3 * Math.min(1, q * 4)), gx = ox + (g.x + 0.5) * cs, gy = toY(g.y) + cs / 2;
+      bx.globalAlpha = 1 - q; bx.lineWidth = Math.max(2, cs * 0.09); bx.strokeStyle = C.paper; bx.beginPath(); bx.arc(gx, gy, r, 0, Math.PI * 2); bx.stroke();
+      bx.lineWidth = Math.max(1, dpr); bx.strokeStyle = C.ink; bx.beginPath(); bx.moveTo(gx - r * 1.35, gy); bx.lineTo(gx + r * 1.35, gy); bx.moveTo(gx, gy - r * 1.35); bx.lineTo(gx, gy + r * 1.35); bx.stroke();
+    }
+    for (const b of fx.blasts) {
+      const bt = b.k === 's' ? SPOT_T : BLAST_T;
+      if ((b.t > bt) !== !!under) continue;
+      const p = Math.min(1, b.t / bt), after = b.t - bt, cx = ox + (b.x + 0.5) * cs, cy = toY(b.y) + cs / 2;
+      const off = Math.max(1, Math.round(cs * (0.06 + 0.12 * (1 - p)) * (reducedMotion ? 0.5 : 1)));
+      if (b.k === 'b') {         // ink splat, overprinted (multiply), with its pink plate knocked out of register; leaves a stain that lifts
+        if (!b.path) b.path = splatPath(b.seed);
+        const e = 1 - (1 - p) * (1 - p), sc = (reducedMotion ? 1 : 0.6 + 0.6 * e) * cs * (1 + 0.04 * b.w);
+        const a = after > 0 ? 0.85 * Math.max(0, 1 - after / 0.5) : 0.85; if (a <= 0) continue;
+        bx.globalCompositeOperation = 'multiply';
+        bx.setTransform(sc, 0, 0, sc, cx + off, cy + off * 0.7); bx.globalAlpha = a * 0.7; bx.fillStyle = C.pink; bx.fill(b.path);
+        bx.setTransform(sc, 0, 0, sc, cx, cy); bx.globalAlpha = a; bx.fillStyle = C.ink; bx.fill(b.path);
+        bx.setTransform(1, 0, 0, 1, 0, 0); bx.globalCompositeOperation = 'source-over';
+      } else if (b.k === 'r') {  // a printer's knife runs down the column, then its two rules linger and lift
+        const x = Math.round(cx), lw = Math.max(3, Math.round(cs * 0.14));
+        if (!reducedMotion && after < 0.2) {
+          const len = Math.min(Hd, p * 1.6 * Hd), a = after > 0 ? 1 - after / 0.2 : 1;
+          bx.globalAlpha = a * 0.8; bx.fillStyle = C.pink; bx.fillRect(x - lw / 2 + off, oy, lw, len);
+          bx.globalAlpha = a; bx.fillStyle = C.ink; bx.fillRect(x - lw / 2, oy, lw, len);
+          if (len < Hd) bx.fillRect(x - cs * 0.3, oy + len - lw, cs * 0.6, lw);   // the blade's serif
+        }
+        const ra = p >= 1 ? 0.5 * Math.max(0, 1 - after / 0.5) : 0;
+        if (ra > 0) { bx.globalAlpha = ra; bx.fillStyle = C.ink; const rw = Math.max(1, Math.round(dpr));
+          bx.fillRect(Math.round(ox + (b.x + 0.36) * cs), oy, rw, Hd); bx.fillRect(Math.round(ox + (b.x + 0.64) * cs), oy, rw, Hd); }
+      } else {                   // registration ring ripples out in the Spot's ink; the crosshair snaps across the sheet
+        const a = Math.sqrt(Math.max(0, 1 - p));
+        if (!reducedMotion && a > 0) {
+          const R_ = p * 7 * cs, lw = Math.max(3, cs * 0.2);
+          bx.lineWidth = lw; bx.globalAlpha = a * 0.7; bx.strokeStyle = C.pink; bx.beginPath(); bx.arc(cx + off, cy + off * 0.7, R_, 0, Math.PI * 2); bx.stroke();
+          bx.globalAlpha = a; bx.strokeStyle = C[b.c] || C.ink; bx.beginPath(); bx.arc(cx, cy, R_, 0, Math.PI * 2); bx.stroke();
+          bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, dpr); bx.beginPath(); bx.arc(cx, cy, R_ * 0.55, 0, Math.PI * 2); bx.stroke();
+        }
+        const ca = after > 0 ? 0.6 * Math.max(0, 1 - after / 0.35) : 0.6;
+        if (ca > 0) { bx.globalAlpha = ca; bx.fillStyle = C.ink; const hw = Math.max(1, Math.round(dpr));
+          bx.fillRect(ox, Math.round(cy), Wd, hw); bx.fillRect(Math.round(cx), oy, hw, Hd);
+          bx.lineWidth = Math.max(1.5, 2 * dpr); bx.strokeStyle = C.ink; bx.beginPath(); bx.arc(cx, cy, cs * 0.45, 0, Math.PI * 2); bx.stroke(); }
+      }
+    }
+    bx.restore(); bx.globalAlpha = 1; bx.globalCompositeOperation = 'source-over';
+  }
+  function drawOvers(f, ox, oy, cs, toY, Wd, Hd, g, kw, rx, ry, dpr) {
+    const d = f.drop;
+    if (d) {   // the plate falls (ease-in) from above the sheet to its landing row
+      const e = 1 - Math.max(0, d.t / d.t0), yy = reducedMotion ? d.y1 : -2 + (d.y1 + 2) * e * e, path = new Path2D();
+      for (const [cx, cy] of ROT[d.type][0]) {
+        const Y = yy + cy; if (Y < HIDDEN - 0.99) continue;
+        const px = ox + (d.x + cx) * cs, py = Math.round(toY(Y));
+        bx.drawImage(sprite(d.type, cs, cx % 3), px + rx, py + ry);
+        path.rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw);
+        if (prefs.glow && !reducedMotion && py > oy) { bx.fillStyle = C[d.type]; bx.globalAlpha = 0.6; const lw = Math.max(1, Math.round(dpr));
+          bx.fillRect(Math.round(px + cs * 0.3), oy, lw, py - oy); bx.fillRect(Math.round(px + cs * 0.7), oy, lw, py - oy); bx.globalAlpha = 1; }
+      }
+      bx.strokeStyle = C.ink; bx.lineWidth = kw; bx.stroke(path);
+    }
+    drawOversSlip(f, ox, oy, cs, Wd, dpr);
+    if (f.tail <= 0) {   // skip band along the foot of the sheet
+      const h = Math.round(cs * 0.9);
+      bx.globalAlpha = 0.85; bx.fillStyle = C.paper; bx.fillRect(ox, oy + Hd - h, Wd, h); bx.globalAlpha = 1;
+      bx.font = '800 ' + Math.max(9, Math.round(cs * 0.36)) + 'px ' + MONO; bx.fillStyle = C.ink2;
+      bx.fillText(matchMedia('(pointer:coarse)').matches ? 'TAP TO SKIP' : 'TAP OR PRESS ANY KEY TO SKIP', ox + Wd / 2, oy + Hd - h / 2);
+    }
+  }
+
+  // the Overs till slip: a paper strip near the top of the sheet that counts the payout up, rings the $1s, and stamps PAID at the end
+  function drawOversSlip(f, ox, oy, cs, Wd, dpr) {
+    const ov = fx.overs || (fx.overs = { shown: f.pts, pts: f.pts, pop: 0, cashPop: 0, done: 0 });   // a resumed payout gets its slip back
+    const w = Math.round(Math.min(Wd - cs * 0.8, cs * 8.4)), h = Math.round(cs * 1.7), x0 = Math.round(ox + (Wd - w) / 2), y0 = Math.round(oy + cs * 0.55);
+    const pop = !reducedMotion && ov.pop > 0 ? ov.pop / 0.14 : 0, done = ov.done > 0 ? ov.done / 0.6 : 0, fin = f.tail > 0;
+    bx.save();
+    bx.fillStyle = C.ink; bx.globalAlpha = 0.25; bx.fillRect(x0, y0 + Math.round(3 * dpr), w, h); bx.globalAlpha = 1;   // flat offset shadow
+    bx.fillStyle = C.paper; bx.fillRect(x0, y0, w, h);
+    bx.strokeStyle = C.ink; bx.lineWidth = Math.max(1, Math.round(1.5 * dpr)); bx.strokeRect(x0 + 0.5, y0 + 0.5, w - 1, h - 1);
+    bx.setLineDash([3 * dpr, 3 * dpr]); bx.beginPath(); bx.moveTo(x0 + cs * 0.2, y0 + h * 0.42); bx.lineTo(x0 + w - cs * 0.2, y0 + h * 0.42); bx.stroke(); bx.setLineDash([]);
+    bx.textBaseline = 'middle'; bx.textAlign = 'left';
+    const lab = Math.max(8, Math.round(cs * 0.34));
+    bx.font = '800 ' + lab + 'px ' + MONO; bx.fillStyle = C.ink2;
+    bx.fillText(fin ? 'OVERS · PAID' : 'OVERS · ' + Math.min(f.i, f.left) + '/' + f.left, x0 + cs * 0.25, y0 + h * 0.22);
+    // running total: the number presses in on every plate (scale pop) with its pink plate knocked off register
+    const val = '+' + fmt(Math.round(ov.shown)), px = Math.round(cs * (0.78 + (0.18 + 0.02 * Math.min(12, Math.max(0, f.i - 8))) * pop + 0.12 * done));   // past plate 8 the pop grows
+    bx.font = '800 ' + px + 'px ' + MONO; bx.textAlign = 'left';
+    const tx = x0 + cs * 0.25, ty = y0 + h * 0.7, off = Math.round((1.5 + 3 * pop + 4 * done) * dpr);
+    if (fin || done > 0) { const tw = bx.measureText(val).width; bx.fillStyle = C.sun; bx.fillRect(tx - cs * 0.08, ty - px * 0.42, tw + cs * 0.16, px * 0.84); }
+    bx.globalCompositeOperation = 'multiply'; bx.fillStyle = C.pink; bx.fillText(val, tx + off, ty + off * 0.7); bx.globalCompositeOperation = 'source-over';
+    bx.fillStyle = C.ink; bx.fillText(val, tx, ty);
+    bx.font = '800 ' + lab + 'px ' + MONO; bx.fillStyle = C.ink2; bx.textAlign = 'right'; bx.fillText('PTS', x0 + w - cs * 0.25, y0 + h * 0.22);
+    // money: one sunflower price tag per $1 rung up, the newest stamps in
+    for (let i = 0; i < f.cash; i++) {
+      const tw = Math.round(cs * 1.05), th = Math.round(cs * 0.62), tx2 = x0 + w - cs * 0.2 - (f.cash - i) * (tw + cs * 0.12), ty2 = Math.round(ty - th / 2);
+      const s2 = i === f.cash - 1 && ov.cashPop > 0 && !reducedMotion ? 1 + 0.6 * (ov.cashPop / 0.16) : 1;
+      bx.save(); bx.translate(tx2 + tw / 2, ty2 + th / 2); bx.rotate((i % 2 ? 4 : -5) * Math.PI / 180); bx.scale(s2, s2);
+      bx.fillStyle = C.sun; bx.beginPath(); bx.moveTo(-tw / 2 + th * 0.4, -th / 2); bx.lineTo(tw / 2, -th / 2); bx.lineTo(tw / 2, th / 2); bx.lineTo(-tw / 2 + th * 0.4, th / 2); bx.lineTo(-tw / 2, 0); bx.closePath(); bx.fill();
+      bx.fillStyle = C.paper; bx.beginPath(); bx.arc(-tw / 2 + th * 0.42, 0, Math.max(1.5, th * 0.1), 0, Math.PI * 2); bx.fill();
+      bx.fillStyle = C.ink; bx.textAlign = 'center'; bx.font = '800 ' + Math.round(th * 0.62) + 'px ' + MONO; bx.fillText('$1', th * 0.18, th * 0.04);
+      bx.restore();
+    }
+    if (done > 0 || fin) {   // PAID stamp lands across the slip (fades in place under reduced motion)
+      const sc = !reducedMotion && done > 0.75 ? 1 + 0.6 * (done - 0.75) / 0.25 : 1;
+      bx.translate(x0 + w * 0.62, y0 + h * 1.3); bx.rotate(-8 * Math.PI / 180); bx.scale(sc, sc);   // straddles the slip's foot, clear of the $ tags
+      const sp = Math.round(cs * 0.75); bx.font = '900 ' + sp + 'px ' + DISPLAY; if ('fontStretch' in bx) bx.fontStretch = 'condensed';
+      const sa = done > 0 ? Math.min(1, (1 - done) * 6 + (reducedMotion ? 0 : 1)) : 1, sw = bx.measureText('PAID').width + sp * 0.5;
+      bx.fillStyle = C.paper; bx.globalAlpha = 0.85 * sa; bx.fillRect(-sw / 2, -sp * 0.6, sw, sp * 1.15); bx.globalAlpha = sa;
+      bx.strokeStyle = C.greenT; bx.lineWidth = Math.max(2, 2.5 * dpr); bx.strokeRect(-sw / 2, -sp * 0.6, sw, sp * 1.15);
+      bx.fillStyle = C.greenT; bx.textAlign = 'center'; bx.fillText('PAID', 0, sp * 0.04);
+    }
+    bx.restore(); bx.textAlign = 'center'; bx.textBaseline = 'middle';
+  }
+  window.addEventListener('stackfall:juice', e => {   // Overs feel: the slip counts, pops and stamps
+    const d = e.detail || {};
+    if (d.type === 'oversStart') fx.overs = { shown: 0, pts: 0, pop: 0, cashPop: 0, done: 0 };
+    else if (d.type === 'oversPiece' && fx.overs) { fx.overs.pop = 0.14; if (d.money) { fx.overs.cashPop = 0.16; if (prefs.particles && !reducedMotion) sparks(COLS - 2, HIDDEN + 1.6, 10, C.sun); } }
+    else if (d.type === 'oversEnd') {
+      if (!fx.overs) fx.overs = { shown: 0, pts: 0, pop: 0, cashPop: 0, done: 0 };
+      fx.overs.done = 0.6; plateSlip(0.14); shake(5);
+      if (prefs.particles && !reducedMotion) for (let i = 0; i < 36; i++) addParticle({ x: COLS / 2 + (Math.random() - 0.5) * 7, y: HIDDEN + 1.4, vx: (Math.random() - 0.5) * 12, vy: -4 - Math.random() * 8, g: 22,
+        life: 0.7 + Math.random() * 0.5, size: 0.16 + Math.random() * 0.14, color: [C.sun, C.pink, C.blue, C.ink][i % 4] });
+    }
+  });
 
   // ---------- boss layers (art-direction 8.3; per boss) ----------
   function drawBossUnder(id, ox, oy, cs, toY, Wd, Hd) {
@@ -3696,7 +4580,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       bx.globalCompositeOperation = 'multiply'; bx.globalAlpha = Math.min(1, fx.rivet.life / 0.3); bx.fillStyle = C.boss;
       bx.fillRect(ox + fx.rivet.x * cs, toY(fx.rivet.y), cs, cs); bx.globalCompositeOperation = 'source-over'; bx.globalAlpha = 1;
     }
-    if ((id === 'tide' || id === 'keystone') && !fx.defeat && !S.winT && S.status !== 'over' && S.status !== 'cleared') {   // "TIDE IN 3" stamp, gap marker in Tide phase 2
+    if ((id === 'tide' || id === 'keystone') && !fx.defeat && !winning() && S.status !== 'over' && S.status !== 'cleared') {   // "TIDE IN 3" stamp, gap marker in Tide phase 2
       const label = (id === 'tide' ? 'TIDE IN ' : 'RISE IN ') + Math.max(0, b.tideIn);
       bx.font = '800 ' + Math.round(cs * 0.42) + 'px ' + MONO;
       const w = bx.measureText(label).width + cs * 0.4, h = cs * 0.62, x = ox + Wd - w - cs * 0.2, y = oy + cs * 0.25;
@@ -3777,7 +4661,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   }
 
   // a piece in a small slip: sprites (or flat fills when tiny) plus one keyline
-  function drawPiece(ctx, t, cx, cy, cs, alpha, dashed) {
+  function drawPiece(ctx, t, cx, cy, cs, alpha, dashed, mk) {   // mk: a special printed on mino HEART[t]
     const cells = ROT[t][0];
     const xs = cells.map(c => c[0]), ys = cells.map(c => c[1]);
     const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
@@ -3787,9 +4671,10 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const path = new Path2D();
     ctx.globalAlpha = alpha;
     cells.forEach(([x, y], i) => {
-      const px = x0 + (x - minX) * cs, py = y0 + (y - minY) * cs;
-      if (cs >= 12) ctx.drawImage(sprite(t, cs, i % 3), px + rb, py + Math.round(rb * 0.6));
-      else { ctx.fillStyle = C[t]; ctx.fillRect(px + g + rb, py + g, cs - 2 * g, cs - 2 * g); }
+      const px = x0 + (x - minX) * cs, py = y0 + (y - minY) * cs, m = mk && i === HEART[t] ? mk : null;
+      if (cs >= 12) { ctx.drawImage(sprite(t, cs, i % 3, m), px + rb, py + Math.round(rb * 0.6));
+        if (m) drawPlate(ctx, m, cs, i % 3, px + rb, py + Math.round(rb * 0.6), Math.round(cs * 0.07), Math.round(cs * 0.05), 0.6 * alpha); }
+      else { ctx.fillStyle = C[t]; ctx.fillRect(px + g + rb, py + g, cs - 2 * g, cs - 2 * g); if (m) { ctx.save(); ctx.translate(px + rb, py); paintMark(ctx, m, cs, g, 0, false); ctx.restore(); ctx.globalAlpha = alpha; } }
       path.rect(px + g + kw / 2, py + g + kw / 2, cs - 2 * g - kw, cs - 2 * g - kw);
     });
     ctx.strokeStyle = C.ink; ctx.lineWidth = kw;
@@ -3803,7 +4688,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const sealed = bossIs('warden'), glass = bossIs('glass');
     if (S.hold) {
       const cs = Math.floor(Math.min(W / 4.6, H / 2.6));
-      drawPiece(hx, S.hold, W / 2, H / 2, cs, S.holdUsed || sealed ? 0.3 : 1, S.holdUsed || sealed);
+      drawPiece(hx, S.hold, W / 2, H / 2, cs, S.holdUsed || sealed ? 0.3 : 1, S.holdUsed || sealed, S.holdMk);
     }
     if (sealed) {   // Warden: a chain across the slip and the padlock motif over it; it shakes when you try to hold
       const sh = fx.sealT > 0 && !reducedMotion ? Math.sin(fx.sealT * 60) * 4 * dpr : 0;
@@ -3840,7 +4725,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     list.forEach((t, i) => {
       const cx = vertical ? W / 2 : slotW * (i + 0.5);
       const cy = vertical ? slotH * (i + 0.5) : H / 2;
-      drawPiece(ctx, t, cx, cy, i === 0 ? cs : Math.floor(cs * 0.82), i === 0 ? 1 : 0.8);
+      drawPiece(ctx, t, cx, cy, i === 0 ? cs : Math.floor(cs * 0.82), i === 0 ? 1 : 0.8, false, i === 0 && ['playing', 'paused', 'countdown'].includes(S.status) ? S.nextMark : null);
     });
   }
 
@@ -3976,16 +4861,20 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     if (data && data.state && data.state.board) {
       S = Object.assign(fresh(false), data.state);
       if (data.run) {
-        R = Object.assign({ maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {}, usedBosses: [] }, data.run);
+        R = Object.assign({ maxCharms: BASE_MAX_CHARMS, bonusPieces: 0, fuseBonus: 0, bossesBeaten: 0, next: {}, usedBosses: [],
+          ticket: null, tickets: 0, bestChain: 0, cascTotal: 0, bonusNext: 0 }, data.run);
         for (const k of ['boss', 'anteBoss']) if (R[k] && !BOSSES[R[k]]) R[k] = OLD_BOSS[R[k]] || 'warden';   // v5 boss ids
         R.charms = (R.charms || []).filter(c => CHARMS[c.id]);
         if (R.boss && S.mode === 'run' && !S.bx && ['intro', 'playing', 'paused'].includes(S.status)) { S.bx = makeBx(); S.bossPhase = 1; }
       }
       if (!MODES[S.mode] || (S.mode === 'run' && !R && S.status !== 'ready')) S = fresh(true);
       if (S.status === 'countdown') S.status = 'intro';
-      if (S.status === 'playing') S.status = 'paused';
+      if (S.status === 'playing') S.status = 'paused';   // mid-cascade and mid-Overs too: Resume continues them
       if (S.bx) S.bx.hitT = 0;
-      if (S.status === 'shop' && R && R.shop) { shopEl.hidden = false; renderShop(); }
+      S.overAt = 0;                                        // a restored over screen takes the retry key at once
+      if (S.cur && S.cur.mk === undefined) S.cur.mk = null;
+      if (S.fin && S.fin.tail > 0 && S.mode === 'run' && R) { S.finPts = S.fin.pts; S.fin = null; roundWon(true); }   // the payout was done: straight to the receipt
+      if (S.status === 'shop' && R && R.shop) { dealNext = false; for (const o of R.shop.charms) o.fresh = false; shopEl.hidden = false; renderShop(); }   // no deal/foil sound on a restore
     } else {
       refill();
     }
