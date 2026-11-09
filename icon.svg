@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1E3B35"/>
+  <rect x="136" y="96" width="240" height="320" fill="#F5F5F1"/>
+  <g stroke="#1B1D22" stroke-width="8" fill="none" transform="translate(6 6)">
+    <rect x="196" y="136" width="60" height="60"/><rect x="256" y="136" width="60" height="60"/><rect x="256" y="196" width="60" height="60"/>
+    <rect x="156" y="296" width="60" height="60"/><rect x="216" y="296" width="60" height="60"/><rect x="276" y="296" width="60" height="60"/><rect x="216" y="236" width="60" height="60"/>
+  </g>
+  <g>
+    <rect x="196" y="136" width="60" height="60" fill="#FF48B0"/><rect x="256" y="136" width="60" height="60" fill="#FF48B0"/><rect x="256" y="196" width="60" height="60" fill="#FF48B0"/>
+    <rect x="156" y="296" width="60" height="60" fill="#0078BF"/><rect x="216" y="296" width="60" height="60" fill="#0078BF"/><rect x="276" y="296" width="60" height="60" fill="#0078BF"/><rect x="216" y="236" width="60" height="60" fill="#0078BF"/>
+  </g>
+  <rect x="156" y="356" width="200" height="40" fill="#FFB511"/>
+  <path d="M164 376h184" stroke="#1B1D22" stroke-width="6" stroke-dasharray="14 10"/>
+</svg>
