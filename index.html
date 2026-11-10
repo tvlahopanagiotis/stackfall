@@ -642,7 +642,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   .right{display:none}
   .left .hold-panel,.left .next-mini{width:19%;flex:none}
   .left .stats-panel{flex:1;min-width:0}
-  #hold,#next-m{aspect-ratio:auto;flex:1;min-height:40px;width:100%}
+  #hold,#next-m{aspect-ratio:auto;flex:1 1 auto;height:0;min-height:40px;width:100%}   /* height 0 + grow: the canvas's own pixel size never feeds back into the HUD row height (v8 could grow without end) */
   .panel{padding:7px 8px 8px;gap:3px;box-shadow:0 2px 0 var(--shadow)}
   .label{font-size:9px;letter-spacing:.1em;gap:4px}
   .label::before{width:7px;height:7px;border-width:1px}
@@ -883,7 +883,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 @media (max-width:700px){
   .app{display:flex;flex-direction:column;height:100dvh;min-height:0;gap:6px;
     padding-block:max(6px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-bottom, 0px))}
-  .left{flex:none;gap:6px}
+  .left{flex:none;gap:6px;align-self:stretch}   /* full width on its own: the canvases no longer size the row */
   .left .hold-panel,.left .next-mini{width:16%}
   .left .panel{padding:4px 5px 5px;gap:2px;box-sizing:border-box}
   #hold,#next-m{min-height:28px}
@@ -1224,7 +1224,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 
 <script>
 (() => {
-  const APP_VERSION = '7.2.0';   // bumped with each release; the play tracker stores it per session
+  const APP_VERSION = '7.3.0';   // bumped with each release; the play tracker stores it per session
   const COLS = 10, ROWS = 22, HIDDEN = 2;
   const LOCK = 0.5, MAX_RESETS = 15, CLEAR_T = 0.2;
   const SPRINT_LINES = 40, ULTRA_SECS = 120;
@@ -2603,11 +2603,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   let R = null;
   const RUN_BASE = { single: [10, 1], double: [25, 2], triple: [45, 3], quad: [80, 5], tspin: [40, 4] };
   const RUN_LV   = { single: [10, 1], double: [15, 1], triple: [20, 2], quad: [25, 2], tspin: [25, 2] };
+  const LV_SOFT = 5;                                    // v8.1: past Lv 5 a +2 mult step becomes +1 (playdata: Quad Lv 17 carried a whole run)
+  const lvMultStep = (t, lv) => lv >= LV_SOFT ? Math.ceil(RUN_LV[t][1] / 2) : RUN_LV[t][1];   // mult added by the upgrade from lv to lv + 1
+  const lvMult = (t, lv) => { let m = 0; for (let k = 1; k < lv; k++) m += lvMultStep(t, k); return m; };
   const CLEAR_NAMES = { single: 'Single', double: 'Double', triple: 'Triple', quad: 'Quad', tspin: 'T-spin' };
   // Balance (game-design.md 1.5-1.6): ante 1 is learnable, antes 3-5 need a build, antes 7-8 need a real synergy.
   // juice-design.md 5: antes 3-8 retuned +9..17% to absorb cascades, Overs and tickets
   // stars-tracker-design.md 1.8: antes 4-8 +~5% more, because playing on for stars pays builds that are ahead of the curve
-  const ANTE_T = [500, 1500, 4200, 7900, 12600, 19400, 28900, 44000];   // was [..., 7500, 12000, 18500, 27500, 42000]
+  const ANTE_T = [500, 1500, 4200, 9900, 15800, 24300, 36100, 55000];   // v8.1: antes 4-8 +25% (playdata: every round hit 3 stars). v8 was [..., 7900, 12600, 19400, 28900, 44000]
   const FOIL_P = 0.05;                                   // each shop charm card rolls foil once, when dealt
   const PAYOUT_SHOW = 20, PAY_X = [3, 6, 0, 4, 7, 1, 5, 2];   // Overs: at most 20 animated pieces; drop columns
   // scratch ticket prizes (juice-design.md 8): weight, ticket text, tier (0 blank .. 3 top)
@@ -2623,7 +2626,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   };
   const ROUND_F = [1, 1.5, 2], ROUND_NAME = ['Small round', 'Big round', 'Boss round'], ROUND_PAY = [3, 4, 5];
   const BASE_PIECES = 40, BASE_MAX_CHARMS = 5;          // R.maxCharms can reach 6 via the Suture spoil
-  const upCost = lv => 2 + lv;                          // upgrade price: Lv1->2 costs $3, Lv4->5 costs $6
+  const upCost = lv => 2 + lv + Math.floor(lv * lv / 10);   // upgrade price: Lv1->2 $3, Lv4->5 $7, Lv8->9 $16, Lv12->13 $28 (v8.1: was 2 + lv)
   const LEFTOVER_CAP = 3;                               // $1 per 5 pieces left, at most $3
   const BOSS_BONUS = ante => 2 + ante;                  // extra $ when a boss falls ($3 .. $9)
   // ---------- play on for stars (stars-tracker-design.md 1): reaching the target is 1 star and the round keeps going ----------
@@ -2866,6 +2869,14 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
   const nextHidden = () => bossIs('shroud') || (bossIs('keystone') && S.bx.phase >= 2);
   const graceText = b => (R.boss === 'surge' ? 'SURGE IN ' : 'PHASE ' + b.pending + ' IN ') + b.grace;
 
+  // v8.1: until a boss's last phase has begun, the score cannot pass the line of the phase it is in (one big hand used to skip phase 2)
+  function bossCap() {
+    const b = S.bx; if (S.mode !== 'run' || !b || !R || !R.boss) return;
+    const ph = BOSSES[R.boss].phases; if (b.phase > ph.length) return;
+    const line = Math.round(ph[b.phase - 1] * S.target); if (S.roundScore <= line) return;
+    const over = S.roundScore - line; S.roundScore = line;
+    fx.floaters.push({ text: 'SHIELDED', sub: '-' + fmt(over), x: COLS / 2, y: HIDDEN + 3, life: 1.3, color: C.boss });
+  }
   function bossCheckPhase() {
     const b = S.bx; if (!b || b.pending || S.roundScore >= S.target) return;   // one pending at a time; a winning clear never stirs
     const ph = BOSSES[R.boss].phases;            // ph[k-1] = score fraction that moves phase k to phase k+1
@@ -3076,7 +3087,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     const lv = R.levels[type];
     const c = { n, type, spin: spin === 'full', pc, rows, x: 1, notes: [],
       pts: RUN_BASE[type][0] + RUN_LV[type][0] * (lv - 1) + 10 * n,
-      mult: RUN_BASE[type][1] + RUN_LV[type][1] * (lv - 1) + (spin === 'full' ? n : 0) };
+      mult: RUN_BASE[type][1] + lvMult(type, lv) + (spin === 'full' ? n : 0) };
     S.combo++;
     if (S.combo > 0) { c.mult += S.combo; note(c, 'Combo', '+' + S.combo + ' mult'); }
     const difficult = n === 4 || (spin && n > 0);
@@ -3106,7 +3117,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     Audio.tally(c.notes, total, playOn() ? Math.min(0.99, total / S.target) : (S.roundScore >= S.target ? 1 : total / S.target), S.combo);   // the crossing fanfare is Audio.star's
     if (c.void) voidStamp(rows); else floater('+' + fmt(total), '', rows);
     renderCharms();
-    bossCheckPhase();
+    bossCap(); bossCheckPhase();
     starCheck();
   }
 
@@ -3385,6 +3396,9 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       const sp = boss.spoil ? SPOILS[boss.spoil] : null;
       nx.append(document.createElement('br'), chip, document.createTextNode(boss.rules.join(' ') + ' Spoils $' + (bossId === 'keystone' ? 0 : BOSS_BONUS(na))
         + (sp ? ' + ' + sp.name + ': ' + sp.desc : '') + (bossNotes(bossId).length ? ' ' + bossNotes(bossId).join(' ') : '')));
+    } else if (nr === 1 && R.anteBoss && BOSSES[R.anteBoss]) {   // v8.1: the ante's boss is named a shop early, so there are two shops to prepare
+      const ab = BOSSES[R.anteBoss], chip = document.createElement('span'); chip.className = 'bchip'; chip.innerHTML = sigilSVG(R.anteBoss); chip.append(ab.name);
+      nx.append(document.createElement('br'), document.createTextNode('Boss after that: '), chip, document.createTextNode(ab.rules.join(' ') + (bossNotes(R.anteBoss).length ? ' ' + bossNotes(R.anteBoss).join(' ') : '')));
     }
     renderTicket();
 
@@ -3409,7 +3423,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     sb.innerHTML = '';
     const disc = R.shop.upDiscount || 0;
     for (const o of R.shop.boosts) {   // a sold card keeps showing the level and price that were bought
-      const lv = o.sold && o.lv ? o.lv : R.levels[o.t], [pp, mm] = RUN_LV[o.t];
+      const lv = o.sold && o.lv ? o.lv : R.levels[o.t], pp = RUN_LV[o.t][0], mm = lvMultStep(o.t, lv);
       const price = o.sold && o.price != null ? o.price : R.shop.freeUpgrades ? 0 : Math.max(0, upCost(lv) - disc);
       sb.append(card({ kind: 'Upgrade · plate', cls: 'up', name: CLEAR_NAMES[o.t], lv: 'LV ' + lv + ' → ' + (lv + 1), price,
         desc: '+' + pp + ' points and +' + mm + ' mult on every ' + CLEAR_NAMES[o.t] + (o.t === 'tspin' ? ' clear' : '') + '.'
@@ -3758,7 +3772,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
     }
     if (ys.length) floater('+' + fmt(total), '', ys, w);
     onChainWave(k.wave, total, n, cells);
-    if (S.mode === 'run') { bossCheckPhase(); starCheck(); }
+    if (S.mode === 'run') { bossCap(); bossCheckPhase(); starCheck(); }
   }
   function endCascade() {
     const k = S.casc; S.casc = null;
@@ -4340,7 +4354,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
       t.textContent = ROUND_NAME[R.round];
       big.hidden = false; big.textContent = fmt(S.target);
       f.hidden = false; f.textContent = 'Score target · ' + S.piecesLeft + ' pieces';
-      p.textContent = 'Reward $' + ROUND_PAY[R.round] + '. Reach the target, then bank or play on for stars. Unused pieces pay $1 per 5 (up to $' + LEFTOVER_CAP + ') and burst for points.';
+      p.textContent = 'Reward $' + ROUND_PAY[R.round] + '. Reach the target, then bank or play on for stars.' + (R.anteBoss && BOSSES[R.anteBoss] ? ' Boss this ante: ' + BOSSES[R.anteBoss].name + ', ' + BOSS_RULE[R.anteBoss] + '.' : ' Unused pieces pay $1 per 5.');
       sk.hidden = false;   // the star plan
       sk.textContent = [nbs('★ ' + fmt(starAt(1))), nbs('★★ ' + fmt(starAt(2)) + ' +$' + STAR_PAY[2]), nbs('★★★ ' + fmt(starAt(3)) + ' +$' + STAR_PAY[3]) + ' + reroll'].join(' · ');
       if (R.ticketNote) { rk.hidden = false; rk.textContent = R.ticketNote; }
