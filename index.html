@@ -726,6 +726,23 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .gstars i{position:absolute;top:50%;left:var(--s1,50%);width:12px;height:12px;margin:-6px 0 0 -6px}
 .gstars i:nth-child(2){left:var(--s2,50%)} .gstars i:nth-child(3){left:var(--s3,75%)} .gstars i:nth-child(4){left:auto;right:1px;margin-left:0}
 .goal .gnotch.n3{left:var(--s3,75%)}
+/* v9.1 damage preview on the goal bar: the ghost's clear as a hatched ink segment (pink on the round bar, ink over boss HP) */
+.goal .gproj{display:none;position:absolute;top:0;bottom:0;z-index:2;pointer-events:none;
+  background:repeating-linear-gradient(-45deg,var(--pink) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1.5px var(--pink)}
+.is-run .goal .gproj:not([hidden]){display:block}
+.is-boss .goal .gproj{background:repeating-linear-gradient(-45deg,var(--paper) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1.5px var(--paper);mix-blend-mode:normal}
+/* v9.1 swap a charm in when the slots are full */
+.owned.swapping .row-o{outline:2px dashed var(--pink);outline-offset:-2px}
+.owned .swap-hd{margin:0 0 6px;font:700 12px/1.35 var(--f-ui, inherit);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.owned button.swap{background:var(--pink);color:var(--ink);border-color:var(--ink)}
+/* v9.1 the sheet heats up: halftone ink creeps in from the edges of the well at a x2.5+ streak (ink, not light) */
+.heat-ink{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .45s var(--e-settle, ease);
+  background:radial-gradient(circle,var(--tc,var(--pink)) 30%,transparent 33%) 0 0/9px 9px;mix-blend-mode:multiply;
+  -webkit-mask-image:radial-gradient(ellipse 70% 62% at 50% 50%,transparent 62%,#000 100%);mask-image:radial-gradient(ellipse 70% 62% at 50% 50%,transparent 62%,#000 100%)}
+.well-wrap[data-tier="3"] .heat-ink{opacity:.18} .well-wrap[data-tier="4"] .heat-ink{opacity:.28}
+.well-wrap[data-tier="5"] .heat-ink{opacity:.38} .well-wrap[data-tier="6"] .heat-ink{opacity:.5;animation:heatReg 1.6s steps(2,jump-none) infinite}
+@keyframes heatReg{0%{background-position:0 0}100%{background-position:1px 1px}}
+@media (prefers-reduced-motion:reduce){ .well-wrap[data-tier="6"] .heat-ink{animation:none} }
 .goal.tight .gstars i{width:10px;height:10px;margin:-5px 0 0 -5px} .goal.tight .gstars i:nth-child(4){margin-left:0}   /* v9 polish: the 70px landscape bar */
 .is-boss .goal .gnotch.n3{display:none}   /* v9: the 3-star notch is a star-round notch only (bosses use n1/n2 for phases) */
 /* v9 Gold leaf (brief C2): the 4th rung's glyph is a star on a gold seal; the seal fills --gold, the star --sun, once it is earned */
@@ -842,7 +859,7 @@ table.rec td.dim{color:var(--ink-2);font-size:12.5px}
 .bank-btn.queued{opacity:.6}
 .bank-btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 .bank-btn:focus-visible{outline-color:var(--paper)}
-#bank-m{height:30px;margin:0;width:104px;min-width:0}   /* fixed: "Bank +$N" and the armed "Tap again" share one box, so the charm tickets never jump mid double-tap */
+#bank-m{height:30px;margin:0;width:136px;min-width:0}   /* v9.1: 136px fits '+8 pieces vs Keystone' */   /* fixed: "Bank +$N" and the armed "Tap again" share one box, so the charm tickets never jump mid double-tap */
 #bank{min-width:110px}   /* desktop: "Bank +$N [B]" and "B again" share one width, so the goal bar's star notches hold still */
 #bank-m::after{content:"";position:absolute;inset:-7px -5px}   /* 40px touch target (inset is from the padding edge, inside the 2px border): the slop stays inside the 6px gaps above and below the row */
 /* narrow wells (the 360x600 viewer in Run is ~200px wide): the over-screen stamp and the near-miss line stay on one line each,
@@ -1140,13 +1157,13 @@ table.plates td.n b{font-weight:800}
     <span class="hstamp" id="h-stamp" aria-live="polite"></span>
   </div>
   <div class="goal-row">
-    <div class="goal" id="goal" aria-hidden="true"><div class="glag" id="g-lag"></div><div class="gfill" id="g-fill"></div><div class="gfill2" id="g-fill2"></div><i class="gnotch" id="g-n1"></i><i class="gnotch n2" id="g-n2"></i><i class="gnotch n3" id="g-n3"></i><div class="glabels"><span class="gname" id="g-name"></span><span class="gpips" id="g-pips"><i></i><i></i><i></i></span><span class="ghp" id="g-hp"></span></div><span class="gstars" id="g-stars"><i></i><i></i><i></i><i class="gl"></i></span></div>
+    <div class="goal" id="goal" aria-hidden="true"><div class="glag" id="g-lag"></div><div class="gfill" id="g-fill"></div><div class="gfill2" id="g-fill2"></div><i class="gproj" id="g-proj"></i><i class="gnotch" id="g-n1"></i><i class="gnotch n2" id="g-n2"></i><i class="gnotch n3" id="g-n3"></i><div class="glabels"><span class="gname" id="g-name"></span><span class="gpips" id="g-pips"><i></i><i></i><i></i></span><span class="ghp" id="g-hp"></span></div><span class="gstars" id="g-stars"><i></i><i></i><i></i><i class="gl"></i></span></div>
     <button type="button" class="bank-btn" id="bank" hidden></button>
     <span class="boss-tag" id="boss-tag"></span>
   </div>
   <div class="well-frame">
   <section class="well-wrap" id="wellWrap" data-tier="0">
-    <canvas id="board" aria-label="Playing field"></canvas>
+    <canvas id="board" aria-label="Playing field"></canvas><i class="heat-ink" aria-hidden="true"></i>
     <div class="callout" id="callout" aria-live="polite"></div>
     <div class="tally" id="tally" aria-live="polite">
       <div class="t-name" id="t-name"></div>
@@ -1366,7 +1383,7 @@ table.plates td.n b{font-weight:800}
 
 <script>
 (() => {
-  const APP_VERSION = '9.0.0';   // bumped with each release; the play tracker stores it per session
+  const APP_VERSION = '9.1.0';   // bumped with each release; the play tracker stores it per session
   const COLS = 10, ROWS = 22, HIDDEN = 2;
   const LOCK = 0.5, MAX_RESETS = 15, CLEAR_T = 0.2;
   const SPRINT_LINES = 40, ULTRA_SECS = 120;
@@ -2918,7 +2935,7 @@ table.plates td.n b{font-weight:800}
   // v9 balance (brief A8): Keystone is ANTE_T[7] x KEYSTONE_F (not x2) with KEYSTONE_PIECES pieces, so it asks for three good hands
   // through its shields rather than three lucky ones. Bosses before SHIELD_ANTE have no shield (bossCap): a big hand may pass the half
   // line (phase 2 still starts after its grace), so the first bosses are not two-hand fights for a deliberate player.
-  const KEYSTONE_F = 2, KEYSTONE_PIECES = 45, SHIELD_ANTE = 3;   // Keystone 184,000: a planned ante-8 Quad build needs 3 Quads (or 2 with Giant Slayer)
+  const KEYSTONE_F = 2, KEYSTONE_PIECES = 45, SHIELD_ANTE = 2;   // v9.1: the shield starts at ante 2 (playdata: ante 2 bosses fell to one 2.4x hand); only ante 1 is a freebie   // Keystone 184,000: a planned ante-8 Quad build needs 3 Quads (or 2 with Giant Slayer)
   const BASE_PIECES = 40, BASE_MAX_CHARMS = 5;          // R.maxCharms can reach 6 via the Suture spoil
   const upCost = lv => 2 + lv + Math.floor(lv * lv / 10);   // upgrade price: Lv1->2 $3, Lv4->5 $7, Lv8->9 $16, Lv12->13 $28 (v8.1: was 2 + lv)
   const LEFTOVER_CAP = 3;                               // $1 per 5 pieces left, at most $3
@@ -2933,8 +2950,8 @@ table.plates td.n b{font-weight:800}
   // to the hand type that scored the hand crossing it. S.stars reaches 4; the receipt, R.stars and the tracker count 3 + a gold flag.
   const GOLD = 4, STAR_WORDS = ['', 'On target!', 'Fine print!', 'Press perfect!', 'Gold leaf!'];
   // v9 Overstock (brief C2): a manual Bank at 1★ or 2★ moves 1 piece per 4 unused into a tray for this ante's boss round (+8 per ante at most)
-  const OS_PER = 4, OS_CAP = 8;
-  const overstockFor = () => playOn() && S.stars >= 1 && S.stars < 3 ? Math.max(0, Math.min(Math.floor(S.piecesLeft / OS_PER), OS_CAP - (R.ostockBank || 0))) : 0;
+  const OS_PER = 3, OS_CAP = 8;   // v9.1: 1 per 3 unused (was 4), and a Bank at 3★ moves pieces too (playdata: the owner never banked in 36 rounds)
+  const overstockFor = () => playOn() && S.stars >= 1 && S.stars < GOLD ? Math.max(0, Math.min(Math.floor(S.piecesLeft / OS_PER), OS_CAP - (R.ostockBank || 0))) : 0;
   const BANK_ARM = 2.5;                                          // seconds the first Bank press stays armed
   const STAR_D = 'M6 .8l1.5 3.4 3.7.3-2.8 2.4.9 3.6L6 8.6 2.7 10.5l.9-3.6L.8 4.5l3.7-.3z';
   const STAR_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="' + STAR_D + '"/></svg>';
@@ -2952,7 +2969,8 @@ table.plates td.n b{font-weight:800}
   // bankGives() lists the extras after the money: Overstock (C2), e.g. '+5 boss pieces'.
   // bankLabel() -> [head, sub]: 'Bank +$2' / '+5 boss pieces', or 'Bank' / 'end round' when there is nothing extra.
   // The Bank slips print head over sub (two lines in the same fixed box); bankText() is the one-line form for callouts and labels.
-  function bankGives() { const n = overstockFor(); return n ? ['+' + n + (n === 1 ? ' boss piece' : ' boss pieces')] : []; }
+  const bossShort = () => { const b = R && BOSSES[R.anteBoss]; return b ? b.name.split(' ').pop() : 'boss'; };   // v9.1: 'Looking Glass' -> 'Glass'
+  function bankGives() { const n = overstockFor(); return n ? ['+' + n + (n === 1 ? ' piece' : ' pieces') + ' vs ' + bossShort()] : []; }
   function bankLabel() {
     const v = bankValue(), g = bankGives();
     return ['Bank' + (v ? ' +$' + v : ''), g.length ? g.join(' · ') : v ? '' : 'end round'];
@@ -3443,8 +3461,9 @@ table.plates td.n b{font-weight:800}
                                   // starShown: the highest star stamped so far (the goal bar's glyphs follow it while stamps are queued)
   function stepStars(now) { while (starQ.length && starQ[0].at <= now) { const q = starQ.shift(); onStar(q.k, q.k - 1, q.first); } }
   // v9 Gold leaf: +1 level to the hand type that scored the hand crossing the Gold rung (STAR_X[3], 4x) (a chain wave counts for the hand that set it off)
+  const bestPlate = () => Object.keys(CLEAR_NAMES).sort((a, b) => (R.levels[b] || 1) - (R.levels[a] || 1) || (R.handN[b] || 0) - (R.handN[a] || 0))[0];
   function goldLeaf() {
-    const t = RUN_BASE[S.lastHand] ? S.lastHand : 'single';
+    const t = bestPlate();   // v9.1: your highest-level plate (ties: the most played), not whichever clear crossed the rung (playdata: two Gold leafs went to Singles)
     R.levels[t] = (R.levels[t] || 1) + 1; S.gold = t; R.gold = (R.gold || 0) + 1;   // the stamp is the tally label + the bank callout ("GOLD LEAF · QUAD LV 9")
     renderCharms();
   }
@@ -3548,6 +3567,47 @@ table.plates td.n b{font-weight:800}
   // a run with progress on the line (paused mid-round, or at any round intro past the first)
   const runAtStake = () => S.mode === 'run' && !!R && (S.status === 'paused' || (S.status === 'intro' && (R.ante > 1 || R.round > 0)));
 
+  // v9.1 damage preview: what a clear would score right now, with no side effects (charms, combo, back-to-back, streak, boss rules).
+  // fresh: as a round's first hand with no combo (the Build sheet's 'Now' column); otherwise as the next hand (the ghost preview).
+  function handEstimate(n, spin, pc, rows, fresh) {
+    if (!(S.mode === 'run' && R) || n <= 0) return null;
+    const type = spin === 'full' ? 'tspin' : ['', 'single', 'double', 'triple', 'quad'][n], lv = R.levels[type];
+    const keep = { combo: S.combo, b2b: S.b2b, rc: S.roundClears, money: R.money, vals: R.charms.map(ch => ch.val) };
+    try {
+      const c = { n, type, spin: spin === 'full', mini: spin === 'mini', pc, rows: rows || [], x: 1, notes: [],
+        pts: RUN_BASE[type][0] + RUN_LV[type][0] * (lv - 1) + 10 * n, mult: RUN_BASE[type][1] + lvMult(type, lv) + (spin === 'full' ? n : 0) };
+      S.combo = fresh ? 0 : S.combo + 1; if (fresh) { S.b2b = false; S.roundClears = Math.max(1, S.roundClears); }
+      if (S.combo > 0) c.mult += S.combo;
+      const difficult = n === 4 || (spin && n > 0);
+      if (difficult && S.b2b) c.mult += 2;
+      const quick = !fresh && S.pieces + 1 - S.lastClearPc <= quickP();
+      for (const ch of R.charms) if (ch.id === 'speed') ch.val = quick ? ch.val + (ch.foil ? 2 : 1) : 0;
+      for (const ch of R.charms) { const d = CHARMS[ch.id]; if (d.score) d.score(c, ch); }
+      if (bossIs('arbiter')) { const bar = S.bx.phase >= 2 ? 3 : 2; if (!c.spin && !c.mini && n < bar) c.void = true; else if (S.bx.phase >= 2) c.mult += 3; }
+      if ((bossIs('tide') || bossIs('keystone')) && rows) c.mult += 2 * rows.filter(y => S.board[y].includes('G')).length;
+      if (pc) c.x *= cv('sweep', 6, 8) || 3;
+      const total = c.void ? 0 : Math.round(c.pts * c.mult * c.x * TIERS[S.tier]);
+      let counted = total;   // a boss shield holds the round score at the phase line (bossCap)
+      const b = S.bx; if (R.boss && b && R.ante >= SHIELD_ANTE) { const ph = BOSSES[R.boss].phases; if (b.phase <= ph.length) counted = Math.min(total, Math.max(0, Math.round(ph[b.phase - 1] * S.target) - S.roundScore)); }
+      return { type, total, counted, held: counted < total, void: !!c.void };
+    } finally { S.combo = keep.combo; S.b2b = keep.b2b; S.roundClears = keep.rc; R.money = keep.money; R.charms.forEach((ch, i) => { ch.val = keep.vals[i]; }); }
+  }
+  // the clear the current piece would make if dropped now (ghost position); cached per piece position and board change
+  let gpKey = '', gpVal = null;
+  function ghostPreview() {
+    const c = S.cur; if (!(S.mode === 'run' && R && c && S.status === 'playing') || S.casc || S.clearRows.length) return null;
+    const gy = ghostY(), key = [c.t, c.r, c.x, gy, S.pieces, S.roundScore, S.tier, S.combo, S.lastRotate, R.charms.length].join();
+    if (key === gpKey) return gpVal;
+    gpKey = key; gpVal = null;
+    const cells = ROT[c.t][c.r].map(([cx, cy]) => [c.x + cx, gy + cy]), ys = [...new Set(cells.map(([, y]) => y))];
+    const rows = ys.filter(y => y >= 0 && y < ROWS && S.board[y].every((v, x) => v || cells.some(([px, py]) => px === x && py === y)));
+    if (!rows.length) return null;
+    let spin = null; if (c.t === 'T' && S.lastRotate && gy === c.y) { try { spin = tSpinKind(); } catch (e) { spin = null; } }
+    const filledAfter = S.board.reduce((k, row, y) => k + (rows.includes(y) ? 0 : row.filter(Boolean).length), 0) + cells.filter(([, y]) => !rows.includes(y)).length;
+    const est = handEstimate(rows.length, spin, filledAfter === 0, rows, false);
+    if (est) { const nm = spin === 'full' ? 'T-spin' : CLEAR_NAMES[est.type]; gpVal = Object.assign(est, { name: nm, rows, top: Math.min(...rows) }); }
+    return gpVal;
+  }
   function runScore(n, spin, pc, rows) {
     if (n === 0) { S.combo = -1; return; }
     const type = spin === 'full' ? 'tspin' : ['', 'single', 'double', 'triple', 'quad'][n];
@@ -3583,7 +3643,8 @@ table.plates td.n b{font-weight:800}
     if (c.void) { total = 0; note(c, 'Arbiter', 'below the bar'); onBossEvent('arbiter', 'void'); }
     S.roundScore += total; R.totalScore += total; R.bestHand = Math.max(R.bestHand, total);
     S.lines += n; S.roundClears++;
-    S.handTier = c.void ? 0 : Math.max(pc ? 1 : 0, handTier(total)); handFeel(S.handTier);   // v9 C6: feedback sized by the hand's value
+    S.handTier = c.void ? 0 : Math.max(pc ? 1 : 0, handTier(total)); handFeel(S.handTier);
+    if (S.handTier >= 1 && prefs.particles && !reducedMotion && rows && rows.length) fx.splashes.push({ y: (Math.min(...rows) + Math.max(...rows) + 1) / 2, t: 0, dur: S.handTier >= 2 ? 0.7 : 0.5, big: S.handTier >= 2 });   // v9.1   // v9 C6: feedback sized by the hand's value
     const tags = []; addHeat(n, spin, pc, tags);   // voided clears still feed the streak
     heatStamp(tags);   // v9 (brief B3): tier-ups and line streaks stamp onto the heat bar, not the tally
     const name = c.spin ? 'T-spin' + ['', ' single', ' double', ' triple'][n] : c.mini ? 'Mini T-spin' + ['', ' single', ' double', ' triple'][n] + (pc ? ' · perfect clear' : '')
@@ -3748,6 +3809,7 @@ table.plates td.n b{font-weight:800}
     }
     // foil rolls once per card, when dealt, and is stored on the card (a reload never rerolls it)
     R.shop.charms = picked.map((id, i) => ({ id, sold: false, free: i === 0 && !!R.shop.freeCharm, foil: Math.random() < FOIL_P, ctr: i === 0 && cpool.length ? cb : null }));
+    R.shop.swapPick = null;   // v9.1: a reroll ends swap mode
     R.shop.freeCharm = false;   // Mirror shard: only the first roll gets the free card; rerolling forfeits it
     Play.dealt(R.shop.charms);
   }
@@ -3984,11 +4046,14 @@ table.plates td.n b{font-weight:800}
     R.shop.charms.forEach((o, i) => {
       const d = CHARMS[o.id], price = charmPrice(o);
       if (o.foil && !o.sold && (dealing || o.fresh)) { o.fresh = false; setTimeout(() => Audio.foil(i), 220 + i * 50); }   // a foil card lands
-      const label = o.sold ? 'Sold' : full ? 'Slots full' : R.money < price ? 'Need $' + (price - R.money) : o.free ? 'Take free' : 'Buy';
+      const maxSell = R.charms.reduce((m, ch) => Math.max(m, sellValue(ch)), 0), picking = R.shop.swapPick === i;   // v9.1: full slots -> swap one out
+      const label = o.sold ? 'Sold' : full ? (picking ? 'Pick one below' : R.money + maxSell >= price ? 'Swap in' : 'Need $' + (price - R.money - maxSell)) : R.money < price ? 'Need $' + (price - R.money) : o.free ? 'Take free' : 'Buy';
       sc.append(card({ kind: RARITY[d.rarity].label, cls: 'r' + ({ common: 1, uncommon: 2, rare: 3 })[d.rarity], rarity: d.rarity, name: d.name, price, foil: !!o.foil, ctr: o.ctr,
         desc: (o.foil ? d.fdesc || d.desc : d.desc) + (o.free && !o.sold ? ' Free · lost if you reroll.' : '') + (o.foilGift && !o.sold ? ' Ticket foil · base price.' : ''),
-        label, enabled: !o.sold && !full && R.money >= price, sold: o.sold, hi: hi++, onBuy: () => {
-        if (o.sold || full || R.money < price) return;
+        label, enabled: !o.sold && (full ? R.money + maxSell >= price : R.money >= price), sold: o.sold, hi: hi++, onBuy: () => {
+        if (o.sold) return;
+        if (full) { if (R.money + maxSell < price) return; R.shop.swapPick = picking ? null : i; renderShop(); if (!picking) { const ow = $('shop-owned'); ow.scrollIntoView({ block: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' }); } return; }
+        if (R.money < price) return;
         R.money -= price; R.charms.push({ id: o.id, val: 0, foil: !!o.foil }); o.sold = true; o.free = false; Play.buy(o.id, !!o.foil, !!o.ctr);
         Audio.buy('charm'); if (o.foil) setTimeout(() => Audio.foil(-1), 160);   // a shorter foil shimmer after the till
         renderShop(); renderCharms();
@@ -4025,6 +4090,14 @@ table.plates td.n b{font-weight:800}
     }
     $('shop-slots').textContent = R.charms.length + '/' + maxCharms();
     const ow = $('shop-owned'); ow.innerHTML = '';
+    const swapO = R.shop.swapPick != null ? R.shop.charms[R.shop.swapPick] : null;
+    if (swapO && swapO.sold) R.shop.swapPick = null;
+    ow.classList.toggle('swapping', !!(swapO && !swapO.sold));
+    if (swapO && !swapO.sold) {   // v9.1 swap mode: pick the charm to replace (its sell value pays toward the new one)
+      const hd = document.createElement('p'); hd.className = 'swap-hd'; hd.textContent = 'Swap in ' + CHARMS[swapO.id].name + ' ($' + charmPrice(swapO) + '): pick a charm to replace. ';
+      const cx = document.createElement('button'); cx.type = 'button'; cx.className = 'small'; cx.textContent = 'Cancel';
+      cx.addEventListener('click', () => { R.shop.swapPick = null; renderShop(); }); hd.append(cx); ow.append(hd);
+    }
     if (!R.charms.length) { const p = document.createElement('p'); p.className = 'note'; p.textContent = 'You have no charms yet.'; ow.append(p); }
     R.charms.forEach((ch, i) => {
       const d = CHARMS[ch.id];
@@ -4033,6 +4106,17 @@ table.plates td.n b{font-weight:800}
       const ds = document.createElement('span'); ds.textContent = charmDesc(ch);
       const sell = document.createElement('button'); sell.type = 'button'; sell.className = 'small'; sell.textContent = 'Sell $' + sellValue(ch);
       sell.setAttribute('aria-label', 'Sell ' + (ch.foil ? 'foil ' : '') + d.name + ' for $' + sellValue(ch));
+      if (swapO && !swapO.sold) {
+        const price = charmPrice(swapO), ok = R.money + sellValue(ch) >= price;
+        sell.textContent = ok ? 'Swap out' : 'Too cheap'; sell.disabled = !ok; sell.classList.add('swap');
+        sell.setAttribute('aria-label', 'Replace ' + d.name + ' with ' + CHARMS[swapO.id].name);
+        sell.addEventListener('click', () => {
+          if (swapO.sold || R.money + sellValue(ch) < price) return Audio.deny && Audio.deny();
+          R.money += sellValue(ch); R.charms.splice(i, 1); Play.sell(ch.id);
+          R.money -= price; R.charms.push({ id: swapO.id, val: 0, foil: !!swapO.foil }); swapO.sold = true; swapO.free = false; Play.buy(swapO.id, !!swapO.foil, !!swapO.ctr);
+          R.shop.swapPick = null; Audio.buy('charm'); renderShop(); renderCharms();
+        });
+      } else
       sell.addEventListener('click', () => { R.money += sellValue(ch); R.charms.splice(i, 1); Play.sell(ch.id); Audio.sell(); renderShop(); renderCharms(); });
       row.append(nb, sell);
       if (d.live || ch.foil) { const em = document.createElement('em'); em.textContent = (ch.foil ? 'FOIL · ' : '') + (d.live ? d.live(ch) : 'boosted'); row.append(em); }
@@ -5391,14 +5475,16 @@ table.plates td.n b{font-weight:800}
       + (maxed ? ' Money past $' + INTEREST_MAX_AT + ' earns nothing more.' : ' $' + (INTEREST_STEP * (it + 1) - R.money) + ' more raises it to +$' + (it + 1) + '.')));
     // hand plates
     const ps = sec('Hand plates'), tb = el('table', 'rec plates'), hr = el('tr');
-    ['Hand', 'Lv', 'Points × mult', 'Next'].forEach(h => hr.append(el('th', '', h))); tb.append(hr);
+    ['Hand', 'Lv', 'Points × mult', 'Now ≈', 'Next'].forEach(h => hr.append(el('th', '', h))); tb.append(hr);
     for (const t of Object.keys(CLEAR_NAMES)) {
       const lv = R.levels[t], [p, m] = plateAt(t, lv), tr = el('tr'), nx = el('td', 'n');
       const nm = el('td', 'b-hand', CLEAR_NAMES[t]); if (t === 'tspin') nm.append(el('small', '', 'double'));
       nx.append(el('b', '', '$' + upCost(lv)), el('small', '', '+' + RUN_LV[t][0] + ' · +' + lvMultStep(t, lv)));
-      tr.append(nm, el('td', 'n', String(lv)), el('td', 'n', fmt(p) + ' × ' + fmt(m)), nx); tb.append(tr);
+      const est = handEstimate(t === 'tspin' ? 2 : ({ single: 1, double: 2, triple: 3, quad: 4 })[t], t === 'tspin' ? 'full' : null, false, [], true), nw = el('td', 'n');   // v9.1: what it scores now
+      if (est) { nw.append(el('b', '', fmt(est.total))); if (S.target > 0 && (S.status === 'playing' || S.status === 'paused')) nw.append(el('small', '', Math.round(100 * est.total / S.target) + '%' + (R.boss ? ' HP' : ''))); }
+      tr.append(nm, el('td', 'n', String(lv)), el('td', 'n', fmt(p) + ' × ' + fmt(m)), nw, nx); tb.append(tr);
     }
-    ps.append(tb, el('p', 'note', 'Next is the price when the shop offers that upgrade, and what it adds (points · mult). Each line cleared adds 10 points.'));
+    ps.append(tb, el('p', 'note', 'Now is what that clear would score right now with your charms and streak, as a share of the round target (or boss HP); combos add more. Next is the upgrade price and what it adds (points · mult).'));
     // charms: full text, foil text, live value
     const cs = sec('Charms', R.charms.length + '/' + maxCharms());
     if (!R.charms.length) cs.append(el('p', 'note', 'No charms yet. Buy them in the shop between rounds.'));
@@ -5762,7 +5848,7 @@ table.plates td.n b{font-weight:800}
   const fx = { trails: [], lockFlash: null, floaters: [], levelT: 0, goT: 0, flipT: 0, rivet: null, sealT: 0, defeat: null,
     slip: { t: 9, amp: 0 }, voids: [], streaks: [], flick: null, rowFlash: 0, healT: 0, tellT: 0, veilFrom: 0, slowT: 0,
     markT: 0,     // markT: the marked mino's stamp-in on spawn (feel pass)
-    blasts: [], regs: [], stopT: 0, overs: null };   // blasts: splat / knife / ring per fired special; stopT: chain hit-stop; overs: payout counter slip
+    blasts: [], regs: [], stopT: 0, overs: null, splashes: [] };   // splashes: v9.1 halftone ink burst on medium/big hands   // blasts: splat / knife / ring per fired special; stopT: chain hit-stop; overs: payout counter slip
   function resetBossFx() { fx.goT = fx.flipT = fx.sealT = fx.rowFlash = fx.healT = fx.tellT = fx.veilFrom = fx.slowT = 0; fx.rivet = null; fx.defeat = null; fx.flick = null;
     fx.voids = []; fx.streaks = []; goalEl.classList.remove('shatter', 'notch-hot', 'heal'); }
   function sparks(x, y, n, color) {
@@ -5870,6 +5956,8 @@ table.plates td.n b{font-weight:800}
     for (const t of fx.trails) t.life -= dt;
     fx.trails = fx.trails.filter(t => t.life > 0);
     if (fx.lockFlash && (fx.lockFlash.life -= dt) <= 0) fx.lockFlash = null;
+    for (const sp of fx.splashes) sp.t += dt;
+    fx.splashes = fx.splashes.filter(sp => sp.t < sp.dur);
     for (const f of fx.floaters) { f.life -= dt; f.y -= dt * 1.6; }
     fx.floaters = fx.floaters.filter(f => f.life > 0);
     if (fx.levelT > 0) fx.levelT -= dt;
@@ -6337,6 +6425,16 @@ table.plates td.n b{font-weight:800}
         if (c.mk) { const [hx_, hy_] = ROT[c.t][c.r][HEART[c.t]], Y = gy + hy_;
           if (Y >= HIDDEN) { bx.globalAlpha = 0.35; bx.drawImage(markSprite(c.mk, cs), ox + (c.x + hx_) * cs, toY(Y)); } }
       }
+      const gpv = prefs.ghost ? ghostPreview() : null;
+      if (gpv) {   // v9.1 damage preview: a small price tag on the rows the ghost would clear ("DOUBLE ≈ 2,340"; boss: "≈ 2,340 HP", "HELD" past a shield)
+        const txt = (gpv.void ? gpv.name.toUpperCase() + ' · VOID' : gpv.name.toUpperCase() + ' ≈ ' + fmt(gpv.counted) + (R.boss ? ' HP' : '') + (gpv.held ? ' · HELD' : ''));
+        bx.save(); const fs = Math.max(Math.round(10 * dpr), Math.round(cs * 0.4)); bx.font = '800 ' + fs + 'px ' + MONO;
+        const tw = bx.measureText(txt).width, pad = fs * 0.35, w = tw + pad * 2, h = fs * 1.45;
+        const rowY = toY(Math.max(HIDDEN, gpv.top)), y = Math.max(oy + 2, rowY - h - 2), x = Math.min(Math.max(ox + 2, ox + Wd / 2 - w / 2), ox + Wd - w - 2);
+        bx.globalAlpha = 0.92; bx.fillStyle = gpv.void ? C.paper : C.ink; bx.fillRect(x, y, w, h);
+        bx.globalAlpha = 1; bx.fillStyle = gpv.void ? C.redT || C.ink : C.paper; bx.textAlign = 'center'; bx.textBaseline = 'middle'; bx.fillText(txt, x + w / 2, y + h / 2 + 1);
+        bx.restore();
+      }
       const lockFade = S.lockT > 0 ? 1 - 0.35 * Math.min(1, S.lockT / lockDelay()) : 1;
       const cp = new Path2D(), cm = new Path2D();
       bx.globalAlpha = lockFade;
@@ -6384,6 +6482,18 @@ table.plates td.n b{font-weight:800}
         bx.setTransform(co, si, -si, co, X, Y); bx.fillRect(-s / 2, -s * 0.275, s, s * 0.55);
       }
       bx.setTransform(1, 0, 0, 1, 0, 0); bx.globalCompositeOperation = 'source-over'; bx.globalAlpha = 1;
+    }
+    for (const sp of fx.splashes) {   // v9.1: two halftone rings, blue then pink, overprinting (multiply) like a registration burst
+      const p = sp.t / sp.dur, cx0 = ox + Wd / 2, cy0 = toY(sp.y), R0 = cs * (1.5 + p * (sp.big ? 9 : 5)), band = cs * (sp.big ? 2.2 : 1.4), step = Math.max(3, cs * 0.42);
+      bx.save(); bx.beginPath(); bx.rect(ox, oy, Wd, Hd); bx.clip(); bx.globalCompositeOperation = 'multiply';
+      [[C.blue, 0], [C.pink, cs * 0.18]].forEach(([col, off]) => {
+        bx.fillStyle = col; bx.globalAlpha = (1 - p) * (sp.big ? 0.55 : 0.4);
+        for (let yy = cy0 - R0 - band; yy <= cy0 + R0 + band; yy += step) for (let xx = ox + ((yy / step) % 2 ? step / 2 : 0); xx <= ox + Wd; xx += step) {
+          const d = Math.hypot(xx - cx0 - off, yy - cy0 - off), k = 1 - Math.abs(d - R0) / band; if (k <= 0) continue;
+          bx.beginPath(); bx.arc(xx, yy, step * 0.42 * k, 0, 6.283); bx.fill();
+        }
+      });
+      bx.restore(); bx.globalAlpha = 1;
     }
     for (const f of fx.floaters) {
       if (f.y < HIDDEN) continue;
@@ -6816,7 +6926,7 @@ table.plates td.n b{font-weight:800}
   const ui = { score: $('s-score'), level: $('s-level'), lines: $('s-lines'), time: $('s-time'), ppm: $('s-ppm'), best: $('s-best'),
     lTime: $('l-time'), lLines: $('l-lines'), lScore: $('l-score'), lLevel: $('l-level'), lPpm: $('l-ppm'), lBest: $('l-best') };
   const PPM_HTML = ui.lPpm.innerHTML;
-  const goalEl = $('goal'), goalFill = $('g-fill'), goalLag = $('g-lag'), goalPips = $('g-pips'), goalFill2 = $('g-fill2');
+  const goalProj = $('g-proj'), goalEl = $('goal'), goalFill = $('g-fill'), goalLag = $('g-lag'), goalPips = $('g-pips'), goalFill2 = $('g-fill2');
   const goalGlyphs = [...$('g-stars').children]; let goalStars = -1;
   // v9: the bar runs to Gold leaf (STAR_X[3] = 4x): notches at 1x, 1.5x and 2.25x, the gold seal at the right end.
   // v9 polish: a rung ladder, not a linear scale (the 4th rung had pushed the 1-star glyph onto the "400 / 600" text and, in the
@@ -6915,6 +7025,15 @@ table.plates td.n b{font-weight:800}
       const sk = live ? (starQ.length ? Math.min(S.stars, starShown) : S.stars) : 0;   // v9: glyphs light as the staggered stamps land
       if (sk !== goalStars) { goalStars = sk; goalGlyphs.forEach((g, i) => g.classList.toggle('on', i < sk)); }   // the 4th glyph is the gold seal
     }
+    // v9.1 damage preview: the ghost's clear, drawn as a hatched segment ahead of the fill (boss: the HP it would take, shields included)
+    const gp = live && S.target > 0 ? ghostPreview() : null;
+    if (gp && gp.counted > 0) {
+      const T = S.target, at = (f) => f <= 1 ? f * rungs[0] : goalPos(f);
+      let a, b;
+      if (bossBar) { const hp = Math.max(0, T - S.roundScore) / T; b = hp; a = Math.max(0, hp - gp.counted / T); }
+      else { a = at(S.roundScore / T); b = Math.min(1, at((S.roundScore + gp.counted) / T)); }
+      goalProj.style.left = (100 * a).toFixed(2) + '%'; goalProj.style.width = (100 * Math.max(0.006, b - a)).toFixed(2) + '%'; goalProj.hidden = false;
+    } else goalProj.hidden = true;
     goalEl.classList.toggle('done', !bossBar && live && S.target > 0 && (S.stars >= 1 || S.roundScore >= S.target));
     syncBank(live);
     const br = bestFor('run');
